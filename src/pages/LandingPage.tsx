@@ -163,7 +163,7 @@ const LandingPage = () => {
               </Button>
             )}
           </div>
-        </div>
+        </FadeIn>
       </section>
 
       {/* Stats bar */}
