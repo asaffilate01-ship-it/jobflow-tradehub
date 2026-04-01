@@ -193,7 +193,7 @@ const JobsPage = () => {
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {jobs.map((job) => (
-            <div key={job.id} className="glass-card p-5 space-y-3 hover:border-primary/30 transition-colors cursor-pointer">
+            <Link key={job.id} to={`/jobs/${job.id}`} className="glass-card p-5 space-y-3 hover:border-primary/30 transition-colors block">
               <div className="flex items-start justify-between">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary">
                   <Briefcase className="h-4 w-4 text-muted-foreground" />
@@ -231,7 +231,12 @@ const JobsPage = () => {
                   Budget hidden
                 </div>
               )}
-            </div>
+              {isTrade && job.status === "posted" && (
+                <div className="pt-1">
+                  <span className="text-xs text-primary font-medium">Click to view & submit quote →</span>
+                </div>
+              )}
+            </Link>
           ))}
         </div>
       )}
