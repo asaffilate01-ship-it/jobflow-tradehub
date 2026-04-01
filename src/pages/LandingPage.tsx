@@ -88,7 +88,7 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="space-y-0">
+    <div className="space-y-0 overflow-hidden">
       {/* Hero */}
       <section className="relative py-20 sm:py-28 overflow-hidden">
         <div className="absolute inset-0 -z-10" style={{ background: "var(--gradient-hero)" }}>
