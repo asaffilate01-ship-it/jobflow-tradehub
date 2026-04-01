@@ -30,6 +30,7 @@ const AppNav = () => {
     { to: "/basic-cam", label: "BASIC CAM", icon: Camera, show: isTrade || isAdmin },
     { to: "/compliance", label: "Certs", icon: FileCheck, show: isTrade || isAdmin },
     { to: "/deliveries", label: "Deliveries", icon: Truck, show: isTrade || isDriver || isAdmin },
+    { to: "/driver", label: "Driver Hub", icon: Truck, show: isDriver || isAdmin },
     { to: "/subscription", label: "Plans", icon: CreditCard, show: isTrade || isAdmin },
   ].filter((item) => item.show);
 
