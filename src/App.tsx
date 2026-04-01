@@ -23,6 +23,8 @@ import SubscriptionPage from "./pages/SubscriptionPage";
 import MessagesPage from "./pages/MessagesPage";
 import BasicCamPage from "./pages/BasicCamPage";
 import ComplianceCertsPage from "./pages/ComplianceCertsPage";
+import PostJobPage from "./pages/PostJobPage";
+import DriverDashboard from "./pages/DriverDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
