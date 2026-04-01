@@ -14,6 +14,67 @@ export type Database = {
   }
   public: {
     Tables: {
+      change_orders: {
+        Row: {
+          cost_delta: number
+          created_at: string
+          description: string
+          id: string
+          job_id: string
+          proposed_by: string
+          signed_at: string | null
+          signed_by_customer: boolean
+          signed_by_trader: boolean
+          status: string
+        }
+        Insert: {
+          cost_delta?: number
+          created_at?: string
+          description: string
+          id?: string
+          job_id: string
+          proposed_by: string
+          signed_at?: string | null
+          signed_by_customer?: boolean
+          signed_by_trader?: boolean
+          status?: string
+        }
+        Update: {
+          cost_delta?: number
+          created_at?: string
+          description?: string
+          id?: string
+          job_id?: string
+          proposed_by?: string
+          signed_at?: string | null
+          signed_by_customer?: boolean
+          signed_by_trader?: boolean
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "change_orders_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "change_orders_proposed_by_fkey"
+            columns: ["proposed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "change_orders_proposed_by_fkey"
+            columns: ["proposed_by"]
+            isOneToOne: false
+            referencedRelation: "trader_profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chart_of_accounts: {
         Row: {
           category: string
@@ -72,6 +133,83 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "cis_returns_trade_company_id_fkey"
+            columns: ["trade_company_id"]
+            isOneToOne: false
+            referencedRelation: "trade_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compliance_certificates: {
+        Row: {
+          cert_number: string | null
+          cert_type: string
+          created_at: string
+          data: Json
+          expiry_date: string | null
+          id: string
+          issued_by: string | null
+          issued_date: string | null
+          job_id: string
+          pdf_path: string | null
+          status: string
+          trade_company_id: string
+          updated_at: string
+        }
+        Insert: {
+          cert_number?: string | null
+          cert_type: string
+          created_at?: string
+          data?: Json
+          expiry_date?: string | null
+          id?: string
+          issued_by?: string | null
+          issued_date?: string | null
+          job_id: string
+          pdf_path?: string | null
+          status?: string
+          trade_company_id: string
+          updated_at?: string
+        }
+        Update: {
+          cert_number?: string | null
+          cert_type?: string
+          created_at?: string
+          data?: Json
+          expiry_date?: string | null
+          id?: string
+          issued_by?: string | null
+          issued_date?: string | null
+          job_id?: string
+          pdf_path?: string | null
+          status?: string
+          trade_company_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_certificates_issued_by_fkey"
+            columns: ["issued_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_certificates_issued_by_fkey"
+            columns: ["issued_by"]
+            isOneToOne: false
+            referencedRelation: "trader_profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_certificates_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_certificates_trade_company_id_fkey"
             columns: ["trade_company_id"]
             isOneToOne: false
             referencedRelation: "trade_companies"
@@ -676,6 +814,114 @@ export type Database = {
             columns: ["uploaded_by"]
             isOneToOne: false
             referencedRelation: "trader_profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_milestones: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          job_id: string
+          proof_note: string | null
+          sort_order: number
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          job_id: string
+          proof_note?: string | null
+          sort_order?: number
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          job_id?: string
+          proof_note?: string | null
+          sort_order?: number
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_milestones_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_tasks: {
+        Row: {
+          assigned_to: string | null
+          created_at: string
+          description: string | null
+          id: string
+          job_id: string
+          sort_order: number
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          job_id: string
+          sort_order?: number
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          job_id?: string
+          sort_order?: number
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_tasks_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_tasks_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "trader_profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_tasks_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
             referencedColumns: ["id"]
           },
         ]
@@ -1349,6 +1595,64 @@ export type Database = {
             columns: ["trade_company_id"]
             isOneToOne: false
             referencedRelation: "trade_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      snag_items: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          job_id: string
+          photo_path: string | null
+          reported_by: string | null
+          resolved_at: string | null
+          severity: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          job_id: string
+          photo_path?: string | null
+          reported_by?: string | null
+          resolved_at?: string | null
+          severity?: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          job_id?: string
+          photo_path?: string | null
+          reported_by?: string | null
+          resolved_at?: string | null
+          severity?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "snag_items_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "snag_items_reported_by_fkey"
+            columns: ["reported_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "snag_items_reported_by_fkey"
+            columns: ["reported_by"]
+            isOneToOne: false
+            referencedRelation: "trader_profiles_public"
             referencedColumns: ["id"]
           },
         ]
