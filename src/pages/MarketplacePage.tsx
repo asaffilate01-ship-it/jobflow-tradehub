@@ -10,6 +10,7 @@ import {
   Paintbrush, Flame, TreePine, Filter, SlidersHorizontal,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { StaggerContainer, StaggerItem, ScaleOnHover } from "@/components/MotionWrapper";
 
 const tradeCategories = [
   { slug: "all", label: "All trades", icon: SlidersHorizontal },
