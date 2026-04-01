@@ -353,7 +353,7 @@ const LandingPage = () => {
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Button asChild size="lg" className="font-semibold gap-2 h-12 px-8">
-              <Link to={user ? "/jobs" : "/signup"}>
+              <Link to={user ? "/post-job" : "/signup"}>
                 {user ? "Post a job" : "Get started free"}
                 <ArrowRight className="h-4 w-4" />
               </Link>
