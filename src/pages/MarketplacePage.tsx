@@ -50,7 +50,7 @@ const MarketplacePage = () => {
         .eq("is_active", true);
 
       if (category !== "all") {
-        query = query.eq("trade_specialism", category);
+        query = query.eq("trade_specialism", category as any);
       }
 
       const { data } = await query;
