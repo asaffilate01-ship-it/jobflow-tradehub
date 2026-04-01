@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { 
   Briefcase, Package, Truck, Home, Menu, X, Users, LogIn, LogOut, 
-  LayoutDashboard, Building2, Search
+  LayoutDashboard, Building2, Search, MessageCircle, Camera, FileCheck, CreditCard
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -23,10 +23,14 @@ const AppNav = () => {
     { to: "/", label: "Home", icon: Home, show: true },
     { to: "/marketplace", label: "Find Trades", icon: Search, show: true },
     { to: "/jobs", label: "Jobs", icon: Briefcase, show: true },
+    { to: "/messages", label: "Messages", icon: MessageCircle, show: !!user },
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, show: isTrade || isAdmin },
     { to: "/trade-accounts", label: "Accounts", icon: Building2, show: isTrade || isAdmin },
     { to: "/materials", label: "Materials", icon: Package, show: isTrade || isAdmin },
+    { to: "/basic-cam", label: "BASIC CAM", icon: Camera, show: isTrade || isAdmin },
+    { to: "/compliance", label: "Certs", icon: FileCheck, show: isTrade || isAdmin },
     { to: "/deliveries", label: "Deliveries", icon: Truck, show: isTrade || isDriver || isAdmin },
+    { to: "/subscription", label: "Plans", icon: CreditCard, show: isTrade || isAdmin },
   ].filter((item) => item.show);
 
   return (
