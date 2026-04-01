@@ -55,6 +55,11 @@ const App = () => (
 
               {/* Jobs */}
               <Route path="/jobs" element={<JobsPage />} />
+              <Route path="/post-job" element={
+                <ProtectedRoute>
+                  <PostJobPage />
+                </ProtectedRoute>
+              } />
               <Route path="/jobs/:id" element={<JobDetailPage />} />
               <Route path="/jobs/:jobId/quote" element={
                 <ProtectedRoute allowedRoles={["trade", "admin"]}>
