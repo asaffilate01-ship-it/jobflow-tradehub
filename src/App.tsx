@@ -114,6 +114,13 @@ const App = () => (
                   <DeliveriesPage />
                 </ProtectedRoute>
               } />
+
+              {/* Driver dashboard */}
+              <Route path="/driver" element={
+                <ProtectedRoute allowedRoles={["driver", "admin"]}>
+                  <DriverDashboard />
+                </ProtectedRoute>
+              } />
             </Route>
 
             <Route path="*" element={<NotFound />} />
