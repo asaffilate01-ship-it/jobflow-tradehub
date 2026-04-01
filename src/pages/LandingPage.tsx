@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
+import { motion } from "framer-motion";
+import { FadeIn, StaggerContainer, StaggerItem, ScaleOnHover } from "@/components/MotionWrapper";
 
 const tradeCategories = [
   { label: "Plumber", slug: "plumber", icon: Wrench },
@@ -86,7 +88,7 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="space-y-0">
+    <div className="space-y-0 overflow-hidden">
       {/* Hero */}
       <section className="relative py-20 sm:py-28 overflow-hidden">
         <div className="absolute inset-0 -z-10" style={{ background: "var(--gradient-hero)" }}>
@@ -94,9 +96,9 @@ const LandingPage = () => {
           <div className="absolute bottom-10 right-1/3 h-72 w-72 rounded-full bg-accent/8 blur-[140px]" />
         </div>
 
-        <div className="max-w-5xl mx-auto text-center space-y-8 px-4">
+        <FadeIn className="max-w-5xl mx-auto text-center space-y-8 px-4">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse-glow" />
+            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
             Trusted by thousands across the UK
           </div>
 
@@ -161,7 +163,7 @@ const LandingPage = () => {
               </Button>
             )}
           </div>
-        </div>
+        </FadeIn>
       </section>
 
       {/* Stats bar */}
@@ -186,22 +188,25 @@ const LandingPage = () => {
         <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl font-bold text-center mb-2">Browse by trade</h2>
           <p className="text-muted-foreground text-center mb-10">Find the right specialist for your project</p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          <StaggerContainer className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
             {tradeCategories.map(({ label, slug, icon: Icon }) => (
-              <Link
-                key={slug}
-                to={`/marketplace?category=${slug}`}
-                className="glass-card p-5 text-center hover:border-primary/40 hover:bg-primary/5 transition-all group"
-              >
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mx-auto mb-3 group-hover:bg-primary/20 transition-colors">
-                  <Icon className="h-6 w-6 text-primary" />
-                </div>
-                <div className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
-                  {label}
-                </div>
-              </Link>
+              <StaggerItem key={slug}>
+                <ScaleOnHover>
+                  <Link
+                    to={`/marketplace?category=${slug}`}
+                    className="glass-card p-5 text-center hover:border-primary/40 hover:bg-primary/5 transition-all group block"
+                  >
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mx-auto mb-3 group-hover:bg-primary/20 transition-colors">
+                      <Icon className="h-6 w-6 text-primary" />
+                    </div>
+                    <div className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                      {label}
+                    </div>
+                  </Link>
+                </ScaleOnHover>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 
@@ -348,7 +353,7 @@ const LandingPage = () => {
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Button asChild size="lg" className="font-semibold gap-2 h-12 px-8">
-              <Link to={user ? "/jobs" : "/signup"}>
+              <Link to={user ? "/post-job" : "/signup"}>
                 {user ? "Post a job" : "Get started free"}
                 <ArrowRight className="h-4 w-4" />
               </Link>

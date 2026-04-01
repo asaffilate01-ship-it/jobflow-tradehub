@@ -10,6 +10,7 @@ import {
   Paintbrush, Flame, TreePine, Filter, SlidersHorizontal,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { StaggerContainer, StaggerItem, ScaleOnHover } from "@/components/MotionWrapper";
 
 const tradeCategories = [
   { slug: "all", label: "All trades", icon: SlidersHorizontal },
@@ -183,13 +184,14 @@ const MarketplacePage = () => {
           )}
         </div>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <StaggerContainer className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered.map((trader) => (
-            <Link
-              key={trader.id}
-              to={`/trader/${trader.id}`}
-              className="glass-card overflow-hidden hover:border-primary/30 hover:shadow-lg transition-all group"
-            >
+            <StaggerItem key={trader.id}>
+              <ScaleOnHover>
+                <Link
+                  to={`/trader/${trader.id}`}
+                  className="glass-card overflow-hidden hover:border-primary/30 hover:shadow-lg transition-all group block"
+                >
               {/* Cover */}
               <div className="h-24 bg-gradient-to-br from-primary/20 via-accent/10 to-secondary relative">
                 {trader.cover_image_url && (
@@ -262,9 +264,11 @@ const MarketplacePage = () => {
                   </div>
                 )}
               </div>
-            </Link>
+                </Link>
+              </ScaleOnHover>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       )}
     </div>
   );

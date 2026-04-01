@@ -23,6 +23,8 @@ import SubscriptionPage from "./pages/SubscriptionPage";
 import MessagesPage from "./pages/MessagesPage";
 import BasicCamPage from "./pages/BasicCamPage";
 import ComplianceCertsPage from "./pages/ComplianceCertsPage";
+import PostJobPage from "./pages/PostJobPage";
+import DriverDashboard from "./pages/DriverDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -53,6 +55,11 @@ const App = () => (
 
               {/* Jobs */}
               <Route path="/jobs" element={<JobsPage />} />
+              <Route path="/post-job" element={
+                <ProtectedRoute>
+                  <PostJobPage />
+                </ProtectedRoute>
+              } />
               <Route path="/jobs/:id" element={<JobDetailPage />} />
               <Route path="/jobs/:jobId/quote" element={
                 <ProtectedRoute allowedRoles={["trade", "admin"]}>
@@ -105,6 +112,13 @@ const App = () => (
               <Route path="/deliveries" element={
                 <ProtectedRoute allowedRoles={["trade", "driver", "admin"]}>
                   <DeliveriesPage />
+                </ProtectedRoute>
+              } />
+
+              {/* Driver dashboard */}
+              <Route path="/driver" element={
+                <ProtectedRoute allowedRoles={["driver", "admin"]}>
+                  <DriverDashboard />
                 </ProtectedRoute>
               } />
             </Route>
