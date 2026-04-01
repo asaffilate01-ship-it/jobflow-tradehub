@@ -268,6 +268,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "delivery_events_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "trader_profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "delivery_events_delivery_id_fkey"
             columns: ["delivery_id"]
             isOneToOne: false
@@ -384,6 +391,13 @@ export type Database = {
             columns: ["profile_id"]
             isOneToOne: true
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driver_profiles_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "trader_profiles_public"
             referencedColumns: ["id"]
           },
         ]
@@ -657,6 +671,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "job_media_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "trader_profiles_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       jobs: {
@@ -717,6 +738,13 @@ export type Database = {
             columns: ["customer_profile_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jobs_customer_profile_id_fkey"
+            columns: ["customer_profile_id"]
+            isOneToOne: false
+            referencedRelation: "trader_profiles_public"
             referencedColumns: ["id"]
           },
           {
@@ -842,6 +870,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "material_orders_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "trader_profiles_public"
             referencedColumns: ["id"]
           },
           {
@@ -1166,6 +1201,7 @@ export type Database = {
       profiles: {
         Row: {
           company_name: string | null
+          cover_image_url: string | null
           created_at: string
           email: string | null
           full_name: string
@@ -1173,11 +1209,18 @@ export type Database = {
           is_active: boolean
           phone: string | null
           rating: number | null
+          service_radius_miles: number | null
+          services_description: string | null
+          trade_bodies: string[] | null
           trade_specialism: Database["public"]["Enums"]["trade_type"] | null
           updated_at: string
+          verified: boolean | null
+          website_url: string | null
+          years_experience: number | null
         }
         Insert: {
           company_name?: string | null
+          cover_image_url?: string | null
           created_at?: string
           email?: string | null
           full_name?: string
@@ -1185,11 +1228,18 @@ export type Database = {
           is_active?: boolean
           phone?: string | null
           rating?: number | null
+          service_radius_miles?: number | null
+          services_description?: string | null
+          trade_bodies?: string[] | null
           trade_specialism?: Database["public"]["Enums"]["trade_type"] | null
           updated_at?: string
+          verified?: boolean | null
+          website_url?: string | null
+          years_experience?: number | null
         }
         Update: {
           company_name?: string | null
+          cover_image_url?: string | null
           created_at?: string
           email?: string | null
           full_name?: string
@@ -1197,8 +1247,14 @@ export type Database = {
           is_active?: boolean
           phone?: string | null
           rating?: number | null
+          service_radius_miles?: number | null
+          services_description?: string | null
+          trade_bodies?: string[] | null
           trade_specialism?: Database["public"]["Enums"]["trade_type"] | null
           updated_at?: string
+          verified?: boolean | null
+          website_url?: string | null
+          years_experience?: number | null
         }
         Relationships: []
       }
@@ -1557,6 +1613,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "trade_companies_owner_profile_id_fkey"
+            columns: ["owner_profile_id"]
+            isOneToOne: false
+            referencedRelation: "trader_profiles_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_roles: {
@@ -1603,7 +1666,54 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      trader_profiles_public: {
+        Row: {
+          company_name: string | null
+          cover_image_url: string | null
+          created_at: string | null
+          full_name: string | null
+          id: string | null
+          rating: number | null
+          service_radius_miles: number | null
+          services_description: string | null
+          trade_bodies: string[] | null
+          trade_specialism: Database["public"]["Enums"]["trade_type"] | null
+          verified: boolean | null
+          website_url: string | null
+          years_experience: number | null
+        }
+        Insert: {
+          company_name?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string | null
+          rating?: number | null
+          service_radius_miles?: number | null
+          services_description?: string | null
+          trade_bodies?: string[] | null
+          trade_specialism?: Database["public"]["Enums"]["trade_type"] | null
+          verified?: boolean | null
+          website_url?: string | null
+          years_experience?: number | null
+        }
+        Update: {
+          company_name?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string | null
+          rating?: number | null
+          service_radius_miles?: number | null
+          services_description?: string | null
+          trade_bodies?: string[] | null
+          trade_specialism?: Database["public"]["Enums"]["trade_type"] | null
+          verified?: boolean | null
+          website_url?: string | null
+          years_experience?: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
