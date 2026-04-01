@@ -96,9 +96,9 @@ const LandingPage = () => {
           <div className="absolute bottom-10 right-1/3 h-72 w-72 rounded-full bg-accent/8 blur-[140px]" />
         </div>
 
-        <div className="max-w-5xl mx-auto text-center space-y-8 px-4">
+        <FadeIn className="max-w-5xl mx-auto text-center space-y-8 px-4">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse-glow" />
+            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
             Trusted by thousands across the UK
           </div>
 
