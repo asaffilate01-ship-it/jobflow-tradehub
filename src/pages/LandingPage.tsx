@@ -188,22 +188,25 @@ const LandingPage = () => {
         <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl font-bold text-center mb-2">Browse by trade</h2>
           <p className="text-muted-foreground text-center mb-10">Find the right specialist for your project</p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          <StaggerContainer className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
             {tradeCategories.map(({ label, slug, icon: Icon }) => (
-              <Link
-                key={slug}
-                to={`/marketplace?category=${slug}`}
-                className="glass-card p-5 text-center hover:border-primary/40 hover:bg-primary/5 transition-all group"
-              >
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mx-auto mb-3 group-hover:bg-primary/20 transition-colors">
-                  <Icon className="h-6 w-6 text-primary" />
-                </div>
-                <div className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
-                  {label}
-                </div>
-              </Link>
+              <StaggerItem key={slug}>
+                <ScaleOnHover>
+                  <Link
+                    to={`/marketplace?category=${slug}`}
+                    className="glass-card p-5 text-center hover:border-primary/40 hover:bg-primary/5 transition-all group block"
+                  >
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mx-auto mb-3 group-hover:bg-primary/20 transition-colors">
+                      <Icon className="h-6 w-6 text-primary" />
+                    </div>
+                    <div className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                      {label}
+                    </div>
+                  </Link>
+                </ScaleOnHover>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 
