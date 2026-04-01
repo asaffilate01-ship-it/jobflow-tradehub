@@ -264,9 +264,11 @@ const MarketplacePage = () => {
                   </div>
                 )}
               </div>
-            </Link>
+                </Link>
+              </ScaleOnHover>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       )}
     </div>
   );
