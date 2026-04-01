@@ -19,6 +19,10 @@ import TradeAccountsPage from "./pages/TradeAccountsPage";
 import ProfileSetupPage from "./pages/ProfileSetupPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import SubscriptionPage from "./pages/SubscriptionPage";
+import MessagesPage from "./pages/MessagesPage";
+import BasicCamPage from "./pages/BasicCamPage";
+import ComplianceCertsPage from "./pages/ComplianceCertsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -56,6 +60,20 @@ const App = () => (
                 </ProtectedRoute>
               } />
 
+              {/* Subscription */}
+              <Route path="/subscription" element={
+                <ProtectedRoute>
+                  <SubscriptionPage />
+                </ProtectedRoute>
+              } />
+
+              {/* Messages — any authenticated user */}
+              <Route path="/messages" element={
+                <ProtectedRoute>
+                  <MessagesPage />
+                </ProtectedRoute>
+              } />
+
               {/* Trade-only pages */}
               <Route path="/dashboard" element={
                 <ProtectedRoute allowedRoles={["trade", "admin"]}>
@@ -70,6 +88,16 @@ const App = () => (
               <Route path="/materials" element={
                 <ProtectedRoute allowedRoles={["trade", "admin"]}>
                   <MaterialsPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/basic-cam" element={
+                <ProtectedRoute allowedRoles={["trade", "admin"]}>
+                  <BasicCamPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/compliance" element={
+                <ProtectedRoute allowedRoles={["trade", "admin"]}>
+                  <ComplianceCertsPage />
                 </ProtectedRoute>
               } />
 
