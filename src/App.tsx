@@ -8,6 +8,8 @@ import AppLayout from "./components/AppLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
 import JobsPage from "./pages/JobsPage";
+import JobDetailPage from "./pages/JobDetailPage";
+import SubmitQuotePage from "./pages/SubmitQuotePage";
 import MaterialsPage from "./pages/MaterialsPage";
 import DeliveriesPage from "./pages/DeliveriesPage";
 import MarketplacePage from "./pages/MarketplacePage";
@@ -45,8 +47,14 @@ const App = () => (
               <Route path="/marketplace" element={<MarketplacePage />} />
               <Route path="/trader/:id" element={<TraderProfilePage />} />
 
-              {/* Jobs — viewable by all, posting gated */}
+              {/* Jobs */}
               <Route path="/jobs" element={<JobsPage />} />
+              <Route path="/jobs/:id" element={<JobDetailPage />} />
+              <Route path="/jobs/:jobId/quote" element={
+                <ProtectedRoute allowedRoles={["trade", "admin"]}>
+                  <SubmitQuotePage />
+                </ProtectedRoute>
+              } />
 
               {/* Trade-only pages */}
               <Route path="/dashboard" element={
