@@ -259,6 +259,7 @@ const JobDetailPage = () => {
               </Button>
             )}
           </div>
+        </div>
         {job.description && <p className="text-sm text-muted-foreground">{job.description}</p>}
         {(job.budget_min || job.budget_max) && (
           <div className="text-sm font-medium text-primary">
