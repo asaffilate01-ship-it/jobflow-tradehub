@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
+import { motion } from "framer-motion";
+import { FadeIn, StaggerContainer, StaggerItem, ScaleOnHover } from "@/components/MotionWrapper";
 
 const tradeCategories = [
   { label: "Plumber", slug: "plumber", icon: Wrench },
