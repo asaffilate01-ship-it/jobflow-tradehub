@@ -251,8 +251,14 @@ const JobDetailPage = () => {
               <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{job.city}, {job.postcode}</span>
             </div>
           </div>
-          <Badge variant="outline" className={statusColor[job.status] ?? ""}>{job.status}</Badge>
-        </div>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className={statusColor[job.status] ?? ""}>{job.status}</Badge>
+            {isTrade && (job.status === "posted" || job.status === "quoted") && (
+              <Button asChild size="sm" className="gap-1 font-semibold">
+                <Link to={`/jobs/${id}/quote`}><FileText className="h-3.5 w-3.5" />Submit quote</Link>
+              </Button>
+            )}
+          </div>
         {job.description && <p className="text-sm text-muted-foreground">{job.description}</p>}
         {(job.budget_min || job.budget_max) && (
           <div className="text-sm font-medium text-primary">
