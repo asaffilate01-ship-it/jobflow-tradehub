@@ -57,23 +57,11 @@ const MarketplacePage = () => {
   useEffect(() => {
     const fetchTraders = async () => {
       setLoading(true);
-      const { data: tradeRoles } = await supabase
-        .from("user_roles")
-        .select("user_id")
-        .eq("role", "trade");
-
-      if (!tradeRoles?.length) {
-        setTraders([]);
-        setLoading(false);
-        return;
-      }
-
-      const tradeUserIds = tradeRoles.map((r) => r.user_id);
       let query = supabase
         .from("profiles")
         .select("id, full_name, company_name, trade_specialism, rating, services_description, service_radius_miles, years_experience, trade_bodies, verified, cover_image_url")
-        .in("id", tradeUserIds)
-        .eq("is_active", true);
+        .eq("is_active", true)
+        .not("trade_specialism", "is", null);
 
       if (category !== "all") {
         query = query.eq("trade_specialism", category as any);
