@@ -3,45 +3,58 @@ import { useAuth } from "@/contexts/AuthContext";
 import { NavLink } from "@/components/NavLink";
 import {
   LayoutDashboard, Briefcase, Package, Camera, FileCheck,
-  Building2, Truck, CreditCard, MessageCircle, LogOut, ChevronLeft,
-  Menu, Wrench, Radio, Shield,
+  Building2, Truck, CreditCard, MessageCircle, LogOut,
+  Wrench, Radio, Shield,
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
   SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
-  SidebarProvider, SidebarTrigger, useSidebar,
+  SidebarProvider, SidebarTrigger,  useSidebar,
 } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-const traderNavItems = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/jobs", label: "Jobs", icon: Briefcase },
-  { to: "/materials", label: "Materials", icon: Package },
-  { to: "/site-evidence", label: "Site Evidence", icon: Camera },
-  { to: "/compliance", label: "Certificates", icon: FileCheck },
-  { to: "/trade-accounts", label: "Trade Accounts", icon: Building2 },
-  { to: "/deliveries", label: "Deliveries", icon: Truck },
-  { to: "/messages", label: "Messages", icon: MessageCircle },
-  { to: "/broadcasts", label: "Broadcasts", icon: Radio },
-  { to: "/kyc-upload", label: "Verification", icon: Shield },
-  { to: "/subscription", label: "Subscription", icon: CreditCard },
+const navGroups = [
+  {
+    label: "Overview",
+    items: [
+      { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { to: "/jobs", label: "Jobs", icon: Briefcase },
+      { to: "/messages", label: "Messages", icon: MessageCircle },
+    ],
+  },
+  {
+    label: "Operations",
+    items: [
+      { to: "/materials", label: "Materials", icon: Package },
+      { to: "/site-evidence", label: "Site Evidence", icon: Camera },
+      { to: "/compliance", label: "Certificates", icon: FileCheck },
+      { to: "/deliveries", label: "Deliveries", icon: Truck },
+    ],
+  },
+  {
+    label: "Account",
+    items: [
+      { to: "/trade-accounts", label: "Trade Accounts", icon: Building2 },
+      { to: "/broadcasts", label: "Broadcasts", icon: Radio },
+      { to: "/kyc-upload", label: "Verification", icon: Shield },
+      { to: "/subscription", label: "Subscription", icon: CreditCard },
+    ],
+  },
 ];
 
-// Mobile bottom nav - only show the most important items
+// Flat list for mobile bottom nav — only the most used
 const mobileNavItems = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/dashboard", label: "Home", icon: LayoutDashboard },
   { to: "/jobs", label: "Jobs", icon: Briefcase },
-  { to: "/materials", label: "Materials", icon: Package },
   { to: "/site-evidence", label: "Evidence", icon: Camera },
   { to: "/messages", label: "Messages", icon: MessageCircle },
+  { to: "/materials", label: "Materials", icon: Package },
 ];
 
 function TraderSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  const location = useLocation();
   const { signOut } = useAuth();
 
   return (
@@ -59,28 +72,30 @@ function TraderSidebar() {
           )}
         </div>
 
-        <SidebarGroup>
-          <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>Navigation</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {traderNavItems.map((item) => (
-                <SidebarMenuItem key={item.to}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.to}
-                      end
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
-                      activeClassName="bg-primary/10 text-primary border-l-2 border-primary"
-                    >
-                      <item.icon className="h-4.5 w-4.5 shrink-0" />
-                      {!collapsed && <span>{item.label}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {navGroups.map((group) => (
+          <SidebarGroup key={group.label}>
+            <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>{group.label}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.items.map((item) => (
+                  <SidebarMenuItem key={item.to}>
+                    <SidebarMenuButton asChild>
+                      <NavLink
+                        to={item.to}
+                        end={item.to === "/dashboard"}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
+                        activeClassName="bg-primary/10 text-primary border-l-2 border-primary"
+                      >
+                        <item.icon className="h-4.5 w-4.5 shrink-0" />
+                        {!collapsed && <span>{item.label}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
 
         {/* Sign out at bottom */}
         <div className="mt-auto p-4">
@@ -101,10 +116,10 @@ function MobileBottomNav() {
   const location = useLocation();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-xl md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-xl md:hidden safe-area-bottom">
       <div className="flex items-center justify-around h-16 px-1">
         {mobileNavItems.map((item) => {
-          const active = location.pathname === item.to;
+          const active = location.pathname === item.to || location.pathname.startsWith(item.to + "/");
           return (
             <NavLink
               key={item.to}
