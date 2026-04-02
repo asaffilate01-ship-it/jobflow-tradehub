@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { NavLink } from "@/components/NavLink";
 import {
   LayoutDashboard, Users, Shield, BarChart3, UserCheck,
-  DollarSign, Settings, LogOut, Radio, CreditCard,
+  DollarSign, LogOut, Radio,
 } from "lucide-react";
 import traderosLogo from "@/assets/traderos-logo.png";
 import NotificationBell from "@/components/NotificationBell";
@@ -29,14 +29,12 @@ const navGroups = [
     items: [
       { to: "/admin/agents", label: "Agent Oversight", icon: UserCheck },
       { to: "/admin/commissions", label: "Commissions", icon: DollarSign },
-      { to: "/admin/rate-cards", label: "Rate Cards", icon: CreditCard },
     ],
   },
   {
     label: "Comms",
     items: [
       { to: "/admin/broadcasts", label: "Broadcasts", icon: Radio },
-      { to: "/admin/settings", label: "Settings", icon: Settings },
     ],
   },
 ];

@@ -83,31 +83,7 @@ const App = () => (
               </ProtectedRoute>
             } />
 
-            {/* Public / Customer layout (top nav) */}
-            <Route element={<AppLayout />}>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/marketplace" element={<MarketplacePage />} />
-              <Route path="/trader/:id" element={<TraderProfilePage />} />
-              <Route path="/jobs" element={<JobsPage />} />
-              <Route path="/post-job" element={
-                <ProtectedRoute>
-                  <PostJobPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/jobs/:id" element={<JobDetailPage />} />
-              <Route path="/my-projects" element={
-                <ProtectedRoute allowedRoles={["customer", "admin"]}>
-                  <CustomerPortalPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/jobs/:jobId/quote" element={
-                <ProtectedRoute allowedRoles={["trade", "admin"]}>
-                  <SubmitQuotePage />
-                </ProtectedRoute>
-              } />
-            </Route>
-
-            {/* Trader layout (sidebar desktop, bottom nav mobile) */}
+            {/* Trader layout (sidebar desktop, bottom nav mobile) — BEFORE AppLayout so authenticated traders match first */}
             <Route element={
               <ProtectedRoute allowedRoles={["trade", "admin", "staff"]}>
                 <KycGate>
@@ -116,6 +92,9 @@ const App = () => (
               </ProtectedRoute>
             }>
               <Route path="/dashboard" element={<TraderDashboard />} />
+              <Route path="/jobs" element={<JobsPage />} />
+              <Route path="/jobs/:id" element={<JobDetailPage />} />
+              <Route path="/jobs/:jobId/quote" element={<SubmitQuotePage />} />
               <Route path="/trade-accounts" element={<TradeAccountsPage />} />
               <Route path="/materials" element={<MaterialsPage />} />
               <Route path="/smart-order" element={<SmartOrderPage />} />
@@ -133,6 +112,25 @@ const App = () => (
               <Route path="/daily-logs/:jobId" element={<DailyLogsPage />} />
               <Route path="/orders/:orderId/receipt" element={<OrderReceiptPage />} />
               <Route path="/accounting" element={<AccountingPage />} />
+            </Route>
+
+            {/* Public / Customer layout (top nav) */}
+            <Route element={<AppLayout />}>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/marketplace" element={<MarketplacePage />} />
+              <Route path="/trader/:id" element={<TraderProfilePage />} />
+              <Route path="/jobs" element={<JobsPage />} />
+              <Route path="/post-job" element={
+                <ProtectedRoute>
+                  <PostJobPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/jobs/:id" element={<JobDetailPage />} />
+              <Route path="/my-projects" element={
+                <ProtectedRoute allowedRoles={["customer", "admin"]}>
+                  <CustomerPortalPage />
+                </ProtectedRoute>
+              } />
             </Route>
 
             {/* Admin layout */}
@@ -159,6 +157,7 @@ const App = () => (
               </ProtectedRoute>
             }>
               <Route path="/driver" element={<DriverDashboard />} />
+              <Route path="/driver/deliveries" element={<DeliveriesPage />} />
               <Route path="/driver/broadcasts" element={<BroadcastsPage />} />
               <Route path="/driver/kyc-upload" element={<KycUploadPage />} />
               <Route path="/driver/orders/:orderId/receipt" element={<OrderReceiptPage />} />
