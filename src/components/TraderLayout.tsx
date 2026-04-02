@@ -4,7 +4,7 @@ import { NavLink } from "@/components/NavLink";
 import {
   LayoutDashboard, Briefcase, Package, Camera, FileCheck,
   Building2, Truck, CreditCard, MessageCircle, LogOut,
-  Radio, Shield, Calendar, CalendarDays, Zap,
+  Radio, Shield, Calendar, CalendarDays, Zap, Calculator,
 } from "lucide-react";
 import traderosLogo from "@/assets/traderos-logo.png";
 import NotificationBell from "@/components/NotificationBell";
