@@ -85,7 +85,7 @@ const MarketplacePage = () => {
   const activeCat = tradeCategories.find((c) => c.slug === category);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 page-enter">
       {/* Hero header */}
       <div className="glass-card-elevated p-8 sm:p-10 relative overflow-hidden">
         <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
