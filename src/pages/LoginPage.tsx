@@ -119,8 +119,8 @@ const LoginPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="glass-card p-8 w-full max-w-md space-y-6">
         <div className="flex flex-col items-center gap-3">
-          <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-${config.color}/10`}>
-            <Icon className={`h-6 w-6 text-${config.color}`} />
+          <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${config.iconBg}`}>
+            <Icon className={`h-6 w-6 ${config.iconText}`} />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">{config.title}</h1>
           <p className="text-sm text-muted-foreground">{config.subtitle}</p>
