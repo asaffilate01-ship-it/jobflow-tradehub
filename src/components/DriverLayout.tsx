@@ -35,7 +35,7 @@ function DriverSidebar() {
     <Sidebar collapsible="icon" className="border-r border-border bg-card">
       <SidebarContent className="pt-4">
         <div className={`px-4 mb-6 flex items-center ${collapsed ? "justify-center" : ""}`}>
-          <img src={traderosLogo} alt="TraderOS" className={collapsed ? "h-8" : "h-9"} />
+          <img src={traderosLogo} alt="TraderOS" className={`${collapsed ? "h-8" : "h-9"} [filter:brightness(0)_invert(1)]`} />
         </div>
 
         <SidebarGroup>
