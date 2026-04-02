@@ -109,8 +109,9 @@ const EvidenceCameraPage = () => {
     ctx.fillText(`🕐 ${timestamp}`, 20, canvas.height - barH + 75);
     ctx.font = "28px -apple-system, sans-serif";
     ctx.fillStyle = "#e0e0e0";
+    const phaseLabel = EVIDENCE_PHASES.find((p) => p.value === phase)?.label ?? phase;
     const folderLabel = EVIDENCE_SUBFOLDERS.find((p) => p.value === subfolder)?.label ?? subfolder;
-    ctx.fillText(`${folderLabel} | ${element || "General"} | ${location || ""}`, 20, canvas.height - barH + 115);
+    ctx.fillText(`${phaseLabel} › ${folderLabel} | ${element || "General"} | ${location || ""}`, 20, canvas.height - barH + 115);
 
     // Top bar - job title
     if (jobTitle) {
