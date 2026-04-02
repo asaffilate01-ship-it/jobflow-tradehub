@@ -8,7 +8,7 @@ import {
   ArrowLeft, Camera as CameraIcon, Flashlight, FlashlightOff, SwitchCamera,
   MapPin, Clock, FolderOpen, Loader2, Type, X,
 } from "lucide-react";
-import { EVIDENCE_SUBFOLDERS, EVIDENCE_LOCATIONS, EVIDENCE_SURVEY_TYPES } from "@/lib/evidence-constants";
+import { EVIDENCE_PHASES, EVIDENCE_SUBFOLDERS, EVIDENCE_LOCATIONS, EVIDENCE_SURVEY_TYPES } from "@/lib/evidence-constants";
 
 const EvidenceCameraPage = () => {
   const navigate = useNavigate();
@@ -25,6 +25,7 @@ const EvidenceCameraPage = () => {
   const [uploading, setUploading] = useState(false);
   const [captureCount, setCaptureCount] = useState(0);
 
+  const [phase, setPhase] = useState<string>(EVIDENCE_PHASES[0].value);
   const [subfolder, setSubfolder] = useState<string>(EVIDENCE_SUBFOLDERS[0].value);
   const [location, setLocation] = useState("");
   const [element, setElement] = useState("");
@@ -108,8 +109,9 @@ const EvidenceCameraPage = () => {
     ctx.fillText(`🕐 ${timestamp}`, 20, canvas.height - barH + 75);
     ctx.font = "28px -apple-system, sans-serif";
     ctx.fillStyle = "#e0e0e0";
+    const phaseLabel = EVIDENCE_PHASES.find((p) => p.value === phase)?.label ?? phase;
     const folderLabel = EVIDENCE_SUBFOLDERS.find((p) => p.value === subfolder)?.label ?? subfolder;
-    ctx.fillText(`${folderLabel} | ${element || "General"} | ${location || ""}`, 20, canvas.height - barH + 115);
+    ctx.fillText(`${phaseLabel} › ${folderLabel} | ${element || "General"} | ${location || ""}`, 20, canvas.height - barH + 115);
 
     // Top bar - job title
     if (jobTitle) {
@@ -142,7 +144,7 @@ const EvidenceCameraPage = () => {
     canvas.toBlob(async (blob) => {
       if (!blob) { setUploading(false); return; }
 
-      const fileName = `${jobId}/${subfolder}/${Date.now()}.jpg`;
+      const fileName = `${jobId}/${phase}/${subfolder}/${Date.now()}.jpg`;
       const { error: uploadErr } = await supabase.storage
         .from("job-evidence")
         .upload(fileName, blob, { contentType: "image/jpeg" });
@@ -219,10 +221,10 @@ const EvidenceCameraPage = () => {
           <div className="rounded-lg px-2.5 py-1 bg-black/40 backdrop-blur-sm inline-flex items-center gap-1 text-[10px] text-white">
             <Clock className="w-2.5 h-2.5" /> {timestamp}
           </div>
-          {(subfolder || element) && (
+          {(phase || subfolder || element) && (
             <div className="rounded-lg px-2.5 py-1 bg-black/40 backdrop-blur-sm inline-flex items-center gap-1.5 text-[10px] text-white">
               <FolderOpen className="w-2.5 h-2.5" />
-              {EVIDENCE_SUBFOLDERS.find((p) => p.value === subfolder)?.label} {element && `› ${element}`}
+              {EVIDENCE_PHASES.find((p) => p.value === phase)?.label} › {EVIDENCE_SUBFOLDERS.find((p) => p.value === subfolder)?.label} {element && `› ${element}`}
             </div>
           )}
           {notes && (
@@ -247,6 +249,9 @@ const EvidenceCameraPage = () => {
       <div className="bg-black/90 backdrop-blur-xl border-t border-white/10 safe-area-bottom">
         {/* Selectors row */}
         <div className="flex gap-2 px-3 pt-3 pb-2 overflow-x-auto">
+          <select className={selectClass} value={phase} onChange={(e) => setPhase(e.target.value)}>
+            {EVIDENCE_PHASES.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
+          </select>
           <select className={selectClass} value={subfolder} onChange={(e) => { setSubfolder(e.target.value); setElement(""); }}>
             {EVIDENCE_SUBFOLDERS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
           </select>

@@ -10,7 +10,7 @@ import {
   Camera, Upload, FolderOpen, Image, Video, ChevronRight, Loader2,
   ArrowLeft, Download,
 } from "lucide-react";
-import { EVIDENCE_SUBFOLDERS } from "@/lib/evidence-constants";
+import { EVIDENCE_PHASES, EVIDENCE_SUBFOLDERS } from "@/lib/evidence-constants";
 
 type MediaItem = {
   id: string;
@@ -57,12 +57,19 @@ const SiteEvidenceProjectPage = () => {
     return () => { supabase.removeChannel(channel); };
   }, [user, jobId]);
 
-  // Count media per phase
+  // Count media per phase and per phase/subfolder
   const phaseCounts: Record<string, number> = {};
+  const subfolderCounts: Record<string, Record<string, number>> = {};
   media.forEach((m) => {
     const pathParts = m.storage_path.split("/");
+    // path: {jobId}/{phase}/{subfolder}/{file} or legacy {jobId}/{phase}/{file}
     const phase = pathParts.length >= 2 ? pathParts[1] : "other";
+    const sub = pathParts.length >= 4 ? pathParts[2] : "";
     phaseCounts[phase] = (phaseCounts[phase] || 0) + 1;
+    if (sub) {
+      if (!subfolderCounts[phase]) subfolderCounts[phase] = {};
+      subfolderCounts[phase][sub] = (subfolderCounts[phase][sub] || 0) + 1;
+    }
   });
 
   const imageCount = media.filter((m) => m.media_type === "photo").length;
@@ -190,30 +197,61 @@ const SiteEvidenceProjectPage = () => {
         </motion.button>
 
         {/* Phase folders */}
-        {EVIDENCE_SUBFOLDERS.map((folder, i) => {
-          const count = phaseCounts[folder.value] || 0;
+        {EVIDENCE_PHASES.map((phase, i) => {
+          const count = phaseCounts[phase.value] || 0;
+          const subs = subfolderCounts[phase.value] || {};
           return (
-            <motion.button
-              key={folder.value}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: (i + 1) * 0.04 }}
-              className="w-full glass-card p-4 text-left hover:border-primary/20 transition-colors"
-              onClick={() => navigate(`/site-evidence/${jobId}/gallery?phase=${folder.value}`)}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 bg-secondary rounded-lg flex items-center justify-center">
-                    <FolderOpen className="w-4 h-4 text-primary" />
+            <div key={phase.value} className="space-y-1.5">
+              <motion.button
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: (i + 1) * 0.04 }}
+                className="w-full glass-card p-4 text-left hover:border-primary/20 transition-colors"
+                onClick={() => navigate(`/site-evidence/${jobId}/gallery?phase=${phase.value}`)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 bg-secondary rounded-lg flex items-center justify-center">
+                      <FolderOpen className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">{phase.label}</p>
+                      <p className="text-xs text-muted-foreground">{count} items</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium text-sm">{folder.label}</p>
-                    <p className="text-xs text-muted-foreground">{count} items</p>
-                  </div>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
                 </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground" />
-              </div>
-            </motion.button>
+              </motion.button>
+
+              {/* Nested subfolders */}
+              {EVIDENCE_SUBFOLDERS.map((sub) => {
+                const subCount = subs[sub.value] || 0;
+                return (
+                  <motion.button
+                    key={`${phase.value}-${sub.value}`}
+                    initial={{ opacity: 0, x: -5 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: (i + 1) * 0.04 + 0.02 }}
+                    className="w-full ml-6 glass-card p-3 text-left hover:border-primary/20 transition-colors"
+                    style={{ width: "calc(100% - 1.5rem)" }}
+                    onClick={() => navigate(`/site-evidence/${jobId}/gallery?phase=${phase.value}&sub=${sub.value}`)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 bg-muted rounded-md flex items-center justify-center">
+                          <FolderOpen className="w-3.5 h-3.5 text-muted-foreground" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-xs">{sub.label}</p>
+                          <p className="text-[10px] text-muted-foreground">{subCount} items</p>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
+                    </div>
+                  </motion.button>
+                );
+              })}
+            </div>
           );
         })}
       </div>

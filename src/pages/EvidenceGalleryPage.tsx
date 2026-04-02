@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { EVIDENCE_SUBFOLDERS } from "@/lib/evidence-constants";
+import { EVIDENCE_PHASES, EVIDENCE_SUBFOLDERS } from "@/lib/evidence-constants";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +24,7 @@ const EvidenceGalleryPage = () => {
   const { jobId } = useParams();
   const [searchParams] = useSearchParams();
   const phaseFilter = searchParams.get("phase") || "";
+  const subFilter = searchParams.get("sub") || "";
   const { user } = useAuth();
 
   const [media, setMedia] = useState<MediaItem[]>([]);
@@ -40,8 +41,9 @@ const EvidenceGalleryPage = () => {
         .eq("job_id", jobId)
         .order("created_at", { ascending: false });
 
-      // Filter by phase folder if specified
-      if (phaseFilter) {
+      if (phaseFilter && subFilter) {
+        query = query.like("storage_path", `${jobId}/${phaseFilter}/${subFilter}/%`);
+      } else if (phaseFilter) {
         query = query.like("storage_path", `${jobId}/${phaseFilter}/%`);
       }
 
@@ -61,7 +63,7 @@ const EvidenceGalleryPage = () => {
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [user, jobId, phaseFilter]);
+  }, [user, jobId, phaseFilter, subFilter]);
 
   const getPublicUrl = (path: string) => {
     const { data } = supabase.storage.from("job-evidence").getPublicUrl(path);
@@ -79,9 +81,13 @@ const EvidenceGalleryPage = () => {
     toast.success("Evidence deleted");
   };
 
+  const phaseLabel = EVIDENCE_PHASES.find((p) => p.value === phaseFilter)?.label ||
+    phaseFilter.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  const subLabel = subFilter
+    ? EVIDENCE_SUBFOLDERS.find((s) => s.value === subFilter)?.label || subFilter
+    : "";
   const folderLabel = phaseFilter
-    ? EVIDENCE_SUBFOLDERS.find((s) => s.value === phaseFilter)?.label ||
-      phaseFilter.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+    ? subLabel ? `${phaseLabel} › ${subLabel}` : phaseLabel
     : "All Evidence";
 
   if (loading) {

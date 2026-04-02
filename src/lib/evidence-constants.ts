@@ -1,4 +1,14 @@
-/** Site evidence folder structure inspired by BASIC CAM */
+/** Site evidence folder structure: Phase → Subfolder → Survey Type */
+
+export const EVIDENCE_PHASES = [
+  { value: "pre-start", label: "Pre-start" },
+  { value: "demolition", label: "Demolition" },
+  { value: "first-fix", label: "First Fix" },
+  { value: "second-fix", label: "Second Fix" },
+  { value: "finishing", label: "Finishing" },
+  { value: "snagging", label: "Snagging" },
+  { value: "handover", label: "Handover" },
+] as const;
 
 export const EVIDENCE_SUBFOLDERS = [
   { value: "EXT", label: "External Elements" },
@@ -32,15 +42,4 @@ export const EVIDENCE_LOCATIONS = [
   "Front elevation", "Hallway first floor", "Hallway Ground", "Kitchen",
   "Living room 1", "Living room 2", "Rear elevation", "Side 1 elevation",
   "Side 2 elevation", "Utility Room", "Other",
-] as const;
-
-/** Legacy phases — kept for backward compat with existing storage paths */
-export const EVIDENCE_PHASES = [
-  { value: "pre-start", label: "Pre-start" },
-  { value: "demolition", label: "Demolition" },
-  { value: "first-fix", label: "First Fix" },
-  { value: "second-fix", label: "Second Fix" },
-  { value: "finishing", label: "Finishing" },
-  { value: "snagging", label: "Snagging" },
-  { value: "handover", label: "Handover" },
 ] as const;
