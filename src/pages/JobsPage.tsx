@@ -224,16 +224,12 @@ const JobsPage = () => {
               <h3 className="font-semibold text-foreground">{job.title}</h3>
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <span className="capitalize">{job.requested_trade.replace("_", " ")}</span>
-                {(isCustomer || isSubscribed) ? (
-                  <span className="flex items-center gap-1">
-                    <MapPin className="h-3.5 w-3.5" />
-                    {job.city}
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1 text-primary/50">
-                    <Lock className="h-3 w-3" />
-                    Subscribe to view
-                  </span>
+                <span className="flex items-center gap-1">
+                  <MapPin className="h-3.5 w-3.5" />
+                  {job.postcode.split(" ")[0]}
+                </span>
+                {(isCustomer || isSubscribed) && (
+                  <span className="text-muted-foreground/70">{job.city}</span>
                 )}
               </div>
               {(isCustomer || isSubscribed) ? (
