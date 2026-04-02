@@ -181,40 +181,40 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="space-y-0 overflow-hidden">
+    <div className="space-y-0 overflow-hidden -mx-4 sm:-mx-6 lg:-mx-8 -mt-8">
       {/* Hero with background image */}
-      <section className="relative min-h-[600px] flex items-center overflow-hidden">
+      <section className="relative min-h-[620px] flex items-center overflow-hidden">
         {/* Background image */}
-        <div className="absolute inset-0 -z-20">
+        <div className="absolute inset-0">
           <img
             src={heroBanner}
             alt="Professional tradesperson at construction site"
             className="w-full h-full object-cover"
             width={1920}
-            height={800}
+            height={1080}
           />
         </div>
         {/* Dark overlay for text readability */}
-        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-foreground/90 via-foreground/75 to-foreground/40 dark:from-background/95 dark:via-background/80 dark:to-background/50" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/70 to-black/30" />
 
-        <FadeIn className="max-w-6xl mx-auto px-4 py-24 sm:py-32 w-full">
+        <FadeIn className="relative max-w-6xl mx-auto px-4 py-24 sm:py-32 w-full z-10">
           <div className="max-w-2xl space-y-8">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/20 bg-primary-foreground/10 backdrop-blur-md px-4 py-1.5 text-sm font-medium text-primary-foreground"
+              className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur-md px-4 py-1.5 text-sm font-medium text-white"
             >
               <Sparkles className="h-3.5 w-3.5" />
               Trusted by thousands across the UK
             </motion.div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.08] text-primary-foreground">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.08] text-white">
               Get the right trade,{" "}
               <span className="text-primary">first time</span>
             </h1>
 
-            <p className="text-lg sm:text-xl text-primary-foreground/80 max-w-xl leading-relaxed">
+            <p className="text-lg sm:text-xl text-white/80 max-w-xl leading-relaxed">
               Get quotes from verified, reviewed tradespeople in your area.
               Compare prices, check credentials, and hire with confidence.
             </p>
@@ -250,7 +250,7 @@ const LandingPage = () => {
                   Search
                 </Button>
               </div>
-              <p className="text-xs text-primary-foreground/60 mt-3">
+              <p className="text-xs text-white/50 mt-3">
                 Popular: <Link to="/marketplace?category=plumber" className="text-primary hover:underline">Plumber</Link>
                 {" · "}<Link to="/marketplace?category=electrician" className="text-primary hover:underline">Electrician</Link>
                 {" · "}<Link to="/marketplace?category=builder" className="text-primary hover:underline">Builder</Link>
@@ -262,14 +262,14 @@ const LandingPage = () => {
             {/* Quick CTAs */}
             <div className="flex flex-wrap gap-3 pt-2">
               {!user && (
-                <Button asChild variant="outline" size="lg" className="gap-2 font-semibold border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 backdrop-blur-sm">
+                <Button asChild variant="outline" size="lg" className="gap-2 font-semibold border-white/20 text-white hover:bg-white/10 backdrop-blur-sm">
                   <Link to="/signup">
                     List your trade
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
               )}
-              <Button variant="ghost" size="lg" className="gap-2 font-medium text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10">
+              <Button variant="ghost" size="lg" className="gap-2 font-medium text-white/80 hover:text-white hover:bg-white/10">
                 <PhoneCall className="h-4 w-4" />
                 Request a callback
               </Button>
