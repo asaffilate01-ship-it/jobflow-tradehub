@@ -34,15 +34,8 @@ function DriverSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r border-border bg-card">
       <SidebarContent className="pt-4">
-        <div className={`px-4 mb-6 flex items-center gap-2.5 ${collapsed ? "justify-center" : ""}`}>
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent">
-            <TruckIcon className="h-5 w-5 text-accent-foreground" />
-          </div>
-          {!collapsed && (
-            <span className="text-lg font-bold tracking-tight text-foreground">
-              Driver<span className="text-accent">Hub</span>
-            </span>
-          )}
+        <div className={`px-4 mb-6 flex items-center ${collapsed ? "justify-center" : ""}`}>
+          <img src={traderosLogo} alt="TraderOS" className={collapsed ? "h-8" : "h-9"} />
         </div>
 
         <SidebarGroup>
