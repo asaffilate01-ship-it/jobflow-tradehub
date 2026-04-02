@@ -1,50 +1,40 @@
 
-## Phase 1: Security & Database Hardening
-1. **Add `profiles` public read policy** for marketplace trader cards (only non-sensitive fields via a view)
-2. **Add `service_radius` and `services_description` columns** to profiles for trader marketplace cards
-3. **Make trader profiles publicly browsable** while keeping PII behind auth walls
+## Features to Build
 
-## Phase 2: Landing Page + Public Marketplace
-4. **Landing page** — Checkatrade-inspired hero with search, category cards, recommended jobs preview
-5. **Public marketplace** — Browse trader cards by category with ratings, services, areas, verification badges
-6. **Trader profile detail page** — Full card with services, past work, trade body memberships, contact (gated by subscription)
+### 1. Multi-Merchant Price Comparison
+- When ordering materials, search `merchant_catalog_items` across multiple merchants for the same/similar items
+- Show a comparison table: merchant name, price, stock status, delivery options
+- Highlight cheapest option per item, factor in delivery cost
+- Trader picks best combination
 
-## Phase 3: Auth & Role-Based Routing  
-7. **Role-aware navigation** — Different nav items per role (customer sees Post Job, trader sees Dashboard, driver sees Jobs)
-8. **Protected routes** — Wrap pages with role guards, redirect unauthorized users
-9. **Profile setup flow** — After signup, prompt to complete profile (trader: services/radius, driver: vehicle, customer: basic info)
+### 2. Merchant Catalog Integration
+- Seed `merchant_catalog_items` with sample products across key merchants (timber, cement, plumbing fittings, etc.)
+- Build a browsable catalog UI on the Materials page — search/filter by category, merchant
+- Allow adding catalog items directly to an order (auto-fills name, price, SKU)
 
-## Phase 4: Customer Flow
-10. **Post a job form** — Title, description, trade type, location, budget, photos, urgency
-11. **Job detail page** — Shows quotes received, progress, milestone payments (for job owner)
-12. **Job visibility rules** — Free traders see title + area code only, subscribed see full details
+### 3. Distance Auto-Calculation
+- Use postcode-based distance estimation (lookup table or Haversine formula)
+- Seed merchant_branches with lat/lng coordinates
+- When a job + merchant branch are selected, auto-calculate miles and update delivery pricing
+- Replace manual miles input with auto-calculated value (with manual override)
 
-## Phase 5: Trader Dashboard
-13. **Dashboard home** — KPIs (active jobs, revenue, pending quotes, upcoming deliveries)
-14. **Trade accounts management** — Add/manage merchant trade accounts (TradePoint, Wickes, Selco etc.)
-15. **Job browser** — View available jobs, filter by trade/location/budget, submit quotes
-16. **Active jobs** — Kanban board with task lists, progress tracking
-17. **Materials ordering** — Search items, compare merchant prices, order with delivery options
+### 4. Driver Broadcast & Acceptance Flow
+- **Driver Dashboard**: Show available (broadcast) deliveries with pickup/dropoff, payout, vehicle requirement
+- Accept delivery → updates status to "assigned" and sets driver_profile_id
+- Delivery status progression: assigned → arrived_at_pickup → collected → en_route → delivered
+- Status update buttons with timestamps
+- Delivery event log (already has table)
 
-## Phase 6: Delivery & Driver Flow
-18. **Delivery pricing engine** — Edge function using rate card data from DB
-19. **Driver job feed** — Available delivery jobs to accept
-20. **Delivery tracking** — Status updates, proof of delivery
+### 5. Merchant Confirmation Flow
+- After trader submits order (status: submitted), merchant needs to confirm
+- Add order detail view showing items, status timeline
+- Status progression: draft → submitted → confirmed → ready_for_pickup → collected → delivered
+- Trader can see real-time status updates on their orders
 
-## Files to create/modify:
-- `src/pages/LandingPage.tsx` — Public landing page
-- `src/pages/MarketplacePage.tsx` — Rewrite with real DB data  
-- `src/pages/TraderProfilePage.tsx` — Individual trader profile
-- `src/pages/PostJobPage.tsx` — Customer job posting
-- `src/pages/JobDetailPage.tsx` — Job detail with quotes/progress
-- `src/pages/TraderDashboard.tsx` — Trader home dashboard
-- `src/pages/TradeAccountsPage.tsx` — Manage merchant accounts
-- `src/pages/ProfileSetupPage.tsx` — Post-signup profile completion
-- `src/components/ProtectedRoute.tsx` — Role-based route guard
-- `src/components/marketplace/TraderCard.tsx` — Checkatrade-style card
-- `src/components/marketplace/CategoryFilter.tsx` — Trade category filter
-- `src/components/jobs/JobCard.tsx` — Job listing card with visibility gating
-- `src/components/dashboard/KpiCards.tsx` — Dashboard stats
-- Update `src/App.tsx` — New routes
-- Update `src/components/AppNav.tsx` — Role-aware navigation
-- DB migration: Add trader_profile fields, public profile view
+### Implementation Order
+1. Seed catalog data (DB insert)
+2. Merchant catalog browsing + add-to-order UI
+3. Multi-merchant comparison on Materials page
+4. Distance auto-calc (seed branch coords + Haversine)
+5. Driver delivery acceptance flow (DriverDashboard)
+6. Order status timeline + confirmation flow
