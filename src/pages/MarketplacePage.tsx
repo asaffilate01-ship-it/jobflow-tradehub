@@ -85,7 +85,7 @@ const MarketplacePage = () => {
   const activeCat = tradeCategories.find((c) => c.slug === category);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 page-enter">
       {/* Hero header */}
       <div className="glass-card-elevated p-8 sm:p-10 relative overflow-hidden">
         <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
@@ -179,16 +179,16 @@ const MarketplacePage = () => {
       {loading ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="glass-card h-80 animate-pulse rounded-xl">
-              <div className="h-24 bg-secondary/50 rounded-t-xl" />
+            <div key={i} className="glass-card rounded-xl overflow-hidden">
+              <div className="h-28 skeleton-shimmer rounded-none" />
               <div className="p-5 space-y-3">
-                <div className="h-5 bg-secondary/50 rounded-lg w-3/4" />
-                <div className="h-4 bg-secondary/40 rounded-lg w-1/2" />
-                <div className="h-3 bg-secondary/30 rounded-lg w-full" />
-                <div className="h-3 bg-secondary/30 rounded-lg w-2/3" />
+                <div className="skeleton-shimmer h-5 w-3/4" />
+                <div className="skeleton-shimmer h-4 w-1/2" />
+                <div className="skeleton-shimmer h-3 w-full" />
+                <div className="skeleton-shimmer h-3 w-2/3" />
                 <div className="flex gap-2 pt-2">
-                  <div className="h-6 bg-secondary/30 rounded-full w-16" />
-                  <div className="h-6 bg-secondary/30 rounded-full w-20" />
+                  <div className="skeleton-shimmer h-6 w-16 rounded-full" />
+                  <div className="skeleton-shimmer h-6 w-20 rounded-full" />
                 </div>
               </div>
             </div>
@@ -196,18 +196,20 @@ const MarketplacePage = () => {
         </div>
       ) : filtered.length === 0 ? (
         <div className="glass-card p-16 text-center space-y-4">
-          <Search className="h-12 w-12 text-muted-foreground mx-auto opacity-40" />
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50 mx-auto">
+            <Search className="h-8 w-8 text-muted-foreground/30" />
+          </div>
           <h3 className="text-lg font-bold text-foreground">
             {traders.length === 0 ? "No traders registered yet" : "No traders match your search"}
           </h3>
-          <p className="text-sm text-muted-foreground max-w-md mx-auto">
+          <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
             {traders.length === 0
-              ? "Be the first tradesperson to join our marketplace."
+              ? "Be the first tradesperson to join our marketplace and start winning jobs."
               : "Try adjusting your search or browse a different category."}
           </p>
           {!user && (
-            <Button asChild variant="outline" size="sm">
-              <Link to="/signup">Register as a tradesperson</Link>
+            <Button asChild variant="outline" size="sm" className="gap-2">
+              <Link to="/signup"><ArrowRight className="h-3.5 w-3.5" /> Register as a tradesperson</Link>
             </Button>
           )}
         </div>
