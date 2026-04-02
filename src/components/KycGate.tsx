@@ -95,7 +95,7 @@ const KycGate = ({ children, requiredFor = ["trade", "driver"] }: KycGateProps) 
             <p className="text-xs text-muted-foreground text-center">
               Required documents: Government-issued photo ID, proof of address, and any trade certifications.
             </p>
-            <Button className="w-full" onClick={() => navigate("/profile-setup")}>
+            <Button className="w-full" onClick={() => navigate("/kyc-upload")}>
               <Shield className="h-4 w-4 mr-2" />
               Upload verification documents
             </Button>

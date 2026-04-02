@@ -25,6 +25,7 @@ const traderNavItems = [
   { to: "/deliveries", label: "Deliveries", icon: Truck },
   { to: "/messages", label: "Messages", icon: MessageCircle },
   { to: "/broadcasts", label: "Broadcasts", icon: Radio },
+  { to: "/kyc-upload", label: "Verification", icon: Shield },
   { to: "/subscription", label: "Subscription", icon: CreditCard },
 ];
 
