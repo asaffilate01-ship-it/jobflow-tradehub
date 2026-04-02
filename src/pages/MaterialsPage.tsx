@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import {
   Package, Calculator, Truck, Search, Plus, Trash2, ShoppingCart,
-  Clock, MapPin, BarChart3, ArrowRight, ChevronDown, ChevronUp, Eye,
+  Clock, MapPin, BarChart3, ArrowRight, ChevronDown, ChevronUp, Eye, QrCode,
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
