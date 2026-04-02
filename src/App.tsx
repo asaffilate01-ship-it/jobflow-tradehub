@@ -106,6 +106,9 @@ const App = () => (
               <Route path="/subscription" element={<SubscriptionPage />} />
               <Route path="/kyc-upload" element={<KycUploadPage />} />
               <Route path="/admin/kyc" element={<AdminKycPage />} />
+              <Route path="/schedule" element={<SchedulePage />} />
+              <Route path="/daily-logs" element={<DailyLogsPage />} />
+              <Route path="/daily-logs/:jobId" element={<DailyLogsPage />} />
             </Route>
 
             {/* Driver layout (sidebar desktop, bottom nav mobile) */}
