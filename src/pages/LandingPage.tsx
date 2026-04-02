@@ -183,19 +183,19 @@ const LandingPage = () => {
   return (
     <div className="space-y-0 overflow-hidden">
       {/* Hero with background image */}
-      <section className="relative min-h-[600px] flex items-center overflow-hidden">
+      <section className="relative min-h-[620px] flex items-center overflow-hidden">
         {/* Background image */}
-        <div className="absolute inset-0 -z-20">
+        <div className="absolute inset-0">
           <img
             src={heroBanner}
             alt="Professional tradesperson at construction site"
             className="w-full h-full object-cover"
             width={1920}
-            height={800}
+            height={1080}
           />
         </div>
         {/* Dark overlay for text readability */}
-        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-foreground/90 via-foreground/75 to-foreground/40 dark:from-background/95 dark:via-background/80 dark:to-background/50" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/70 to-black/30" />
 
         <FadeIn className="max-w-6xl mx-auto px-4 py-24 sm:py-32 w-full">
           <div className="max-w-2xl space-y-8">
