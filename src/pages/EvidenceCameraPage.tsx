@@ -249,6 +249,9 @@ const EvidenceCameraPage = () => {
       <div className="bg-black/90 backdrop-blur-xl border-t border-white/10 safe-area-bottom">
         {/* Selectors row */}
         <div className="flex gap-2 px-3 pt-3 pb-2 overflow-x-auto">
+          <select className={selectClass} value={phase} onChange={(e) => setPhase(e.target.value)}>
+            {EVIDENCE_PHASES.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
+          </select>
           <select className={selectClass} value={subfolder} onChange={(e) => { setSubfolder(e.target.value); setElement(""); }}>
             {EVIDENCE_SUBFOLDERS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
           </select>
