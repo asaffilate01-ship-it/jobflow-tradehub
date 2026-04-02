@@ -28,6 +28,7 @@ const navGroups = [
     label: "Operations",
     items: [
       { to: "/materials", label: "Materials", icon: Package },
+      { to: "/smart-order", label: "Smart Order", icon: Zap },
       { to: "/site-evidence", label: "Site Evidence", icon: Camera },
       { to: "/daily-logs", label: "Daily Logs", icon: CalendarDays },
       { to: "/compliance", label: "Certificates", icon: FileCheck },
