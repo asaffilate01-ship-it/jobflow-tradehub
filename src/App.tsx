@@ -41,6 +41,13 @@ import DailyLogsPage from "./pages/DailyLogsPage";
 import CustomerPortalPage from "./pages/CustomerPortalPage";
 import OrderReceiptPage from "./pages/OrderReceiptPage";
 import VerifyOrderPage from "./pages/VerifyOrderPage";
+import AgentLayout from "./components/AgentLayout";
+import AgentDashboard from "./pages/AgentDashboard";
+import AgentReferralsPage from "./pages/AgentReferralsPage";
+import AgentCommissionsPage from "./pages/AgentCommissionsPage";
+import AgentAnalyticsPage from "./pages/AgentAnalyticsPage";
+import AgentReferralLinkPage from "./pages/AgentReferralLinkPage";
+import AccountingPage from "./pages/AccountingPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -121,6 +128,7 @@ const App = () => (
               <Route path="/daily-logs" element={<DailyLogsPage />} />
               <Route path="/daily-logs/:jobId" element={<DailyLogsPage />} />
               <Route path="/orders/:orderId/receipt" element={<OrderReceiptPage />} />
+              <Route path="/accounting" element={<AccountingPage />} />
             </Route>
 
             {/* Driver layout (sidebar desktop, bottom nav mobile) */}
@@ -135,6 +143,19 @@ const App = () => (
               <Route path="/driver/broadcasts" element={<BroadcastsPage />} />
               <Route path="/driver/kyc-upload" element={<KycUploadPage />} />
               <Route path="/driver/orders/:orderId/receipt" element={<OrderReceiptPage />} />
+            </Route>
+
+            {/* Agent layout (sidebar desktop, bottom nav mobile) */}
+            <Route element={
+              <ProtectedRoute allowedRoles={["agent", "admin"]}>
+                <AgentLayout />
+              </ProtectedRoute>
+            }>
+              <Route path="/agent" element={<AgentDashboard />} />
+              <Route path="/agent/referrals" element={<AgentReferralsPage />} />
+              <Route path="/agent/commissions" element={<AgentCommissionsPage />} />
+              <Route path="/agent/analytics" element={<AgentAnalyticsPage />} />
+              <Route path="/agent/referral-link" element={<AgentReferralLinkPage />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />

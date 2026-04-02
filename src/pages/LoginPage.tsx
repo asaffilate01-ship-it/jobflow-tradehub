@@ -3,19 +3,20 @@ import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Wrench, Shield, TruckIcon, Lock, AlertTriangle, Eye, EyeOff, Home } from "lucide-react";
+import { Wrench, Shield, TruckIcon, Lock, AlertTriangle, Eye, EyeOff, Home, UserCheck } from "lucide-react";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
 import traderosLogo from "@/assets/traderos-logo.png";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
-type Portal = "trader" | "driver" | "admin" | "customer" | null;
+type Portal = "trader" | "driver" | "admin" | "customer" | "agent" | null;
 
 const portalToRole: Record<Exclude<Portal, null>, AppRole> = {
   trader: "trade",
   driver: "driver",
   admin: "admin",
   customer: "customer",
+  agent: "agent",
 };
 
 const portalConfig = {
@@ -55,6 +56,15 @@ const portalConfig = {
     redirect: "/",
     roleName: "customer",
   },
+  agent: {
+    icon: UserCheck,
+    title: "Agent Login",
+    subtitle: "Referrals, commission & analytics",
+    iconBg: "bg-emerald-500/10",
+    iconText: "text-emerald-600",
+    redirect: "/agent",
+    roleName: "agent",
+  },
 } as const;
 
 const MAX_ATTEMPTS = 5;
@@ -65,6 +75,7 @@ const TEST_ACCOUNTS = [
   { label: "Customer", email: "customer@traderos.dev", password: "customer123!", portal: "customer" as Portal },
   { label: "Driver", email: "driver@traderos.dev", password: "driver123!", portal: "driver" as Portal },
   { label: "Admin", email: "admin@traderos.dev", password: "admin123!", portal: "admin" as Portal },
+  { label: "Agent", email: "agent@traderos.dev", password: "agent123!", portal: "agent" as Portal },
 ];
 
 const LoginPage = () => {
@@ -222,7 +233,7 @@ const LoginPage = () => {
           )}
 
           <div className="grid gap-3">
-            {(["customer", "trader", "driver", "admin"] as const).map((key) => {
+            {(["customer", "trader", "driver", "agent", "admin"] as const).map((key) => {
               const config = portalConfig[key];
               const Icon = config.icon;
               return (

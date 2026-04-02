@@ -1,10 +1,9 @@
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { NavLink } from "@/components/NavLink";
 import {
-  LayoutDashboard, Briefcase, Package, Camera, FileCheck,
-  Building2, Truck, CreditCard, MessageCircle, LogOut,
-  Radio, Shield, Calendar, CalendarDays, Zap, Calculator,
+  LayoutDashboard, Users, Wallet, UserCircle, LogOut,
+  TrendingUp, Link as LinkIcon,
 } from "lucide-react";
 import traderosLogo from "@/assets/traderos-logo.png";
 import NotificationBell from "@/components/NotificationBell";
@@ -19,50 +18,23 @@ const navGroups = [
   {
     label: "Overview",
     items: [
-      { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-      { to: "/jobs", label: "Jobs", icon: Briefcase },
-      { to: "/schedule", label: "Schedule", icon: Calendar },
-      { to: "/messages", label: "Messages", icon: MessageCircle },
-    ],
-  },
-  {
-    label: "Operations",
-    items: [
-      { to: "/materials", label: "Materials", icon: Package },
-      { to: "/smart-order", label: "Smart Order", icon: Zap },
-      { to: "/site-evidence", label: "Site Evidence", icon: Camera },
-      { to: "/daily-logs", label: "Daily Logs", icon: CalendarDays },
-      { to: "/compliance", label: "Certificates", icon: FileCheck },
-      { to: "/deliveries", label: "Deliveries", icon: Truck },
-    ],
-  },
-  {
-    label: "Finance",
-    items: [
-      { to: "/accounting", label: "Accounting", icon: Calculator },
-      { to: "/trade-accounts", label: "Trade Accounts", icon: Building2 },
-      { to: "/subscription", label: "Subscription", icon: CreditCard },
-    ],
-  },
-  {
-    label: "Account",
-    items: [
-      { to: "/broadcasts", label: "Broadcasts", icon: Radio },
-      { to: "/kyc-upload", label: "Verification", icon: Shield },
+      { to: "/agent", label: "Dashboard", icon: LayoutDashboard },
+      { to: "/agent/referrals", label: "Referrals", icon: Users },
+      { to: "/agent/commissions", label: "Commissions", icon: Wallet },
+      { to: "/agent/analytics", label: "Analytics", icon: TrendingUp },
+      { to: "/agent/referral-link", label: "Referral Link", icon: LinkIcon },
     ],
   },
 ];
 
-// Flat list for mobile bottom nav — only the most used
 const mobileNavItems = [
-  { to: "/dashboard", label: "Home", icon: LayoutDashboard },
-  { to: "/jobs", label: "Jobs", icon: Briefcase },
-  { to: "/schedule", label: "Schedule", icon: Calendar },
-  { to: "/site-evidence", label: "Evidence", icon: Camera },
-  { to: "/messages", label: "Chat", icon: MessageCircle },
+  { to: "/agent", label: "Home", icon: LayoutDashboard },
+  { to: "/agent/referrals", label: "Referrals", icon: Users },
+  { to: "/agent/commissions", label: "Earnings", icon: Wallet },
+  { to: "/agent/analytics", label: "Stats", icon: TrendingUp },
 ];
 
-function TraderSidebar() {
+function AgentSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const { signOut } = useAuth();
@@ -70,9 +42,9 @@ function TraderSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r border-border bg-card">
       <SidebarContent className="pt-4">
-        {/* Logo */}
         <div className={`px-4 mb-6 flex items-center ${collapsed ? "justify-center" : ""}`}>
           <img src={traderosLogo} alt="TraderOS" className={collapsed ? "h-8" : "h-9"} />
+          {!collapsed && <span className="ml-2 text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">Agent</span>}
         </div>
 
         {navGroups.map((group) => (
@@ -85,7 +57,7 @@ function TraderSidebar() {
                     <SidebarMenuButton asChild>
                       <NavLink
                         to={item.to}
-                        end={item.to === "/dashboard"}
+                        end={item.to === "/agent"}
                         className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
                         activeClassName="bg-primary/10 text-primary border-l-2 border-primary"
                       >
@@ -100,7 +72,6 @@ function TraderSidebar() {
           </SidebarGroup>
         ))}
 
-        {/* Sign out at bottom */}
         <div className="mt-auto p-4">
           <button
             onClick={() => signOut()}
@@ -122,7 +93,7 @@ function MobileBottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-xl md:hidden safe-area-bottom">
       <div className="flex items-center justify-around h-16 px-1">
         {mobileNavItems.map((item) => {
-          const active = location.pathname === item.to || location.pathname.startsWith(item.to + "/");
+          const active = location.pathname === item.to || (item.to !== "/agent" && location.pathname.startsWith(item.to));
           return (
             <NavLink
               key={item.to}
@@ -141,19 +112,17 @@ function MobileBottomNav() {
   );
 }
 
-const TraderLayout = () => {
+const AgentLayout = () => {
   const isMobile = useIsMobile();
 
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
-        {/* Desktop sidebar */}
         <div className="hidden md:block">
-          <TraderSidebar />
+          <AgentSidebar />
         </div>
 
         <div className="flex-1 flex flex-col min-w-0">
-          {/* Top bar */}
           <header className="sticky top-0 z-40 h-14 flex items-center justify-between gap-3 border-b border-border bg-background/80 backdrop-blur-xl px-4">
             <div className="flex items-center gap-3">
               <SidebarTrigger className="hidden md:flex" />
@@ -164,17 +133,15 @@ const TraderLayout = () => {
             <NotificationBell />
           </header>
 
-          {/* Main content */}
           <main className="flex-1 container py-6 pb-20 md:pb-6">
             <Outlet />
           </main>
         </div>
 
-        {/* Mobile bottom nav */}
         {isMobile && <MobileBottomNav />}
       </div>
     </SidebarProvider>
   );
 };
 
-export default TraderLayout;
+export default AgentLayout;

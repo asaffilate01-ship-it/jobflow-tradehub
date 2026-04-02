@@ -14,6 +14,137 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_commissions: {
+        Row: {
+          agent_id: string
+          amount: number
+          created_at: string
+          id: string
+          paid_at: string | null
+          period_end: string | null
+          period_start: string | null
+          referral_id: string | null
+          status: string
+        }
+        Insert: {
+          agent_id: string
+          amount?: number
+          created_at?: string
+          id?: string
+          paid_at?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          referral_id?: string | null
+          status?: string
+        }
+        Update: {
+          agent_id?: string
+          amount?: number
+          created_at?: string
+          id?: string
+          paid_at?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          referral_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_commissions_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_commissions_referral_id_fkey"
+            columns: ["referral_id"]
+            isOneToOne: false
+            referencedRelation: "agent_referrals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_referrals: {
+        Row: {
+          agent_id: string
+          commission_earned: number
+          converted_at: string | null
+          created_at: string
+          id: string
+          referral_type: string
+          referred_user_id: string
+          status: string
+        }
+        Insert: {
+          agent_id: string
+          commission_earned?: number
+          converted_at?: string | null
+          created_at?: string
+          id?: string
+          referral_type?: string
+          referred_user_id: string
+          status?: string
+        }
+        Update: {
+          agent_id?: string
+          commission_earned?: number
+          converted_at?: string | null
+          created_at?: string
+          id?: string
+          referral_type?: string
+          referred_user_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_referrals_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agents: {
+        Row: {
+          commission_rate: number
+          commission_type: string
+          created_at: string
+          id: string
+          profile_id: string
+          referral_code: string
+          status: string
+          total_earned: number
+          total_paid: number
+          updated_at: string
+        }
+        Insert: {
+          commission_rate?: number
+          commission_type?: string
+          created_at?: string
+          id?: string
+          profile_id: string
+          referral_code: string
+          status?: string
+          total_earned?: number
+          total_paid?: number
+          updated_at?: string
+        }
+        Update: {
+          commission_rate?: number
+          commission_type?: string
+          created_at?: string
+          id?: string
+          profile_id?: string
+          referral_code?: string
+          status?: string
+          total_earned?: number
+          total_paid?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       broadcast_channels: {
         Row: {
           audience_role: string
@@ -2481,7 +2612,7 @@ export type Database = {
         | "journal"
         | "cis"
         | "driver_payout"
-      app_role: "customer" | "trade" | "driver" | "admin"
+      app_role: "customer" | "trade" | "driver" | "admin" | "agent"
       cis_status:
         | "not_applicable"
         | "pending_verification"
@@ -2682,7 +2813,7 @@ export const Constants = {
         "cis",
         "driver_payout",
       ],
-      app_role: ["customer", "trade", "driver", "admin"],
+      app_role: ["customer", "trade", "driver", "admin", "agent"],
       cis_status: [
         "not_applicable",
         "pending_verification",
