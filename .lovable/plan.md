@@ -1,46 +1,55 @@
 
-## Phase 1: Database & Infrastructure (this message)
+## Phase 1: Database & Infrastructure ✅
+- Notifications table + realtime
+- Broadcast channels & messages
+- Group messaging
 
-### 1A. Notifications table + realtime
-- Create `notifications` table (type, title, body, recipient_id, read_at, link, metadata)
-- RLS: users see only their own notifications
-- Enable realtime on notifications table
+## Phase 2: In-App Notification UI ✅
+- Bell icon with unread count
+- Notification dropdown with mark-as-read
+- Realtime subscription
 
-### 1B. Broadcast channels
-- Create `broadcast_channels` table (name, audience_role, created_by)
-- Create `broadcast_messages` table (channel_id, title, body, sent_at, sent_by)
-- Admin/trade can broadcast to drivers, traders, etc.
+## Phase 3: PWA Setup ✅
+- manifest.json, mobile meta tags
+- Installable web app
 
-### 1C. Group messaging
-- Add `channel` concept to existing messages (job-scoped stays, add broadcast channels)
+## Phase 4: Capacitor Setup ✅
+- Native shell configured
 
-## Phase 2: In-App Notification UI (this message)
-- Bell icon component with unread count badge
-- Notification dropdown/panel with mark-as-read
-- Wire to realtime subscription for instant updates
-- Add to TraderLayout, DriverLayout, AppNav
+## Phase 5: Marketplace & Procurement ✅
+- Smart Order comparison engine
+- Trade account credential storage (AES-GCM encrypted)
+- Price quotes & itemised reports
 
-## Phase 3: PWA Setup (this message)
-- Add `manifest.json` with icons and `display: standalone`
-- Add mobile meta tags to `index.html`
-- Simple installable web app (no service worker to avoid preview issues)
+## Phase 6: Customer Portal & Trust ✅
+- Customer project dashboard (My Projects)
+- Trader portfolio with reviews
+- Budget tracker on job detail
+- Postcode outcode on marketplace cards
 
-## Phase 4: Capacitor Setup (this message)
-- Install Capacitor dependencies
-- Configure `capacitor.config.ts` with hot-reload URL
-- Instructions for user to build native
+## Phase 7: Merchant Integrations ✅ (stubs ready)
+- `scrape-merchant-prices` edge function — Firecrawl scraping + API adapter pattern
+- `sync-merchant-catalog` edge function — CSV/JSON bulk catalog upload
+- API adapter stubs for Travis Perkins, Jewson, Toolstation, Screwfix
 
-## Phase 5: Email & SMS Notifications (next message)
+## Phase 8: Email & SMS Notifications (next)
 - Email domain setup for transactional emails
 - Twilio connector for SMS alerts
 - Edge function to dispatch notifications across channels
 
-## Phase 6: Push Notifications (next message)
+## Phase 9: Push Notifications (next)
 - Web Push API integration for PWA
 - Capacitor Push Notifications plugin for native
 
-## Phase 7: OWASP Top 10 Security Audit (next message)
+## Phase 10: OWASP Top 10 Security Audit (next)
 - Run security scan
 - Review all RLS policies
 - Check for injection, XSS, broken auth, CSRF
 - Fix findings and document
+
+## Phase 11: Live Merchant API Integrations (future)
+- Travis Perkins API credentials + real adapter
+- Jewson API integration
+- Toolstation product feed
+- Screwfix catalog sync
+- Automated daily price sync via cron/scheduled function
