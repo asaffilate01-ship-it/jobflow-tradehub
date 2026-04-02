@@ -110,7 +110,7 @@ const JobsPage = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 page-enter">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Jobs Marketplace</h1>
