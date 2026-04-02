@@ -22,6 +22,7 @@ const navGroups = [
       { to: "/admin/users", label: "Users", icon: Users },
       { to: "/admin/kyc-review", label: "KYC Review", icon: Shield },
       { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
+      { to: "/admin/audit-log", label: "Audit Log", icon: ScrollText },
     ],
   },
   {
