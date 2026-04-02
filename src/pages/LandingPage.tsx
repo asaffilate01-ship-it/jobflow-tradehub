@@ -2,14 +2,20 @@ import { Link } from "react-router-dom";
 import {
   ArrowRight, Users, Shield, Star,
   Search, CheckCircle, Clock, MapPin, ThumbsUp, Award,
-  Phone, FileText, Truck, Package, Building2, Zap,
+  Phone, FileText, Truck, Package, Building2, Zap, Calendar,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { FadeIn, StaggerContainer, StaggerItem, ScaleOnHover } from "@/components/MotionWrapper";
+
+import heroBanner from "@/assets/hero-banner.jpg";
+import blogKitchen from "@/assets/blog-kitchen-refit.jpg";
+import blogTech from "@/assets/blog-trade-tech.jpg";
+import blogDelivery from "@/assets/blog-delivery.jpg";
 
 import plumberIcon from "@/assets/icons/plumber-3d.png";
 import electricianIcon from "@/assets/icons/electrician-3d.png";
@@ -86,6 +92,33 @@ const whyBetter = [
   { icon: ThumbsUp, title: "Payment Protection", desc: "Milestone-based payments — you only pay when work is completed to your satisfaction." },
 ];
 
+const blogPosts = [
+  {
+    title: "How to Plan a Kitchen Refit: The Complete 2026 Guide",
+    excerpt: "From layout choices to budgeting for materials, here's everything you need to know before starting your kitchen renovation.",
+    image: blogKitchen,
+    date: "28 Mar 2026",
+    category: "Homeowner Guides",
+    readTime: "7 min read",
+  },
+  {
+    title: "Why Digital Job Management Is Changing the Trades",
+    excerpt: "GPS-stamped evidence, milestone payments, and real-time updates — how technology is building trust between trades and customers.",
+    image: blogTech,
+    date: "21 Mar 2026",
+    category: "Trade Insights",
+    readTime: "5 min read",
+  },
+  {
+    title: "Same-Day Material Delivery: How It Works",
+    excerpt: "Order from 30+ UK merchants at trade prices and get materials delivered to site within hours. Here's the full breakdown.",
+    image: blogDelivery,
+    date: "14 Mar 2026",
+    category: "Platform Updates",
+    readTime: "4 min read",
+  },
+];
+
 const LandingPage = () => {
   const { user } = useAuth();
   const [searchTrade, setSearchTrade] = useState("");
@@ -100,79 +133,91 @@ const LandingPage = () => {
 
   return (
     <div className="space-y-0 overflow-hidden">
-      {/* Hero */}
-      <section className="relative py-20 sm:py-28 overflow-hidden">
-        <div className="absolute inset-0 -z-10" style={{ background: "var(--gradient-hero)" }}>
-          <div className="absolute top-20 left-1/4 h-96 w-96 rounded-full bg-primary/10 blur-[160px]" />
-          <div className="absolute bottom-10 right-1/3 h-72 w-72 rounded-full bg-accent/8 blur-[140px]" />
+      {/* Hero with background image */}
+      <section className="relative py-24 sm:py-32 overflow-hidden">
+        {/* Background image */}
+        <div className="absolute inset-0 -z-20">
+          <img
+            src={heroBanner}
+            alt="Professional tradesperson at construction site"
+            className="w-full h-full object-cover"
+            width={1920}
+            height={800}
+          />
         </div>
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-background/95 via-background/85 to-background/60" />
+        {/* Accent glow */}
+        <div className="absolute top-20 left-1/4 h-96 w-96 rounded-full bg-primary/8 blur-[160px] -z-10" />
 
-        <FadeIn className="max-w-5xl mx-auto text-center space-y-8 px-4">
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-            Trusted by thousands across the UK
-          </div>
-
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.08]">
-            Get the right trade,{" "}
-            <span className="text-gradient">first time</span>
-          </h1>
-
-          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Get quotes from verified, reviewed tradespeople in your area.
-            Compare prices, check credentials, and hire with confidence.
-          </p>
-
-          {/* Dual search — trade + location */}
-          <div className="max-w-2xl mx-auto">
-            <div className="flex flex-col sm:flex-row gap-2 p-2 rounded-2xl bg-card/80 border border-border backdrop-blur-sm">
-              <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input
-                  placeholder="What do you need? e.g. Plumber, Kitchen refit…"
-                  className="pl-12 h-14 text-base border-0 bg-transparent focus-visible:ring-0"
-                  value={searchTrade}
-                  onChange={(e) => setSearchTrade(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                />
-              </div>
-              <div className="relative flex-1 sm:border-l border-border">
-                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input
-                  placeholder="Location or postcode"
-                  className="pl-12 h-14 text-base border-0 bg-transparent focus-visible:ring-0"
-                  value={searchLocation}
-                  onChange={(e) => setSearchLocation(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                />
-              </div>
-              <Button
-                onClick={handleSearch}
-                size="lg"
-                className="h-14 px-8 rounded-xl font-semibold text-base shrink-0"
-              >
-                Search
-              </Button>
+        <FadeIn className="max-w-5xl mx-auto px-4">
+          <div className="max-w-2xl space-y-8">
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 backdrop-blur-sm px-4 py-1.5 text-sm font-medium text-primary">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+              Trusted by thousands across the UK
             </div>
-            <p className="text-xs text-muted-foreground mt-3">
-              Popular: <Link to="/marketplace?category=plumber" className="text-primary hover:underline">Plumber</Link>
-              {" · "}<Link to="/marketplace?category=electrician" className="text-primary hover:underline">Electrician</Link>
-              {" · "}<Link to="/marketplace?category=builder" className="text-primary hover:underline">Builder</Link>
-              {" · "}<Link to="/marketplace?category=roofer" className="text-primary hover:underline">Roofer</Link>
-              {" · "}<Link to="/marketplace?category=gas_engineer" className="text-primary hover:underline">Gas Engineer</Link>
-            </p>
-          </div>
 
-          {/* Quick CTAs */}
-          <div className="flex flex-wrap justify-center gap-3 pt-2">
-            {!user && (
-              <Button asChild variant="outline" size="lg" className="gap-2 font-semibold">
-                <Link to="/signup">
-                  List your trade
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            )}
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.08]">
+              Get the right trade,{" "}
+              <span className="text-gradient">first time</span>
+            </h1>
+
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-xl leading-relaxed">
+              Get quotes from verified, reviewed tradespeople in your area.
+              Compare prices, check credentials, and hire with confidence.
+            </p>
+
+            {/* Search bar */}
+            <div className="max-w-xl">
+              <div className="flex flex-col sm:flex-row gap-2 p-2 rounded-2xl bg-card/90 border border-border backdrop-blur-sm shadow-lg">
+                <div className="relative flex-1">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    placeholder="What do you need? e.g. Plumber…"
+                    className="pl-12 h-14 text-base border-0 bg-transparent focus-visible:ring-0"
+                    value={searchTrade}
+                    onChange={(e) => setSearchTrade(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  />
+                </div>
+                <div className="relative flex-1 sm:border-l border-border">
+                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    placeholder="Postcode or city"
+                    className="pl-12 h-14 text-base border-0 bg-transparent focus-visible:ring-0"
+                    value={searchLocation}
+                    onChange={(e) => setSearchLocation(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  />
+                </div>
+                <Button
+                  onClick={handleSearch}
+                  size="lg"
+                  className="h-14 px-8 rounded-xl font-semibold text-base shrink-0"
+                >
+                  Search
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground mt-3">
+                Popular: <Link to="/marketplace?category=plumber" className="text-primary hover:underline">Plumber</Link>
+                {" · "}<Link to="/marketplace?category=electrician" className="text-primary hover:underline">Electrician</Link>
+                {" · "}<Link to="/marketplace?category=builder" className="text-primary hover:underline">Builder</Link>
+                {" · "}<Link to="/marketplace?category=roofer" className="text-primary hover:underline">Roofer</Link>
+                {" · "}<Link to="/marketplace?category=gas_engineer" className="text-primary hover:underline">Gas Engineer</Link>
+              </p>
+            </div>
+
+            {/* Quick CTAs */}
+            <div className="flex flex-wrap gap-3 pt-2">
+              {!user && (
+                <Button asChild variant="outline" size="lg" className="gap-2 font-semibold backdrop-blur-sm">
+                  <Link to="/signup">
+                    List your trade
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              )}
+            </div>
           </div>
         </FadeIn>
       </section>
@@ -255,7 +300,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Reviews / Testimonials */}
+      {/* Reviews */}
       <section className="py-16 px-4">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl font-bold text-center mb-2">What customers say</h2>
@@ -302,8 +347,67 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* For Traders CTA */}
+      {/* Blog / Articles */}
       <section className="py-16 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-end justify-between mb-10">
+            <div>
+              <h2 className="text-2xl font-bold mb-2">From the blog</h2>
+              <p className="text-muted-foreground">Guides, tips, and platform updates</p>
+            </div>
+            <Button variant="ghost" size="sm" className="gap-1.5 text-primary hidden sm:flex">
+              View all articles
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {blogPosts.map((post, i) => (
+              <motion.article
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="glass-card overflow-hidden group cursor-pointer hover:border-primary/30 hover:shadow-lg transition-all"
+              >
+                <div className="aspect-[16/10] overflow-hidden">
+                  <img
+                    src={post.image}
+                    alt={post.title}
+                    loading="lazy"
+                    width={800}
+                    height={512}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="p-5 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-[10px] font-medium py-0">{post.category}</Badge>
+                    <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                      <Clock className="h-2.5 w-2.5" />
+                      {post.readTime}
+                    </span>
+                  </div>
+                  <h3 className="font-semibold text-foreground leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                    {post.title}
+                  </h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                    {post.excerpt}
+                  </p>
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground pt-2 border-t border-border">
+                    <Calendar className="h-3 w-3" />
+                    {post.date}
+                  </div>
+                </div>
+              </motion.article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* For Traders CTA */}
+      <section className="py-16 px-4 bg-card/30">
         <div className="glass-card p-8 sm:p-12 max-w-5xl mx-auto glow">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div className="space-y-5">
