@@ -158,7 +158,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const payload = { title, body: notifBody || "", link: link || "/", tag: tag || "tradeflow" };
+    const payload = { title, body: notifBody || "", link: link || "/", tag: tag || "traderos" };
     let sent = 0;
     let failed = 0;
     const expiredEndpoints: string[] = [];
