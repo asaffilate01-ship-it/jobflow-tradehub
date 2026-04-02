@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Truck } from "lucide-react";
+import traderosLogo from "@/assets/traderos-logo.png";
 
 const footerLinks = {
   Platform: [
