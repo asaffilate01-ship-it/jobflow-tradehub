@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { NavLink } from "@/components/NavLink";
 import {
   LayoutDashboard, Truck, DollarSign, User, LogOut, Package,
-  TruckIcon, Navigation, Settings,
+  TruckIcon, Navigation, Settings, Radio,
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 import {
