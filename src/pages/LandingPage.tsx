@@ -262,14 +262,14 @@ const LandingPage = () => {
             {/* Quick CTAs */}
             <div className="flex flex-wrap gap-3 pt-2">
               {!user && (
-                <Button asChild variant="outline" size="lg" className="gap-2 font-semibold border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 backdrop-blur-sm">
+                <Button asChild variant="outline" size="lg" className="gap-2 font-semibold border-white/20 text-white hover:bg-white/10 backdrop-blur-sm">
                   <Link to="/signup">
                     List your trade
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
               )}
-              <Button variant="ghost" size="lg" className="gap-2 font-medium text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10">
+              <Button variant="ghost" size="lg" className="gap-2 font-medium text-white/80 hover:text-white hover:bg-white/10">
                 <PhoneCall className="h-4 w-4" />
                 Request a callback
               </Button>
