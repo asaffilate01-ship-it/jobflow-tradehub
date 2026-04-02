@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import {
   Building2, Plus, CheckCircle, XCircle, Store, Search,
-  Truck, ShoppingBag, CreditCard, Filter
+  Truck, ShoppingBag, CreditCard, Filter, Lock, Globe, KeyRound
 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -17,6 +17,10 @@ type TradeAccount = {
   account_reference: string;
   account_name: string | null;
   verified: boolean;
+  portal_url: string | null;
+  portal_username: string | null;
+  encrypted_credentials: string | null;
+  discount_percentage: number | null;
   merchant?: { name: string; slug: string };
 };
 
