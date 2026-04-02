@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { EVIDENCE_SUBFOLDERS } from "@/lib/evidence-constants";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -79,7 +80,8 @@ const EvidenceGalleryPage = () => {
   };
 
   const folderLabel = phaseFilter
-    ? phaseFilter.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+    ? EVIDENCE_SUBFOLDERS.find((s) => s.value === phaseFilter)?.label ||
+      phaseFilter.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
     : "All Evidence";
 
   if (loading) {
