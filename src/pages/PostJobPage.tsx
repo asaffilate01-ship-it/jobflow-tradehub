@@ -9,7 +9,8 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Wrench, Zap, HardHat, Home, Grid3X3, Hammer, BrickWall,
-  Paintbrush, Flame, TreePine, ArrowRight, ArrowLeft, CheckCircle, MapPin
+  Paintbrush, Flame, TreePine, ArrowRight, ArrowLeft, CheckCircle, MapPin,
+  Truck, Trash2, SprayCan,
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
