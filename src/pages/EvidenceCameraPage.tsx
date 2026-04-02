@@ -25,7 +25,7 @@ const EvidenceCameraPage = () => {
   const [uploading, setUploading] = useState(false);
   const [captureCount, setCaptureCount] = useState(0);
 
-  const [phase, setPhase] = useState(EVIDENCE_PHASES[0].value);
+  const [phase, setPhase] = useState<string>(EVIDENCE_PHASES[0].value);
   const [location, setLocation] = useState("");
   const [element, setElement] = useState("");
   const [notes, setNotes] = useState("");
