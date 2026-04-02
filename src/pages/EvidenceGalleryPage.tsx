@@ -63,7 +63,7 @@ const EvidenceGalleryPage = () => {
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [user, jobId, phaseFilter]);
+  }, [user, jobId, phaseFilter, subFilter]);
 
   const getPublicUrl = (path: string) => {
     const { data } = supabase.storage.from("job-evidence").getPublicUrl(path);
