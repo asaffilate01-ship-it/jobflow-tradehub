@@ -125,7 +125,9 @@ const App = () => (
               {/* Driver dashboard */}
               <Route path="/driver" element={
                 <ProtectedRoute allowedRoles={["driver", "admin"]}>
-                  <DriverDashboard />
+                  <KycGate>
+                    <DriverDashboard />
+                  </KycGate>
                 </ProtectedRoute>
               } />
             </Route>
