@@ -104,6 +104,7 @@ const App = () => (
             }>
               <Route path="/driver" element={<DriverDashboard />} />
               <Route path="/driver/broadcasts" element={<BroadcastsPage />} />
+              <Route path="/driver/kyc-upload" element={<KycUploadPage />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
