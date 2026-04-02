@@ -437,7 +437,7 @@ const LandingPage = () => {
               <Award className="h-3 w-3" />
               Why us
             </Badge>
-            <h2 className="text-3xl font-bold">Why TradeFlow?</h2>
+            <h2 className="text-3xl font-bold">Why TraderOS?</h2>
             <p className="text-muted-foreground max-w-md mx-auto">More than a directory — a complete project management platform</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
