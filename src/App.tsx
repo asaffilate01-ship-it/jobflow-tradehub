@@ -30,6 +30,8 @@ import PostJobPage from "./pages/PostJobPage";
 import DriverDashboard from "./pages/DriverDashboard";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import BroadcastsPage from "./pages/BroadcastsPage";
+import KycUploadPage from "./pages/KycUploadPage";
+import AdminKycPage from "./pages/AdminKycPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -88,6 +90,8 @@ const App = () => (
               <Route path="/messages" element={<MessagesPage />} />
               <Route path="/broadcasts" element={<BroadcastsPage />} />
               <Route path="/subscription" element={<SubscriptionPage />} />
+              <Route path="/kyc-upload" element={<KycUploadPage />} />
+              <Route path="/admin/kyc" element={<AdminKycPage />} />
             </Route>
 
             {/* Driver layout (sidebar desktop, bottom nav mobile) */}
@@ -100,6 +104,7 @@ const App = () => (
             }>
               <Route path="/driver" element={<DriverDashboard />} />
               <Route path="/driver/broadcasts" element={<BroadcastsPage />} />
+              <Route path="/driver/kyc-upload" element={<KycUploadPage />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
