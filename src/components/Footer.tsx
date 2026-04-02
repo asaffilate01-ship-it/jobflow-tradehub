@@ -15,7 +15,7 @@ const footerLinks = {
     { label: "Compliance Certs", to: "/compliance" },
   ],
   Company: [
-    { label: "About TradeFlow", to: "/" },
+    { label: "About TraderOS", to: "/" },
     { label: "Blog", to: "/" },
     { label: "Privacy Policy", to: "/" },
     { label: "Terms of Service", to: "/" },
