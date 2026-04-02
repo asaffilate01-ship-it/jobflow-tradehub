@@ -1,50 +1,46 @@
-## Phase 1: Navigation Overhaul
 
-### 1a. Trader Sidebar (Desktop) + Bottom Nav (Mobile)
-- Create `TraderLayout.tsx` with shadcn Sidebar for desktop (collapsible icon mode)
-- Bottom nav bar for mobile with key trader actions (Dashboard, Jobs, Materials, Evidence, Messages)
-- Replace `AppLayout` usage for all trade-only routes in `App.tsx`
-- Keep `AppLayout` (top nav) for public/customer pages
+## Phase 1: Database & Infrastructure (this message)
 
-### 1b. Driver Layout
-- Similar pattern: compact sidebar desktop, bottom nav mobile
-- Key nav: Dashboard, Active Deliveries, Earnings, Profile
+### 1A. Notifications table + realtime
+- Create `notifications` table (type, title, body, recipient_id, read_at, link, metadata)
+- RLS: users see only their own notifications
+- Enable realtime on notifications table
 
-### 2. Rename "Basic CAM" → "Site Evidence"
-- Rename the page title, nav labels, and route from `/basic-cam` to `/site-evidence`
-- Update all references
+### 1B. Broadcast channels
+- Create `broadcast_channels` table (name, audience_role, created_by)
+- Create `broadcast_messages` table (channel_id, title, body, sent_at, sent_by)
+- Admin/trade can broadcast to drivers, traders, etc.
 
-## Phase 2: UI/UX Polish
+### 1C. Group messaging
+- Add `channel` concept to existing messages (job-scoped stays, add broadcast channels)
 
-### 3. Trader Dashboard Polish
-- Better KPI cards with sparklines/progress indicators
-- Recent activity feed (quotes, orders, messages)
-- Job status chips with consistent color coding
-- Responsive card grid improvements
+## Phase 2: In-App Notification UI (this message)
+- Bell icon component with unread count badge
+- Notification dropdown/panel with mark-as-read
+- Wire to realtime subscription for instant updates
+- Add to TraderLayout, DriverLayout, AppNav
 
-### 4. Driver Dashboard Polish
-- Cleaner delivery cards with route info
-- Earnings summary with period selector
-- Available jobs map placeholder
+## Phase 3: PWA Setup (this message)
+- Add `manifest.json` with icons and `display: standalone`
+- Add mobile meta tags to `index.html`
+- Simple installable web app (no service worker to avoid preview issues)
 
-### 5. Materials Page Polish
-- Step-by-step wizard flow (Select Job → Browse Catalog → Compare Prices → Checkout)
-- Better price comparison table layout
-- Clearer delivery mode selection with cost breakdown
+## Phase 4: Capacitor Setup (this message)
+- Install Capacitor dependencies
+- Configure `capacitor.config.ts` with hot-reload URL
+- Instructions for user to build native
 
-### 6. General Polish
-- Consistent glass-card styling with subtle gradients
-- Loading skeletons everywhere
-- Empty states with CTAs
-- Breadcrumbs on detail pages
+## Phase 5: Email & SMS Notifications (next message)
+- Email domain setup for transactional emails
+- Twilio connector for SMS alerts
+- Edge function to dispatch notifications across channels
 
-## Phase 3: Spec Gap Fills
+## Phase 6: Push Notifications (next message)
+- Web Push API integration for PWA
+- Capacitor Push Notifications plugin for native
 
-### 7. Multi-Merchant Price Comparison (per spec)
-- Show itemised report: cheapest per product across merchants
-- Factor in delivery costs + trade account discounts
-- Allow trader to pick best option per item
-
-### 8. Job Visibility Rules (per spec)
-- Free users: title, trade type, area code, property type only
-- Subscribed: full address, budget, customer contact, description
+## Phase 7: OWASP Top 10 Security Audit (next message)
+- Run security scan
+- Review all RLS policies
+- Check for injection, XSS, broken auth, CSRF
+- Fix findings and document
