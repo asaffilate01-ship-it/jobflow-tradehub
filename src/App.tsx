@@ -157,6 +157,7 @@ const App = () => (
               </ProtectedRoute>
             }>
               <Route path="/driver" element={<DriverDashboard />} />
+              <Route path="/driver/deliveries" element={<DeliveriesPage />} />
               <Route path="/driver/broadcasts" element={<BroadcastsPage />} />
               <Route path="/driver/kyc-upload" element={<KycUploadPage />} />
               <Route path="/driver/orders/:orderId/receipt" element={<OrderReceiptPage />} />
