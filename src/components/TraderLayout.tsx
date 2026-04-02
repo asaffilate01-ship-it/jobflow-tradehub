@@ -134,16 +134,19 @@ const TraderLayout = () => {
 
         <div className="flex-1 flex flex-col min-w-0">
           {/* Top bar */}
-          <header className="sticky top-0 z-40 h-14 flex items-center gap-3 border-b border-border bg-background/80 backdrop-blur-xl px-4">
-            <SidebarTrigger className="hidden md:flex" />
-            <div className="md:hidden flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                <Wrench className="h-4 w-4 text-primary-foreground" />
+          <header className="sticky top-0 z-40 h-14 flex items-center justify-between gap-3 border-b border-border bg-background/80 backdrop-blur-xl px-4">
+            <div className="flex items-center gap-3">
+              <SidebarTrigger className="hidden md:flex" />
+              <div className="md:hidden flex items-center gap-2.5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+                  <Wrench className="h-4 w-4 text-primary-foreground" />
+                </div>
+                <span className="text-base font-bold tracking-tight text-foreground">
+                  Trade<span className="text-primary">Flow</span>
+                </span>
               </div>
-              <span className="text-base font-bold tracking-tight text-foreground">
-                Trade<span className="text-primary">Flow</span>
-              </span>
             </div>
+            <NotificationBell />
           </header>
 
           {/* Main content */}
