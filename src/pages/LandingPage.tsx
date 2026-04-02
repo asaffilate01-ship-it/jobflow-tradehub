@@ -1,9 +1,8 @@
 import { Link } from "react-router-dom";
 import {
-  Wrench, Zap, HardHat, Home, Grid3X3, Hammer, BrickWall,
-  Paintbrush, Flame, TreePine, ArrowRight, Users, Shield, Star,
+  ArrowRight, Users, Shield, Star,
   Search, CheckCircle, Clock, MapPin, ThumbsUp, Award,
-  Phone, FileText, Truck, Package, Building2, Quote,
+  Phone, FileText, Truck, Package, Building2, Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,18 +11,30 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { FadeIn, StaggerContainer, StaggerItem, ScaleOnHover } from "@/components/MotionWrapper";
 
+import plumberIcon from "@/assets/icons/plumber-3d.png";
+import electricianIcon from "@/assets/icons/electrician-3d.png";
+import builderIcon from "@/assets/icons/builder-3d.png";
+import rooferIcon from "@/assets/icons/roofer-3d.png";
+import tilerIcon from "@/assets/icons/tiler-3d.png";
+import carpenterIcon from "@/assets/icons/carpenter-3d.png";
+import bricklayerIcon from "@/assets/icons/bricklayer-3d.png";
+import plastererIcon from "@/assets/icons/plasterer-3d.png";
+import painterIcon from "@/assets/icons/painter-3d.png";
+import gasEngineerIcon from "@/assets/icons/gas-engineer-3d.png";
+import landscaperIcon from "@/assets/icons/landscaper-3d.png";
+
 const tradeCategories = [
-  { label: "Plumber", slug: "plumber", icon: Wrench },
-  { label: "Electrician", slug: "electrician", icon: Zap },
-  { label: "Builder", slug: "builder", icon: HardHat },
-  { label: "Roofer", slug: "roofer", icon: Home },
-  { label: "Tiler", slug: "tiler", icon: Grid3X3 },
-  { label: "Carpenter", slug: "carpenter", icon: Hammer },
-  { label: "Bricklayer", slug: "bricklayer", icon: BrickWall },
-  { label: "Plasterer", slug: "plasterer", icon: HardHat },
-  { label: "Painter", slug: "painter", icon: Paintbrush },
-  { label: "Gas Engineer", slug: "gas_engineer", icon: Flame },
-  { label: "Landscaper", slug: "landscaper", icon: TreePine },
+  { label: "Plumber", slug: "plumber", img: plumberIcon },
+  { label: "Electrician", slug: "electrician", img: electricianIcon },
+  { label: "Builder", slug: "builder", img: builderIcon },
+  { label: "Roofer", slug: "roofer", img: rooferIcon },
+  { label: "Tiler", slug: "tiler", img: tilerIcon },
+  { label: "Carpenter", slug: "carpenter", img: carpenterIcon },
+  { label: "Bricklayer", slug: "bricklayer", img: bricklayerIcon },
+  { label: "Plasterer", slug: "plasterer", img: plastererIcon },
+  { label: "Painter", slug: "painter", img: painterIcon },
+  { label: "Gas Engineer", slug: "gas_engineer", img: gasEngineerIcon },
+  { label: "Landscaper", slug: "landscaper", img: landscaperIcon },
 ];
 
 const stats = [
@@ -189,16 +200,21 @@ const LandingPage = () => {
           <h2 className="text-2xl font-bold text-center mb-2">Browse by trade</h2>
           <p className="text-muted-foreground text-center mb-10">Find the right specialist for your project</p>
           <StaggerContainer className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {tradeCategories.map(({ label, slug, icon: Icon }) => (
+            {tradeCategories.map(({ label, slug, img }) => (
               <StaggerItem key={slug}>
                 <ScaleOnHover>
                   <Link
                     to={`/marketplace?category=${slug}`}
                     className="glass-card p-5 text-center hover:border-primary/40 hover:bg-primary/5 transition-all group block"
                   >
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mx-auto mb-3 group-hover:bg-primary/20 transition-colors">
-                      <Icon className="h-6 w-6 text-primary" />
-                    </div>
+                    <img
+                      src={img}
+                      alt={label}
+                      loading="lazy"
+                      width={64}
+                      height={64}
+                      className="h-16 w-16 object-contain mx-auto mb-3 drop-shadow-md group-hover:scale-110 transition-transform"
+                    />
                     <div className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
                       {label}
                     </div>
