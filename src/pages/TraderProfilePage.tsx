@@ -190,17 +190,53 @@ const TraderProfilePage = () => {
             </div>
           )}
 
-          {/* Placeholder for past work / reviews */}
+          {/* Portfolio / Before & After Gallery */}
           <div className="glass-card p-6 space-y-3">
-            <h2 className="text-lg font-semibold">Past Work & Reviews</h2>
-            <p className="text-sm text-muted-foreground">Photos and reviews from completed projects will appear here.</p>
-            <div className="grid grid-cols-3 gap-2">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="aspect-square rounded-lg bg-secondary/50 flex items-center justify-center">
-                  <CheckCircle className="h-6 w-6 text-muted-foreground/30" />
-                </div>
-              ))}
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Past Work Gallery</h2>
+              {completedJobCount > 0 && (
+                <span className="text-xs text-muted-foreground">{completedJobCount} completed job{completedJobCount !== 1 ? "s" : ""}</span>
+              )}
             </div>
+            {portfolioImages.length > 0 ? (
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                {portfolioImages.map((url, i) => (
+                  <div key={i} className="aspect-square rounded-lg overflow-hidden bg-secondary group relative">
+                    <img src={url} alt={`Work sample ${i + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-2">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="aspect-square rounded-lg bg-secondary/50 flex items-center justify-center">
+                    <CheckCircle className="h-6 w-6 text-muted-foreground/30" />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Reviews */}
+          <div className="glass-card p-6 space-y-3">
+            <h2 className="text-lg font-semibold">Customer Reviews</h2>
+            {reviews.length > 0 ? (
+              <div className="space-y-3">
+                {reviews.map((r: any) => (
+                  <div key={r.id} className="p-3 rounded-lg bg-secondary/40 space-y-1.5">
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star key={i} className={`h-3.5 w-3.5 ${i < r.rating ? "text-primary fill-primary" : "text-muted-foreground/30"}`} />
+                      ))}
+                      <span className="text-xs text-muted-foreground ml-2">{new Date(r.created_at).toLocaleDateString("en-GB", { month: "short", year: "numeric" })}</span>
+                    </div>
+                    {r.comment && <p className="text-sm text-muted-foreground">{r.comment}</p>}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No reviews yet.</p>
+            )}
           </div>
         </div>
 
