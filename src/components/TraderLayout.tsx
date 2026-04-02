@@ -4,7 +4,7 @@ import { NavLink } from "@/components/NavLink";
 import {
   LayoutDashboard, Briefcase, Package, Camera, FileCheck,
   Building2, Truck, CreditCard, MessageCircle, LogOut,
-  Wrench, Radio, Shield, Calendar, CalendarDays,
+  Wrench, Radio, Shield, Calendar, CalendarDays, Zap,
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 import {
@@ -28,6 +28,7 @@ const navGroups = [
     label: "Operations",
     items: [
       { to: "/materials", label: "Materials", icon: Package },
+      { to: "/smart-order", label: "Smart Order", icon: Zap },
       { to: "/site-evidence", label: "Site Evidence", icon: Camera },
       { to: "/daily-logs", label: "Daily Logs", icon: CalendarDays },
       { to: "/compliance", label: "Certificates", icon: FileCheck },
