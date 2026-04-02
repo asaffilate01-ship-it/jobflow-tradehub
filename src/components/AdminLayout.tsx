@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { NavLink } from "@/components/NavLink";
 import {
   LayoutDashboard, Users, Shield, BarChart3, UserCheck,
-  DollarSign, LogOut, Radio,
+  DollarSign, LogOut, Radio, ScrollText,
 } from "lucide-react";
 import traderosLogo from "@/assets/traderos-logo.png";
 import NotificationBell from "@/components/NotificationBell";
