@@ -181,7 +181,7 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="space-y-0 overflow-hidden">
+    <div className="space-y-0 overflow-hidden -mx-4 sm:-mx-6 lg:-mx-8 -mt-8">
       {/* Hero with background image */}
       <section className="relative min-h-[620px] flex items-center overflow-hidden">
         {/* Background image */}
