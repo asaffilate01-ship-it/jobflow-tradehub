@@ -118,7 +118,6 @@ const DriverLayout = () => {
               <div className="md:hidden">
                 <img src={traderosLogo} alt="TraderOS" className="h-7" />
               </div>
-              </div>
             </div>
             <NotificationBell />
           </header>
