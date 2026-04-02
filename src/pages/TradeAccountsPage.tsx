@@ -255,46 +255,46 @@ const TradeAccountsPage = () => {
           </h2>
           <div className="grid sm:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">
-                Merchant
-              </label>
-              <select
-                className={selectClass}
-                value={selectedMerchant}
-                onChange={(e) => setSelectedMerchant(e.target.value)}
-                required
-              >
+              <label className="text-sm font-medium text-muted-foreground">Merchant</label>
+              <select className={selectClass} value={selectedMerchant} onChange={(e) => setSelectedMerchant(e.target.value)} required>
                 <option value="">Select merchant…</option>
-                {merchants
-                  .filter((m) => m.supports_trade_account)
-                  .map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.name}
-                    </option>
-                  ))}
+                {merchants.filter((m) => m.supports_trade_account).map((m) => (
+                  <option key={m.id} value={m.id}>{m.name}</option>
+                ))}
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">
-                Account reference
-              </label>
-              <Input
-                placeholder="e.g. TP-12345"
-                value={accountRef}
-                onChange={(e) => setAccountRef(e.target.value)}
-                required
-              />
+              <label className="text-sm font-medium text-muted-foreground">Account reference</label>
+              <Input placeholder="e.g. TP-12345" value={accountRef} onChange={(e) => setAccountRef(e.target.value)} required />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">
-                Account name (optional)
-              </label>
-              <Input
-                placeholder="e.g. Main site account"
-                value={accountName}
-                onChange={(e) => setAccountName(e.target.value)}
-              />
+              <label className="text-sm font-medium text-muted-foreground">Trade discount %</label>
+              <Input type="number" placeholder="e.g. 15" value={discountPct} onChange={(e) => setDiscountPct(e.target.value)} />
             </div>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-muted-foreground">Account name (optional)</label>
+              <Input placeholder="e.g. Main site account" value={accountName} onChange={(e) => setAccountName(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-muted-foreground flex items-center gap-1"><Globe className="h-3 w-3" />Portal URL</label>
+              <Input placeholder="https://portal.jewson.co.uk" value={portalUrl} onChange={(e) => setPortalUrl(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-muted-foreground flex items-center gap-1"><KeyRound className="h-3 w-3" />Portal username</label>
+              <Input placeholder="your@email.com" value={portalUsername} onChange={(e) => setPortalUsername(e.target.value)} />
+            </div>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-muted-foreground flex items-center gap-1"><Lock className="h-3 w-3" />Portal password</label>
+              <Input type="password" placeholder="Encrypted & stored securely" value={portalPassword} onChange={(e) => setPortalPassword(e.target.value)} />
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+            <Lock className="h-3 w-3" />
+            Credentials are encrypted server-side using AES-256. We never store plain-text passwords.
           </div>
           <Button type="submit" className="font-semibold" disabled={submitting}>
             {submitting ? "Adding…" : "Add trade account"}
@@ -312,52 +312,62 @@ const TradeAccountsPage = () => {
       ) : accounts.length === 0 ? (
         <div className="glass-card p-10 text-center space-y-3">
           <Building2 className="h-10 w-10 text-muted-foreground mx-auto" />
-          <p className="text-muted-foreground font-medium">
-            No trade accounts linked yet
-          </p>
-          <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-            Link your merchant accounts below to start ordering materials at
-            trade prices.
-          </p>
+          <p className="text-muted-foreground font-medium">No trade accounts linked yet</p>
+          <p className="text-xs text-muted-foreground max-w-sm mx-auto">Link your merchant accounts below to start ordering materials at trade prices.</p>
         </div>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {accounts.map((acc) => (
-            <div
-              key={acc.id}
-              className="glass-card p-4 flex items-start gap-3 hover:border-primary/20 transition-colors"
-            >
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 shrink-0">
-                <Store className="h-5 w-5 text-primary" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-semibold text-foreground text-sm">
-                    {acc.merchant?.name ?? "Unknown"}
-                  </span>
-                  {acc.verified ? (
-                    <Badge
-                      variant="outline"
-                      className="bg-success/15 text-success border-success/20 gap-1 text-[10px]"
-                    >
-                      <CheckCircle className="h-3 w-3" />
-                      Verified
-                    </Badge>
-                  ) : (
-                    <Badge
-                      variant="outline"
-                      className="bg-warning/15 text-warning border-warning/20 gap-1 text-[10px]"
-                    >
-                      <XCircle className="h-3 w-3" />
-                      Pending
-                    </Badge>
-                  )}
+            <div key={acc.id} className="glass-card p-4 space-y-3 hover:border-primary/20 transition-colors">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 shrink-0">
+                  <Store className="h-5 w-5 text-primary" />
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Ref: <span className="font-mono">{acc.account_reference}</span>
-                  {acc.account_name && ` — ${acc.account_name}`}
-                </p>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-semibold text-foreground text-sm">{acc.merchant?.name ?? "Unknown"}</span>
+                    {acc.verified ? (
+                      <Badge variant="outline" className="bg-success/15 text-success border-success/20 gap-1 text-[10px]"><CheckCircle className="h-3 w-3" />Verified</Badge>
+                    ) : (
+                      <Badge variant="outline" className="bg-warning/15 text-warning border-warning/20 gap-1 text-[10px]"><XCircle className="h-3 w-3" />Pending</Badge>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Ref: <span className="font-mono">{acc.account_reference}</span>
+                    {acc.account_name && ` — ${acc.account_name}`}
+                  </p>
+                </div>
               </div>
+              <div className="flex items-center gap-3 text-[10px]">
+                {acc.encrypted_credentials ? (
+                  <span className="flex items-center gap-1 text-success"><Lock className="h-3 w-3" />Credentials saved</span>
+                ) : (
+                  <span className="flex items-center gap-1 text-muted-foreground"><KeyRound className="h-3 w-3" />No credentials</span>
+                )}
+                {(acc.discount_percentage ?? 0) > 0 && (
+                  <span className="text-primary font-medium">{acc.discount_percentage}% discount</span>
+                )}
+              </div>
+              {editingCredentials === acc.id ? (
+                <div className="space-y-2 pt-2 border-t border-border">
+                  <Input size={1} placeholder="Portal URL" value={editPortalUrl} onChange={(e) => setEditPortalUrl(e.target.value)} className="h-8 text-xs" />
+                  <Input size={1} placeholder="Username" value={editPortalUsername} onChange={(e) => setEditPortalUsername(e.target.value)} className="h-8 text-xs" />
+                  <Input size={1} type="password" placeholder="Password" value={editPassword} onChange={(e) => setEditPassword(e.target.value)} className="h-8 text-xs" />
+                  <div className="flex gap-2">
+                    <Button size="sm" className="h-7 text-xs" onClick={() => handleSaveCredentials(acc.id)} disabled={savingCredentials}>{savingCredentials ? "Saving…" : "Save"}</Button>
+                    <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setEditingCredentials(null)}>Cancel</Button>
+                  </div>
+                </div>
+              ) : (
+                <Button size="sm" variant="ghost" className="h-7 text-xs w-full" onClick={() => {
+                  setEditingCredentials(acc.id);
+                  setEditPortalUrl(acc.portal_url ?? "");
+                  setEditPortalUsername(acc.portal_username ?? "");
+                  setEditPassword("");
+                }}>
+                  <KeyRound className="h-3 w-3 mr-1" />{acc.encrypted_credentials ? "Update" : "Add"} Credentials
+                </Button>
+              )}
             </div>
           ))}
         </div>
