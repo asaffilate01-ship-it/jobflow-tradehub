@@ -8,7 +8,7 @@ import {
   ArrowLeft, Camera as CameraIcon, Flashlight, FlashlightOff, SwitchCamera,
   MapPin, Clock, FolderOpen, Loader2, Type, X,
 } from "lucide-react";
-import { EVIDENCE_PHASES, EVIDENCE_LOCATIONS, EVIDENCE_ELEMENTS } from "@/lib/evidence-constants";
+import { EVIDENCE_SUBFOLDERS, EVIDENCE_LOCATIONS, EVIDENCE_SURVEY_TYPES } from "@/lib/evidence-constants";
 
 const EvidenceCameraPage = () => {
   const navigate = useNavigate();
