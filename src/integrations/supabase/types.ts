@@ -2535,6 +2535,9 @@ export type Database = {
         | "painter"
         | "landscaper"
         | "other"
+        | "removals"
+        | "rubbish_collection"
+        | "cleaner"
       urgency_level: "standard" | "priority" | "emergency"
       vehicle_type:
         | "car"
@@ -2738,6 +2741,9 @@ export const Constants = {
         "painter",
         "landscaper",
         "other",
+        "removals",
+        "rubbish_collection",
+        "cleaner",
       ],
       urgency_level: ["standard", "priority", "emergency"],
       vehicle_type: [

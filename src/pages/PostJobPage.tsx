@@ -9,7 +9,8 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Wrench, Zap, HardHat, Home, Grid3X3, Hammer, BrickWall,
-  Paintbrush, Flame, TreePine, ArrowRight, ArrowLeft, CheckCircle, MapPin
+  Paintbrush, Flame, TreePine, ArrowRight, ArrowLeft, CheckCircle, MapPin,
+  Truck, Trash2, SprayCan,
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -27,6 +28,9 @@ const trades: { slug: TradeType; label: string; icon: any }[] = [
   { slug: "painter", label: "Painter", icon: Paintbrush },
   { slug: "gas_engineer", label: "Gas Engineer", icon: Flame },
   { slug: "landscaper", label: "Landscaper", icon: TreePine },
+  { slug: "removals", label: "Removals", icon: Truck },
+  { slug: "rubbish_collection", label: "Rubbish Collection", icon: Trash2 },
+  { slug: "cleaner", label: "Cleaner", icon: SprayCan },
   { slug: "other", label: "Other", icon: Hammer },
 ];
 
