@@ -201,13 +201,18 @@ const JobsPage = () => {
       {loading ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="glass-card p-5 h-40 animate-pulse" />
+            <div key={i} className="glass-card p-5 space-y-3">
+              <div className="skeleton-shimmer h-9 w-9 rounded-lg" />
+              <div className="skeleton-shimmer h-5 w-3/4" />
+              <div className="skeleton-shimmer h-4 w-1/2" />
+            </div>
           ))}
         </div>
       ) : jobs.length === 0 ? (
-        <div className="glass-card p-12 text-center">
-          <Briefcase className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-          <p className="text-muted-foreground">No jobs posted yet.</p>
+        <div className="empty-state glass-card">
+          <Briefcase className="empty-state-icon" />
+          <p className="empty-state-title">No jobs posted yet</p>
+          <p className="empty-state-desc">Be the first to post a job and get quotes from verified tradespeople.</p>
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
