@@ -1,11 +1,12 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { 
-  Briefcase, Truck, Home, Menu, X, Users, LogIn, LogOut, Search, FolderOpen, Sun, Moon
+  Briefcase, Home, Menu, X, Users, LogIn, LogOut, Search, FolderOpen, Sun, Moon
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
+import traderosLogo from "@/assets/traderos-logo.png";
 
 const AppNav = () => {
   const location = useLocation();
