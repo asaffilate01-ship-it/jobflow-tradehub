@@ -148,24 +148,61 @@ const TradeAccountsPage = () => {
       merchant_id: selectedMerchant,
       account_reference: accountRef,
       account_name: accountName || null,
+      discount_percentage: discountPct ? Number(discountPct) : 0,
     });
     setSubmitting(false);
     if (error) {
       toast.error(error.message);
     } else {
+      // Save credentials via edge function if provided
+      if (portalPassword) {
+        const { data: newAccs } = await supabase
+          .from("trade_accounts")
+          .select("id")
+          .eq("trade_company_id", companyId)
+          .eq("merchant_id", selectedMerchant)
+          .order("created_at", { ascending: false })
+          .limit(1);
+        if (newAccs?.[0]) {
+          await supabase.functions.invoke("merchant-credentials", {
+            body: { action: "save", trade_account_id: newAccs[0].id, portal_url: portalUrl, portal_username: portalUsername, password: portalPassword },
+          });
+        }
+      }
       toast.success("Trade account added!");
       setShowForm(false);
-      setAccountRef("");
-      setAccountName("");
-      const { data: accs } = await supabase
-        .from("trade_accounts")
-        .select("id, merchant_id, account_reference, account_name, verified")
-        .eq("trade_company_id", companyId);
-      const enriched = (accs ?? []).map((a) => ({
-        ...a,
-        merchant: merchants.find((m) => m.id === a.merchant_id),
-      }));
-      setAccounts(enriched as TradeAccount[]);
+      setAccountRef(""); setAccountName(""); setPortalUrl(""); setPortalUsername(""); setPortalPassword(""); setDiscountPct("");
+      await refreshAccounts();
+    }
+  };
+
+  const refreshAccounts = async () => {
+    if (!companyId) return;
+    const { data: accs } = await supabase
+      .from("trade_accounts")
+      .select("id, merchant_id, account_reference, account_name, verified, portal_url, portal_username, encrypted_credentials, discount_percentage")
+      .eq("trade_company_id", companyId);
+    const enriched = (accs ?? []).map((a: any) => ({
+      ...a,
+      merchant: merchants.find((m) => m.id === a.merchant_id),
+    }));
+    setAccounts(enriched as TradeAccount[]);
+  };
+
+  const handleSaveCredentials = async (accountId: string) => {
+    if (!editPassword) { toast.error("Enter a password"); return; }
+    setSavingCredentials(true);
+    const { data, error } = await supabase.functions.invoke("merchant-credentials", {
+      body: { action: "save", trade_account_id: accountId, portal_url: editPortalUrl, portal_username: editPortalUsername, password: editPassword },
+    });
+    setSavingCredentials(false);
+    if (error || data?.error) {
+      toast.error(data?.error || error?.message || "Failed to save credentials");
+    } else {
+      toast.success("Credentials saved securely");
+      setEditingCredentials(null);
+      setEditPassword(""); setEditPortalUrl(""); setEditPortalUsername("");
+      await refreshAccounts();
     }
   };
 
