@@ -233,7 +233,7 @@ const LoginPage = () => {
           )}
 
           <div className="grid gap-3">
-            {(["customer", "trader", "driver", "admin"] as const).map((key) => {
+            {(["customer", "trader", "driver", "agent", "admin"] as const).map((key) => {
               const config = portalConfig[key];
               const Icon = config.icon;
               return (
