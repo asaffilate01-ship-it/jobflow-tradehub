@@ -37,12 +37,18 @@ const navGroups = [
     ],
   },
   {
+    label: "Finance",
+    items: [
+      { to: "/accounting", label: "Accounting", icon: Calculator },
+      { to: "/trade-accounts", label: "Trade Accounts", icon: Building2 },
+      { to: "/subscription", label: "Subscription", icon: CreditCard },
+    ],
+  },
+  {
     label: "Account",
     items: [
-      { to: "/trade-accounts", label: "Trade Accounts", icon: Building2 },
       { to: "/broadcasts", label: "Broadcasts", icon: Radio },
       { to: "/kyc-upload", label: "Verification", icon: Shield },
-      { to: "/subscription", label: "Subscription", icon: CreditCard },
     ],
   },
 ];
