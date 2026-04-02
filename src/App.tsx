@@ -29,6 +29,7 @@ import ComplianceCertsPage from "./pages/ComplianceCertsPage";
 import PostJobPage from "./pages/PostJobPage";
 import DriverDashboard from "./pages/DriverDashboard";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import BroadcastsPage from "./pages/BroadcastsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
