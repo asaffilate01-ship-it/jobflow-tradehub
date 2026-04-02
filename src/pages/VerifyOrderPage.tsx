@@ -129,7 +129,7 @@ const VerifyOrderPage = () => {
           </div>
 
           <div className="text-center text-[10px] text-muted-foreground pt-2">
-            TradeFlow Platform • Verified at {format(new Date(), "HH:mm dd/MM/yyyy")}
+            TraderOS Platform • Verified at {format(new Date(), "HH:mm dd/MM/yyyy")}
           </div>
         </div>
       </div>
