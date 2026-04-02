@@ -1,7 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { 
-  Briefcase, Package, Truck, Home, Menu, X, Users, LogIn, LogOut, 
-  LayoutDashboard, Building2, Search, MessageCircle, Camera, FileCheck, CreditCard
+  Briefcase, Truck, Home, Menu, X, Users, LogIn, LogOut, Search
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,21 +17,14 @@ const AppNav = () => {
   const isCustomer = roles.includes("customer");
   const isAdmin = roles.includes("admin");
 
-  // Build nav items based on role
+  // Public / customer nav items only — trader/driver have their own layouts
   const navItems = [
     { to: "/", label: "Home", icon: Home, show: true },
     { to: "/marketplace", label: "Find Trades", icon: Search, show: true },
     { to: "/jobs", label: "Jobs", icon: Briefcase, show: true },
-    { to: "/messages", label: "Messages", icon: MessageCircle, show: !!user },
-    { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, show: isTrade || isAdmin },
-    { to: "/trade-accounts", label: "Accounts", icon: Building2, show: isTrade || isAdmin },
-    { to: "/materials", label: "Materials", icon: Package, show: isTrade || isAdmin },
-    { to: "/basic-cam", label: "BASIC CAM", icon: Camera, show: isTrade || isAdmin },
-    { to: "/compliance", label: "Certs", icon: FileCheck, show: isTrade || isAdmin },
-    { to: "/deliveries", label: "Deliveries", icon: Truck, show: isTrade || isDriver || isAdmin },
-    { to: "/driver", label: "Driver Hub", icon: Truck, show: isDriver || isAdmin },
-    { to: "/subscription", label: "Plans", icon: CreditCard, show: isTrade || isAdmin },
-  ].filter((item) => item.show);
+  ];
+
+  const filteredItems = navItems.filter((item) => item.show);
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
@@ -48,7 +40,7 @@ const AppNav = () => {
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-1">
-          {navItems.map(({ to, label, icon: Icon }) => {
+          {filteredItems.map(({ to, label, icon: Icon }) => {
             const active = location.pathname === to;
             return (
               <Link
@@ -71,10 +63,14 @@ const AppNav = () => {
           {user ? (
             <div className="flex items-center gap-2">
               {isTrade && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">Trade</span>
+                <Button variant="outline" size="sm" onClick={() => navigate("/dashboard")} className="gap-2 text-xs">
+                  Trader Portal
+                </Button>
               )}
               {isDriver && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-info/10 text-info font-medium">Driver</span>
+                <Button variant="outline" size="sm" onClick={() => navigate("/driver")} className="gap-2 text-xs">
+                  Driver Hub
+                </Button>
               )}
               {isCustomer && (
                 <span className="text-xs px-2 py-0.5 rounded-full bg-success/10 text-success font-medium">Customer</span>
@@ -109,7 +105,7 @@ const AppNav = () => {
       {/* Mobile menu */}
       {mobileOpen && (
         <div className="md:hidden border-t border-border bg-background px-4 pb-4">
-          {navItems.map(({ to, label, icon: Icon }) => {
+          {filteredItems.map(({ to, label, icon: Icon }) => {
             const active = location.pathname === to;
             return (
               <Link
@@ -127,6 +123,30 @@ const AppNav = () => {
               </Link>
             );
           })}
+
+          {user && (isTrade || isDriver) && (
+            <div className="pt-2 border-t border-border mt-2 space-y-1">
+              {isTrade && (
+                <Link
+                  to="/dashboard"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-3 rounded-md px-3 py-3 text-sm font-medium text-primary"
+                >
+                  Go to Trader Portal →
+                </Link>
+              )}
+              {isDriver && (
+                <Link
+                  to="/driver"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-3 rounded-md px-3 py-3 text-sm font-medium text-accent"
+                >
+                  Go to Driver Hub →
+                </Link>
+              )}
+            </div>
+          )}
+
           <div className="pt-2 border-t border-border mt-2">
             {user ? (
               <button

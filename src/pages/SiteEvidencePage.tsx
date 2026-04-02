@@ -215,8 +215,8 @@ const BasicCamPage = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">BASIC CAM</h1>
-        <p className="text-sm text-muted-foreground mt-1">GPS-stamped photo & video evidence for jobs</p>
+        <h1 className="text-2xl font-bold tracking-tight">Site Evidence</h1>
+        <p className="text-sm text-muted-foreground mt-1">GPS-stamped photo & video evidence for your jobs</p>
       </div>
 
       {/* Controls */}

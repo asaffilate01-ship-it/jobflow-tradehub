@@ -44,8 +44,26 @@ const JobsPage = () => {
 
   const isCustomer = roles.includes("customer");
   const isTrade = roles.includes("trade");
-  // TODO: Check marketplace_memberships for subscription status
-  const isSubscribed = isTrade; // For now, all trades can see — will gate with subscriptions later
+  const isAdmin = roles.includes("admin");
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
+  // Check subscription status
+  useEffect(() => {
+    if (!user || !isTrade) return;
+    const checkSub = async () => {
+      const { data: companies } = await supabase.from("trade_companies").select("id").eq("owner_profile_id", user.id);
+      if (companies?.length) {
+        const { data: memberships } = await supabase
+          .from("marketplace_memberships")
+          .select("id")
+          .eq("trade_company_id", companies[0].id)
+          .eq("status", "active")
+          .limit(1);
+        setIsSubscribed((memberships?.length ?? 0) > 0 || isAdmin);
+      }
+    };
+    checkSub();
+  }, [user, isTrade, isAdmin]);
 
   const fetchJobs = async () => {
     setLoading(true);

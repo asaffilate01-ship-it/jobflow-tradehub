@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "./contexts/AuthContext";
 import AppLayout from "./components/AppLayout";
+import TraderLayout from "./components/TraderLayout";
+import DriverLayout from "./components/DriverLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import KycGate from "./components/KycGate";
 import LandingPage from "./pages/LandingPage";
@@ -22,7 +24,7 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import SubscriptionPage from "./pages/SubscriptionPage";
 import MessagesPage from "./pages/MessagesPage";
-import BasicCamPage from "./pages/BasicCamPage";
+import SiteEvidencePage from "./pages/SiteEvidencePage";
 import ComplianceCertsPage from "./pages/ComplianceCertsPage";
 import PostJobPage from "./pages/PostJobPage";
 import DriverDashboard from "./pages/DriverDashboard";
@@ -49,14 +51,11 @@ const App = () => (
               </ProtectedRoute>
             } />
 
-            {/* Main layout */}
+            {/* Public / Customer layout (top nav) */}
             <Route element={<AppLayout />}>
-              {/* Public */}
               <Route path="/" element={<LandingPage />} />
               <Route path="/marketplace" element={<MarketplacePage />} />
               <Route path="/trader/:id" element={<TraderProfilePage />} />
-
-              {/* Jobs */}
               <Route path="/jobs" element={<JobsPage />} />
               <Route path="/post-job" element={
                 <ProtectedRoute>
@@ -69,67 +68,35 @@ const App = () => (
                   <SubmitQuotePage />
                 </ProtectedRoute>
               } />
+            </Route>
 
-              {/* Subscription */}
-              <Route path="/subscription" element={
-                <ProtectedRoute>
-                  <SubscriptionPage />
-                </ProtectedRoute>
-              } />
+            {/* Trader layout (sidebar desktop, bottom nav mobile) */}
+            <Route element={
+              <ProtectedRoute allowedRoles={["trade", "admin"]}>
+                <KycGate>
+                  <TraderLayout />
+                </KycGate>
+              </ProtectedRoute>
+            }>
+              <Route path="/dashboard" element={<TraderDashboard />} />
+              <Route path="/trade-accounts" element={<TradeAccountsPage />} />
+              <Route path="/materials" element={<MaterialsPage />} />
+              <Route path="/site-evidence" element={<SiteEvidencePage />} />
+              <Route path="/compliance" element={<ComplianceCertsPage />} />
+              <Route path="/deliveries" element={<DeliveriesPage />} />
+              <Route path="/messages" element={<MessagesPage />} />
+              <Route path="/subscription" element={<SubscriptionPage />} />
+            </Route>
 
-              {/* Messages — any authenticated user */}
-              <Route path="/messages" element={
-                <ProtectedRoute>
-                  <MessagesPage />
-                </ProtectedRoute>
-              } />
-
-              {/* Trade-only pages */}
-              <Route path="/dashboard" element={
-                <ProtectedRoute allowedRoles={["trade", "admin"]}>
-                  <KycGate>
-                    <TraderDashboard />
-                  </KycGate>
-                </ProtectedRoute>
-              } />
-              <Route path="/trade-accounts" element={
-                <ProtectedRoute allowedRoles={["trade", "admin"]}>
-                  <TradeAccountsPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/materials" element={
-                <ProtectedRoute allowedRoles={["trade", "admin"]}>
-                  <KycGate>
-                    <MaterialsPage />
-                  </KycGate>
-                </ProtectedRoute>
-              } />
-              <Route path="/basic-cam" element={
-                <ProtectedRoute allowedRoles={["trade", "admin"]}>
-                  <BasicCamPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/compliance" element={
-                <ProtectedRoute allowedRoles={["trade", "admin"]}>
-                  <ComplianceCertsPage />
-                </ProtectedRoute>
-              } />
-
-              {/* Deliveries — trades + drivers */}
-              <Route path="/deliveries" element={
-                <ProtectedRoute allowedRoles={["trade", "driver", "admin"]}>
-                  <DeliveriesPage />
-                </ProtectedRoute>
-              } />
-
-              {/* Driver dashboard */}
-              <Route path="/driver" element={
-                <ProtectedRoute allowedRoles={["driver", "admin"]}>
-                  <KycGate>
-                    <DriverDashboard />
-                  </KycGate>
-                </ProtectedRoute>
-              } />
+            {/* Driver layout (sidebar desktop, bottom nav mobile) */}
+            <Route element={
+              <ProtectedRoute allowedRoles={["driver", "admin"]}>
+                <KycGate>
+                  <DriverLayout />
+                </KycGate>
+              </ProtectedRoute>
+            }>
+              <Route path="/driver" element={<DriverDashboard />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />

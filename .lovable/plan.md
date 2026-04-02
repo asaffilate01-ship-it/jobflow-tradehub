@@ -1,40 +1,50 @@
+## Phase 1: Navigation Overhaul
 
-## Features to Build
+### 1a. Trader Sidebar (Desktop) + Bottom Nav (Mobile)
+- Create `TraderLayout.tsx` with shadcn Sidebar for desktop (collapsible icon mode)
+- Bottom nav bar for mobile with key trader actions (Dashboard, Jobs, Materials, Evidence, Messages)
+- Replace `AppLayout` usage for all trade-only routes in `App.tsx`
+- Keep `AppLayout` (top nav) for public/customer pages
 
-### 1. Multi-Merchant Price Comparison
-- When ordering materials, search `merchant_catalog_items` across multiple merchants for the same/similar items
-- Show a comparison table: merchant name, price, stock status, delivery options
-- Highlight cheapest option per item, factor in delivery cost
-- Trader picks best combination
+### 1b. Driver Layout
+- Similar pattern: compact sidebar desktop, bottom nav mobile
+- Key nav: Dashboard, Active Deliveries, Earnings, Profile
 
-### 2. Merchant Catalog Integration
-- Seed `merchant_catalog_items` with sample products across key merchants (timber, cement, plumbing fittings, etc.)
-- Build a browsable catalog UI on the Materials page — search/filter by category, merchant
-- Allow adding catalog items directly to an order (auto-fills name, price, SKU)
+### 2. Rename "Basic CAM" → "Site Evidence"
+- Rename the page title, nav labels, and route from `/basic-cam` to `/site-evidence`
+- Update all references
 
-### 3. Distance Auto-Calculation
-- Use postcode-based distance estimation (lookup table or Haversine formula)
-- Seed merchant_branches with lat/lng coordinates
-- When a job + merchant branch are selected, auto-calculate miles and update delivery pricing
-- Replace manual miles input with auto-calculated value (with manual override)
+## Phase 2: UI/UX Polish
 
-### 4. Driver Broadcast & Acceptance Flow
-- **Driver Dashboard**: Show available (broadcast) deliveries with pickup/dropoff, payout, vehicle requirement
-- Accept delivery → updates status to "assigned" and sets driver_profile_id
-- Delivery status progression: assigned → arrived_at_pickup → collected → en_route → delivered
-- Status update buttons with timestamps
-- Delivery event log (already has table)
+### 3. Trader Dashboard Polish
+- Better KPI cards with sparklines/progress indicators
+- Recent activity feed (quotes, orders, messages)
+- Job status chips with consistent color coding
+- Responsive card grid improvements
 
-### 5. Merchant Confirmation Flow
-- After trader submits order (status: submitted), merchant needs to confirm
-- Add order detail view showing items, status timeline
-- Status progression: draft → submitted → confirmed → ready_for_pickup → collected → delivered
-- Trader can see real-time status updates on their orders
+### 4. Driver Dashboard Polish
+- Cleaner delivery cards with route info
+- Earnings summary with period selector
+- Available jobs map placeholder
 
-### Implementation Order
-1. Seed catalog data (DB insert)
-2. Merchant catalog browsing + add-to-order UI
-3. Multi-merchant comparison on Materials page
-4. Distance auto-calc (seed branch coords + Haversine)
-5. Driver delivery acceptance flow (DriverDashboard)
-6. Order status timeline + confirmation flow
+### 5. Materials Page Polish
+- Step-by-step wizard flow (Select Job → Browse Catalog → Compare Prices → Checkout)
+- Better price comparison table layout
+- Clearer delivery mode selection with cost breakdown
+
+### 6. General Polish
+- Consistent glass-card styling with subtle gradients
+- Loading skeletons everywhere
+- Empty states with CTAs
+- Breadcrumbs on detail pages
+
+## Phase 3: Spec Gap Fills
+
+### 7. Multi-Merchant Price Comparison (per spec)
+- Show itemised report: cheapest per product across merchants
+- Factor in delivery costs + trade account discounts
+- Allow trader to pick best option per item
+
+### 8. Job Visibility Rules (per spec)
+- Free users: title, trade type, area code, property type only
+- Subscribed: full address, budget, customer contact, description
