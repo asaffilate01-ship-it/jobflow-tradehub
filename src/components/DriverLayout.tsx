@@ -5,6 +5,7 @@ import {
   LayoutDashboard, Truck, DollarSign, User, LogOut, Package,
   TruckIcon, Navigation, Settings,
 } from "lucide-react";
+import NotificationBell from "@/components/NotificationBell";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
   SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
