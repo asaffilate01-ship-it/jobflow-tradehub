@@ -76,13 +76,8 @@ const Footer = () => (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
         {/* Brand */}
         <div className="col-span-2 md:col-span-1 space-y-4">
-          <Link to="/" className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-              <Truck className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="text-lg font-bold tracking-tight text-foreground">
-              Trade<span className="text-primary">Flow</span>
-            </span>
+          <Link to="/" className="flex items-center gap-2">
+            <img src={traderosLogo} alt="TraderOS" className="h-9" />
           </Link>
           <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
             The UK's complete platform for finding trusted tradespeople and managing construction projects.
