@@ -49,9 +49,9 @@ const navGroups = [
 const mobileNavItems = [
   { to: "/dashboard", label: "Home", icon: LayoutDashboard },
   { to: "/jobs", label: "Jobs", icon: Briefcase },
+  { to: "/schedule", label: "Schedule", icon: Calendar },
   { to: "/site-evidence", label: "Evidence", icon: Camera },
-  { to: "/messages", label: "Messages", icon: MessageCircle },
-  { to: "/materials", label: "Materials", icon: Package },
+  { to: "/messages", label: "Chat", icon: MessageCircle },
 ];
 
 function TraderSidebar() {
