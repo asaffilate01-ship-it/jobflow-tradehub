@@ -4,13 +4,13 @@ import { NavLink } from "@/components/NavLink";
 import {
   LayoutDashboard, Briefcase, Package, Camera, FileCheck,
   Building2, Truck, CreditCard, MessageCircle, LogOut,
-  Wrench, Radio, Shield,
+  Wrench, Radio, Shield, Calendar, CalendarDays,
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
   SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
-  SidebarProvider, SidebarTrigger,  useSidebar,
+  SidebarProvider, SidebarTrigger, useSidebar,
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -20,6 +20,7 @@ const navGroups = [
     items: [
       { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
       { to: "/jobs", label: "Jobs", icon: Briefcase },
+      { to: "/schedule", label: "Schedule", icon: Calendar },
       { to: "/messages", label: "Messages", icon: MessageCircle },
     ],
   },
@@ -28,6 +29,7 @@ const navGroups = [
     items: [
       { to: "/materials", label: "Materials", icon: Package },
       { to: "/site-evidence", label: "Site Evidence", icon: Camera },
+      { to: "/daily-logs", label: "Daily Logs", icon: CalendarDays },
       { to: "/compliance", label: "Certificates", icon: FileCheck },
       { to: "/deliveries", label: "Deliveries", icon: Truck },
     ],
