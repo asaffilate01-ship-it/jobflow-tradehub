@@ -147,6 +147,7 @@ const App = () => (
               <Route path="/admin/agents" element={<AdminAgentsPage />} />
               <Route path="/admin/commissions" element={<AgentCommissionsPage />} />
               <Route path="/admin/broadcasts" element={<BroadcastsPage />} />
+              <Route path="/admin/audit-log" element={<AdminAuditLogPage />} />
             </Route>
 
             {/* Driver layout (sidebar desktop, bottom nav mobile) */}
