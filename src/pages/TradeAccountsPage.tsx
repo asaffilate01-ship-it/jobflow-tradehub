@@ -72,7 +72,18 @@ const TradeAccountsPage = () => {
   const [selectedMerchant, setSelectedMerchant] = useState("");
   const [accountRef, setAccountRef] = useState("");
   const [accountName, setAccountName] = useState("");
+  const [portalUrl, setPortalUrl] = useState("");
+  const [portalUsername, setPortalUsername] = useState("");
+  const [portalPassword, setPortalPassword] = useState("");
+  const [discountPct, setDiscountPct] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  // Credential editing
+  const [editingCredentials, setEditingCredentials] = useState<string | null>(null);
+  const [editPassword, setEditPassword] = useState("");
+  const [editPortalUrl, setEditPortalUrl] = useState("");
+  const [editPortalUsername, setEditPortalUsername] = useState("");
+  const [savingCredentials, setSavingCredentials] = useState(false);
 
   const selectClass =
     "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
