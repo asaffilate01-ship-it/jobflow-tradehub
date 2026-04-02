@@ -124,9 +124,9 @@ const TradeAccountsPage = () => {
       if (cId) {
         const { data: accs } = await supabase
           .from("trade_accounts")
-          .select("id, merchant_id, account_reference, account_name, verified")
+          .select("id, merchant_id, account_reference, account_name, verified, portal_url, portal_username, encrypted_credentials, discount_percentage")
           .eq("trade_company_id", cId);
-        const enriched = (accs ?? []).map((a) => ({
+        const enriched = (accs ?? []).map((a: any) => ({
           ...a,
           merchant: (merch ?? []).find(
             (m: Merchant) => m.id === a.merchant_id
