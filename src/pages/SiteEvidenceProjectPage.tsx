@@ -10,7 +10,7 @@ import {
   Camera, Upload, FolderOpen, Image, Video, ChevronRight, Loader2,
   ArrowLeft, Download,
 } from "lucide-react";
-import { EVIDENCE_PHASES } from "@/lib/evidence-constants";
+import { EVIDENCE_SUBFOLDERS } from "@/lib/evidence-constants";
 
 type MediaItem = {
   id: string;
