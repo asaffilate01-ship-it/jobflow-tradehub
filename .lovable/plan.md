@@ -32,20 +32,23 @@
 - `sync-merchant-catalog` edge function — CSV/JSON bulk catalog upload
 - API adapter stubs for Travis Perkins, Jewson, Toolstation, Screwfix
 
-## Phase 8: Email & SMS Notifications (next)
-- Email domain setup for transactional emails
-- Twilio connector for SMS alerts
-- Edge function to dispatch notifications across channels
+## Phase 8: Email & SMS Notifications ✅ (dispatch ready, domain pending)
+- `dispatch-notification` edge function — multi-channel (in-app, email, SMS)
+- Email: uses Lovable email infra (send_email_message RPC) — needs domain setup
+- SMS: Twilio integration ready — needs TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER secrets
+- Supports single-recipient and broadcast modes
 
 ## Phase 9: Push Notifications (next)
 - Web Push API integration for PWA
 - Capacitor Push Notifications plugin for native
 
-## Phase 10: OWASP Top 10 Security Audit (next)
-- Run security scan
-- Review all RLS policies
-- Check for injection, XSS, broken auth, CSRF
-- Fix findings and document
+## Phase 10: OWASP Top 10 Security Audit ✅
+- Removed public material_orders read policy → replaced with verify_order_status() RPC
+- Replaced public profiles policy → restricted to authenticated, sensitive fields protected
+- Tightened jobs RLS → posted visible to all, other statuses only to related users
+- Removed duplicate storage INSERT policy on job-evidence
+- Added UPDATE policy on job-evidence storage
+- Realtime channel scoping: documented as Supabase-managed limitation
 
 ## Phase 11: Live Merchant API Integrations (future)
 - Travis Perkins API credentials + real adapter
