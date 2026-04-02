@@ -109,7 +109,7 @@ const App = () => (
 
             {/* Trader layout (sidebar desktop, bottom nav mobile) */}
             <Route element={
-              <ProtectedRoute allowedRoles={["trade", "admin"]}>
+              <ProtectedRoute allowedRoles={["trade", "admin", "staff"]}>
                 <KycGate>
                   <TraderLayout />
                 </KycGate>
@@ -128,12 +128,26 @@ const App = () => (
               <Route path="/broadcasts" element={<BroadcastsPage />} />
               <Route path="/subscription" element={<SubscriptionPage />} />
               <Route path="/kyc-upload" element={<KycUploadPage />} />
-              <Route path="/admin/kyc" element={<AdminKycPage />} />
               <Route path="/schedule" element={<SchedulePage />} />
               <Route path="/daily-logs" element={<DailyLogsPage />} />
               <Route path="/daily-logs/:jobId" element={<DailyLogsPage />} />
               <Route path="/orders/:orderId/receipt" element={<OrderReceiptPage />} />
               <Route path="/accounting" element={<AccountingPage />} />
+            </Route>
+
+            {/* Admin layout */}
+            <Route element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminLayout />
+              </ProtectedRoute>
+            }>
+              <Route path="/admin" element={<AdminDashboardPage />} />
+              <Route path="/admin/users" element={<AdminUsersPage />} />
+              <Route path="/admin/kyc-review" element={<AdminKycPage />} />
+              <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
+              <Route path="/admin/agents" element={<AdminAgentsPage />} />
+              <Route path="/admin/commissions" element={<AgentCommissionsPage />} />
+              <Route path="/admin/broadcasts" element={<BroadcastsPage />} />
             </Route>
 
             {/* Driver layout (sidebar desktop, bottom nav mobile) */}
