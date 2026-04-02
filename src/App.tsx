@@ -53,6 +53,7 @@ import AdminDashboardPage from "./pages/AdminDashboardPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
 import AdminAnalyticsPage from "./pages/AdminAnalyticsPage";
 import AdminAgentsPage from "./pages/AdminAgentsPage";
+import AdminAuditLogPage from "./pages/AdminAuditLogPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -146,6 +147,7 @@ const App = () => (
               <Route path="/admin/agents" element={<AdminAgentsPage />} />
               <Route path="/admin/commissions" element={<AgentCommissionsPage />} />
               <Route path="/admin/broadcasts" element={<BroadcastsPage />} />
+              <Route path="/admin/audit-log" element={<AdminAuditLogPage />} />
             </Route>
 
             {/* Driver layout (sidebar desktop, bottom nav mobile) */}
