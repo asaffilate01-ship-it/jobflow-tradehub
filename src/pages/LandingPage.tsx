@@ -197,7 +197,7 @@ const LandingPage = () => {
         {/* Dark overlay for text readability */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/70 to-black/30" />
 
-        <FadeIn className="max-w-6xl mx-auto px-4 py-24 sm:py-32 w-full">
+        <FadeIn className="relative max-w-6xl mx-auto px-4 py-24 sm:py-32 w-full z-10">
           <div className="max-w-2xl space-y-8">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
