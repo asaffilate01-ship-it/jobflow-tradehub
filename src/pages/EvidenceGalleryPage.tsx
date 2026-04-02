@@ -24,6 +24,7 @@ const EvidenceGalleryPage = () => {
   const { jobId } = useParams();
   const [searchParams] = useSearchParams();
   const phaseFilter = searchParams.get("phase") || "";
+  const subFilter = searchParams.get("sub") || "";
   const { user } = useAuth();
 
   const [media, setMedia] = useState<MediaItem[]>([]);
