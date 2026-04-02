@@ -1265,36 +1265,54 @@ export type Database = {
       }
       merchants: {
         Row: {
+          average_price_band: string
+          category: string
           created_at: string
           id: string
           integration_mode: string
+          lat: number | null
+          lng: number | null
           name: string
+          postcode: string | null
           slug: string
           supports_click_collect: boolean
           supports_delivery: boolean
           supports_trade_account: boolean
+          type: string
           website_url: string | null
         }
         Insert: {
+          average_price_band?: string
+          category?: string
           created_at?: string
           id?: string
           integration_mode?: string
+          lat?: number | null
+          lng?: number | null
           name: string
+          postcode?: string | null
           slug: string
           supports_click_collect?: boolean
           supports_delivery?: boolean
           supports_trade_account?: boolean
+          type?: string
           website_url?: string | null
         }
         Update: {
+          average_price_band?: string
+          category?: string
           created_at?: string
           id?: string
           integration_mode?: string
+          lat?: number | null
+          lng?: number | null
           name?: string
+          postcode?: string | null
           slug?: string
           supports_click_collect?: boolean
           supports_delivery?: boolean
           supports_trade_account?: boolean
+          type?: string
           website_url?: string | null
         }
         Relationships: []
