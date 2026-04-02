@@ -296,12 +296,16 @@ const LoginPage = () => {
           >
             ← Back to portal selection
           </button>
-          <p className="text-sm text-muted-foreground">
-            Don't have an account?{" "}
-            <Link to="/signup" className="text-primary hover:underline font-medium">
+          <div className="flex items-center justify-center gap-3">
+            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+              <Home className="h-3.5 w-3.5" />
+              Home
+            </Link>
+            <span className="text-muted-foreground/40">·</span>
+            <Link to="/signup" className="text-sm text-primary hover:underline font-medium">
               Sign up
             </Link>
-          </p>
+          </div>
         </div>
       </div>
     </div>
