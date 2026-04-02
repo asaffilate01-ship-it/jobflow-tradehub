@@ -120,6 +120,7 @@ const App = () => (
               <Route path="/schedule" element={<SchedulePage />} />
               <Route path="/daily-logs" element={<DailyLogsPage />} />
               <Route path="/daily-logs/:jobId" element={<DailyLogsPage />} />
+              <Route path="/orders/:orderId/receipt" element={<OrderReceiptPage />} />
             </Route>
 
             {/* Driver layout (sidebar desktop, bottom nav mobile) */}
