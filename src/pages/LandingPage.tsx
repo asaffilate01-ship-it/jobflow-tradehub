@@ -203,18 +203,18 @@ const LandingPage = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/20 bg-primary-foreground/10 backdrop-blur-md px-4 py-1.5 text-sm font-medium text-primary-foreground"
+              className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur-md px-4 py-1.5 text-sm font-medium text-white"
             >
               <Sparkles className="h-3.5 w-3.5" />
               Trusted by thousands across the UK
             </motion.div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.08] text-primary-foreground">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.08] text-white">
               Get the right trade,{" "}
               <span className="text-primary">first time</span>
             </h1>
 
-            <p className="text-lg sm:text-xl text-primary-foreground/80 max-w-xl leading-relaxed">
+            <p className="text-lg sm:text-xl text-white/80 max-w-xl leading-relaxed">
               Get quotes from verified, reviewed tradespeople in your area.
               Compare prices, check credentials, and hire with confidence.
             </p>
