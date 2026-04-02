@@ -80,7 +80,8 @@ const EvidenceGalleryPage = () => {
   };
 
   const folderLabel = phaseFilter
-    ? phaseFilter.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+    ? EVIDENCE_SUBFOLDERS.find((s) => s.value === phaseFilter)?.label ||
+      phaseFilter.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
     : "All Evidence";
 
   if (loading) {
