@@ -87,7 +87,9 @@ const App = () => (
               {/* Trade-only pages */}
               <Route path="/dashboard" element={
                 <ProtectedRoute allowedRoles={["trade", "admin"]}>
-                  <TraderDashboard />
+                  <KycGate>
+                    <TraderDashboard />
+                  </KycGate>
                 </ProtectedRoute>
               } />
               <Route path="/trade-accounts" element={
