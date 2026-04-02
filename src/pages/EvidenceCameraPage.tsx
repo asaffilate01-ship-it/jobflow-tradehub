@@ -219,10 +219,10 @@ const EvidenceCameraPage = () => {
           <div className="rounded-lg px-2.5 py-1 bg-black/40 backdrop-blur-sm inline-flex items-center gap-1 text-[10px] text-white">
             <Clock className="w-2.5 h-2.5" /> {timestamp}
           </div>
-          {(phase || element) && (
+          {(subfolder || element) && (
             <div className="rounded-lg px-2.5 py-1 bg-black/40 backdrop-blur-sm inline-flex items-center gap-1.5 text-[10px] text-white">
               <FolderOpen className="w-2.5 h-2.5" />
-              {EVIDENCE_PHASES.find((p) => p.value === phase)?.label} {element && `› ${element}`}
+              {EVIDENCE_SUBFOLDERS.find((p) => p.value === subfolder)?.label} {element && `› ${element}`}
             </div>
           )}
           {notes && (
