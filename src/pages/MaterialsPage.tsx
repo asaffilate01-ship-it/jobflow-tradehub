@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import {
   Package, Calculator, Truck, Search, Plus, Trash2, ShoppingCart,
-  Clock, MapPin, BarChart3, ArrowRight, ChevronDown, ChevronUp, Eye,
+  Clock, MapPin, BarChart3, ArrowRight, ChevronDown, ChevronUp, Eye, QrCode,
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -696,12 +697,22 @@ const MaterialsPage = () => {
                     </div>
                     <div className="text-sm text-muted-foreground">{(o.merchants as any)?.name ?? "Unknown"} — {o.delivery_mode?.replace(/_/g, " ")}</div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="text-right">
-                      <div className="font-semibold text-primary">£{Number(o.goods_total + o.platform_delivery_fee).toFixed(2)}</div>
-                      <div className="text-xs text-muted-foreground">{new Date(o.created_at).toLocaleDateString()}</div>
-                    </div>
-                    <Eye className="h-4 w-4 text-muted-foreground" />
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <div className="font-semibold text-primary">£{Number(o.goods_total + o.platform_delivery_fee).toFixed(2)}</div>
+                        <div className="text-xs text-muted-foreground">{new Date(o.created_at).toLocaleDateString()}</div>
+                      </div>
+                      {["confirmed", "ready_for_pickup", "collected", "delivered"].includes(o.order_status) && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-1 text-xs"
+                          onClick={(e) => { e.stopPropagation(); window.location.href = `/orders/${o.id}/receipt`; }}
+                        >
+                          <QrCode className="h-3.5 w-3.5" /> Receipt
+                        </Button>
+                      )}
+                      <Eye className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </div>
               );

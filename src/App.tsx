@@ -39,6 +39,8 @@ import AdminKycPage from "./pages/AdminKycPage";
 import SchedulePage from "./pages/SchedulePage";
 import DailyLogsPage from "./pages/DailyLogsPage";
 import CustomerPortalPage from "./pages/CustomerPortalPage";
+import OrderReceiptPage from "./pages/OrderReceiptPage";
+import VerifyOrderPage from "./pages/VerifyOrderPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -51,10 +53,11 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <Routes>
-            {/* Public auth pages */}
+            {/* Public pages */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/verify-order/:orderId" element={<VerifyOrderPage />} />
             <Route path="/profile-setup" element={
               <ProtectedRoute>
                 <ProfileSetupPage />
@@ -117,6 +120,7 @@ const App = () => (
               <Route path="/schedule" element={<SchedulePage />} />
               <Route path="/daily-logs" element={<DailyLogsPage />} />
               <Route path="/daily-logs/:jobId" element={<DailyLogsPage />} />
+              <Route path="/orders/:orderId/receipt" element={<OrderReceiptPage />} />
             </Route>
 
             {/* Driver layout (sidebar desktop, bottom nav mobile) */}
@@ -130,6 +134,7 @@ const App = () => (
               <Route path="/driver" element={<DriverDashboard />} />
               <Route path="/driver/broadcasts" element={<BroadcastsPage />} />
               <Route path="/driver/kyc-upload" element={<KycUploadPage />} />
+              <Route path="/driver/orders/:orderId/receipt" element={<OrderReceiptPage />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
