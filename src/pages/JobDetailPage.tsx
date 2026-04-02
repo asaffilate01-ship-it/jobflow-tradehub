@@ -291,24 +291,69 @@ const JobDetailPage = () => {
       <div className="space-y-4">
         {/* OVERVIEW */}
         {tab === "overview" && (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="glass-card p-5 space-y-1">
-              <div className="text-2xl font-bold text-foreground">{quotes.length}</div>
-              <div className="text-xs text-muted-foreground">Quotes received</div>
+          <>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="glass-card p-5 space-y-1">
+                <div className="text-2xl font-bold text-foreground">{quotes.length}</div>
+                <div className="text-xs text-muted-foreground">Quotes received</div>
+              </div>
+              <div className="glass-card p-5 space-y-1">
+                <div className="text-2xl font-bold text-foreground">{tasks.filter(t => t.status === "done").length}/{tasks.length}</div>
+                <div className="text-xs text-muted-foreground">Tasks completed</div>
+              </div>
+              <div className="glass-card p-5 space-y-1">
+                <div className="text-2xl font-bold text-foreground">£{milestones.filter(m => m.status === "paid").reduce((s: number, m: any) => s + (m.amount ?? 0), 0).toLocaleString()}</div>
+                <div className="text-xs text-muted-foreground">Paid so far</div>
+              </div>
+              <div className="glass-card p-5 space-y-1">
+                <div className="text-2xl font-bold text-foreground">{snags.filter(s => s.status === "open").length}</div>
+                <div className="text-xs text-muted-foreground">Open snags</div>
+              </div>
             </div>
-            <div className="glass-card p-5 space-y-1">
-              <div className="text-2xl font-bold text-foreground">{tasks.filter(t => t.status === "done").length}/{tasks.length}</div>
-              <div className="text-xs text-muted-foreground">Tasks completed</div>
-            </div>
-            <div className="glass-card p-5 space-y-1">
-              <div className="text-2xl font-bold text-foreground">£{milestones.filter(m => m.status === "paid").reduce((s: number, m: any) => s + (m.amount ?? 0), 0).toLocaleString()}</div>
-              <div className="text-xs text-muted-foreground">Paid so far</div>
-            </div>
-            <div className="glass-card p-5 space-y-1">
-              <div className="text-2xl font-bold text-foreground">{snags.filter(s => s.status === "open").length}</div>
-              <div className="text-xs text-muted-foreground">Open snags</div>
-            </div>
-          </div>
+
+            {/* Budget Tracker */}
+            {(() => {
+              const acceptedQuote = quotes.find((q: any) => q.status === "accepted");
+              const quotedTotal = acceptedQuote?.total_amount ?? (job.budget_max || job.budget_min || 0);
+              const paidAmount = milestones.filter((m: any) => m.status === "paid").reduce((s: number, m: any) => s + (m.amount ?? 0), 0);
+              const pendingAmount = milestones.filter((m: any) => m.status !== "paid").reduce((s: number, m: any) => s + (m.amount ?? 0), 0);
+              const changeOrdersCost = changes.filter((c: any) => c.status === "accepted").reduce((s: number, c: any) => s + (c.cost_delta ?? 0), 0);
+              const adjustedTotal = quotedTotal + changeOrdersCost;
+              const spentPct = adjustedTotal > 0 ? Math.min(100, Math.round((paidAmount / adjustedTotal) * 100)) : 0;
+
+              return quotedTotal > 0 ? (
+                <div className="glass-card p-5 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold flex items-center gap-2"><DollarSign className="h-4 w-4 text-primary" />Budget Tracker</h3>
+                    <span className="text-sm font-medium text-primary">{spentPct}% spent</span>
+                  </div>
+                  <div className="w-full bg-secondary rounded-full h-3 overflow-hidden">
+                    <div className="h-full rounded-full bg-gradient-to-r from-primary to-primary/70 transition-all duration-500" style={{ width: `${spentPct}%` }} />
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                    <div>
+                      <div className="text-muted-foreground text-xs">Quoted</div>
+                      <div className="font-semibold">£{quotedTotal.toLocaleString()}</div>
+                    </div>
+                    {changeOrdersCost !== 0 && (
+                      <div>
+                        <div className="text-muted-foreground text-xs">Change Orders</div>
+                        <div className="font-semibold text-warning">{changeOrdersCost > 0 ? "+" : ""}£{changeOrdersCost.toLocaleString()}</div>
+                      </div>
+                    )}
+                    <div>
+                      <div className="text-muted-foreground text-xs">Paid</div>
+                      <div className="font-semibold text-success">£{paidAmount.toLocaleString()}</div>
+                    </div>
+                    <div>
+                      <div className="text-muted-foreground text-xs">Remaining</div>
+                      <div className="font-semibold">£{Math.max(0, adjustedTotal - paidAmount).toLocaleString()}</div>
+                    </div>
+                  </div>
+                </div>
+              ) : null;
+            })()}
+          </>
         )}
 
         {/* QUOTES */}
