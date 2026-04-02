@@ -16,13 +16,13 @@ import traderosLogo from "@/assets/traderos-logo.png";
 
 const driverNavItems = [
   { to: "/driver", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/deliveries", label: "Deliveries", icon: Package },
+  { to: "/driver/deliveries", label: "Deliveries", icon: Package },
   { to: "/driver/broadcasts", label: "Broadcasts", icon: Radio },
 ];
 
 const mobileNavItems = [
   { to: "/driver", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/deliveries", label: "Deliveries", icon: Package },
+  { to: "/driver/deliveries", label: "Deliveries", icon: Package },
   { to: "/driver/broadcasts", label: "Alerts", icon: Radio },
 ];
 
