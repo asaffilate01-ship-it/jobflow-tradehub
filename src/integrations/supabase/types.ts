@@ -2219,6 +2219,47 @@ export type Database = {
           },
         ]
       }
+      staff_assignments: {
+        Row: {
+          created_at: string
+          id: string
+          invited_by: string
+          is_active: boolean
+          permissions: Json
+          trade_company_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invited_by: string
+          is_active?: boolean
+          permissions?: Json
+          trade_company_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invited_by?: string
+          is_active?: boolean
+          permissions?: Json
+          trade_company_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_assignments_trade_company_id_fkey"
+            columns: ["trade_company_id"]
+            isOneToOne: false
+            referencedRelation: "trade_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subcontractor_invoices: {
         Row: {
           cis_deduction_amount: number
@@ -2612,7 +2653,7 @@ export type Database = {
         | "journal"
         | "cis"
         | "driver_payout"
-      app_role: "customer" | "trade" | "driver" | "admin" | "agent"
+      app_role: "customer" | "trade" | "driver" | "admin" | "agent" | "staff"
       cis_status:
         | "not_applicable"
         | "pending_verification"
@@ -2813,7 +2854,7 @@ export const Constants = {
         "cis",
         "driver_payout",
       ],
-      app_role: ["customer", "trade", "driver", "admin", "agent"],
+      app_role: ["customer", "trade", "driver", "admin", "agent", "staff"],
       cis_status: [
         "not_applicable",
         "pending_verification",
