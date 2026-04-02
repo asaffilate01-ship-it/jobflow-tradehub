@@ -144,6 +144,19 @@ const App = () => (
               <Route path="/driver/orders/:orderId/receipt" element={<OrderReceiptPage />} />
             </Route>
 
+            {/* Agent layout (sidebar desktop, bottom nav mobile) */}
+            <Route element={
+              <ProtectedRoute allowedRoles={["agent", "admin"]}>
+                <AgentLayout />
+              </ProtectedRoute>
+            }>
+              <Route path="/agent" element={<AgentDashboard />} />
+              <Route path="/agent/referrals" element={<AgentReferralsPage />} />
+              <Route path="/agent/commissions" element={<AgentCommissionsPage />} />
+              <Route path="/agent/analytics" element={<AgentAnalyticsPage />} />
+              <Route path="/agent/referral-link" element={<AgentReferralLinkPage />} />
+            </Route>
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
