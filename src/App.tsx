@@ -42,12 +42,17 @@ import CustomerPortalPage from "./pages/CustomerPortalPage";
 import OrderReceiptPage from "./pages/OrderReceiptPage";
 import VerifyOrderPage from "./pages/VerifyOrderPage";
 import AgentLayout from "./components/AgentLayout";
+import AdminLayout from "./components/AdminLayout";
 import AgentDashboard from "./pages/AgentDashboard";
 import AgentReferralsPage from "./pages/AgentReferralsPage";
 import AgentCommissionsPage from "./pages/AgentCommissionsPage";
 import AgentAnalyticsPage from "./pages/AgentAnalyticsPage";
 import AgentReferralLinkPage from "./pages/AgentReferralLinkPage";
 import AccountingPage from "./pages/AccountingPage";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
+import AdminUsersPage from "./pages/AdminUsersPage";
+import AdminAnalyticsPage from "./pages/AdminAnalyticsPage";
+import AdminAgentsPage from "./pages/AdminAgentsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
