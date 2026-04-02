@@ -27,6 +27,9 @@ const trades: { slug: TradeType; label: string; icon: any }[] = [
   { slug: "painter", label: "Painter", icon: Paintbrush },
   { slug: "gas_engineer", label: "Gas Engineer", icon: Flame },
   { slug: "landscaper", label: "Landscaper", icon: TreePine },
+  { slug: "removals", label: "Removals", icon: Hammer },
+  { slug: "rubbish_collection", label: "Rubbish Collection", icon: Hammer },
+  { slug: "cleaner", label: "Cleaner", icon: Hammer },
   { slug: "other", label: "Other", icon: Hammer },
 ];
 

@@ -8,7 +8,7 @@ import {
   Star, MapPin, Search, Shield, Award, Clock, ArrowRight,
   Wrench, Zap, HardHat, Home, Grid3X3, Hammer, BrickWall,
   Paintbrush, Flame, TreePine, SlidersHorizontal, Users, CheckCircle,
-  MessageCircle,
+  MessageCircle, Truck, Trash2, SprayCan,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
@@ -27,6 +27,9 @@ const tradeCategories = [
   { slug: "plasterer", label: "Plasterer", icon: HardHat },
   { slug: "painter", label: "Painter", icon: Paintbrush },
   { slug: "landscaper", label: "Landscaper", icon: TreePine },
+  { slug: "removals", label: "Removals", icon: Truck },
+  { slug: "rubbish_collection", label: "Rubbish Collection", icon: Trash2 },
+  { slug: "cleaner", label: "Cleaner", icon: SprayCan },
 ];
 
 type TraderCard = {
