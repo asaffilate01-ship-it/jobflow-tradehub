@@ -3,7 +3,7 @@ import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Truck, Wrench, Shield, TruckIcon, Lock, AlertTriangle } from "lucide-react";
+import { Truck, Wrench, Shield, TruckIcon, Lock, AlertTriangle, Eye, EyeOff, Home } from "lucide-react";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -68,6 +68,7 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [attempts, setAttempts] = useState(0);
   const [lockedUntil, setLockedUntil] = useState<number | null>(null);
 
@@ -200,12 +201,16 @@ const LoginPage = () => {
             })}
           </div>
 
-          <p className="text-center text-sm text-muted-foreground">
-            Don't have an account?{" "}
-            <Link to="/signup" className="text-primary hover:underline font-medium">
+          <div className="flex items-center justify-center gap-3">
+            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+              <Home className="h-3.5 w-3.5" />
+              Home
+            </Link>
+            <span className="text-muted-foreground/40">·</span>
+            <Link to="/signup" className="text-sm text-primary hover:underline font-medium">
               Sign up
             </Link>
-          </p>
+          </div>
         </div>
       </div>
     );
@@ -257,16 +262,26 @@ const LoginPage = () => {
                 Forgot password?
               </button>
             </div>
-            <Input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-              minLength={6}
-              autoComplete="current-password"
-              disabled={isLocked}
-            />
+            <div className="relative">
+              <Input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                minLength={6}
+                autoComplete="current-password"
+                disabled={isLocked}
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
           <Button type="submit" className="w-full font-semibold" disabled={loading || isLocked}>
             {loading ? "Verifying…" : "Sign in securely"}
@@ -285,12 +300,16 @@ const LoginPage = () => {
           >
             ← Back to portal selection
           </button>
-          <p className="text-sm text-muted-foreground">
-            Don't have an account?{" "}
-            <Link to="/signup" className="text-primary hover:underline font-medium">
+          <div className="flex items-center justify-center gap-3">
+            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+              <Home className="h-3.5 w-3.5" />
+              Home
+            </Link>
+            <span className="text-muted-foreground/40">·</span>
+            <Link to="/signup" className="text-sm text-primary hover:underline font-medium">
               Sign up
             </Link>
-          </p>
+          </div>
         </div>
       </div>
     </div>
