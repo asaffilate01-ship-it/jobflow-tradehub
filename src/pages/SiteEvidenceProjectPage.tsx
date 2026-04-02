@@ -57,12 +57,19 @@ const SiteEvidenceProjectPage = () => {
     return () => { supabase.removeChannel(channel); };
   }, [user, jobId]);
 
-  // Count media per phase
+  // Count media per phase and per phase/subfolder
   const phaseCounts: Record<string, number> = {};
+  const subfolderCounts: Record<string, Record<string, number>> = {};
   media.forEach((m) => {
     const pathParts = m.storage_path.split("/");
+    // path: {jobId}/{phase}/{subfolder}/{file} or legacy {jobId}/{phase}/{file}
     const phase = pathParts.length >= 2 ? pathParts[1] : "other";
+    const sub = pathParts.length >= 4 ? pathParts[2] : "";
     phaseCounts[phase] = (phaseCounts[phase] || 0) + 1;
+    if (sub) {
+      if (!subfolderCounts[phase]) subfolderCounts[phase] = {};
+      subfolderCounts[phase][sub] = (subfolderCounts[phase][sub] || 0) + 1;
+    }
   });
 
   const imageCount = media.filter((m) => m.media_type === "photo").length;
