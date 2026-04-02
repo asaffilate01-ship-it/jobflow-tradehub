@@ -114,8 +114,8 @@ const LandingPage = () => {
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.08]">
-            Find a tradesperson{" "}
-            <span className="text-gradient">you can trust</span>
+            Get the right trade,{" "}
+            <span className="text-gradient">first time</span>
           </h1>
 
           <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
