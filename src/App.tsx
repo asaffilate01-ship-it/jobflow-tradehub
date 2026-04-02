@@ -79,6 +79,11 @@ const App = () => (
                 </ProtectedRoute>
               } />
               <Route path="/jobs/:id" element={<JobDetailPage />} />
+              <Route path="/my-projects" element={
+                <ProtectedRoute allowedRoles={["customer", "admin"]}>
+                  <CustomerPortalPage />
+                </ProtectedRoute>
+              } />
               <Route path="/jobs/:jobId/quote" element={
                 <ProtectedRoute allowedRoles={["trade", "admin"]}>
                   <SubmitQuotePage />

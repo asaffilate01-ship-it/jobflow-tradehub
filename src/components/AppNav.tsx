@@ -22,6 +22,7 @@ const AppNav = () => {
     { to: "/", label: "Home", icon: Home, show: true },
     { to: "/marketplace", label: "Find Trades", icon: Search, show: true },
     { to: "/jobs", label: "Jobs", icon: Briefcase, show: true },
+    { to: "/my-projects", label: "My Projects", icon: FolderOpen, show: isCustomer },
   ];
 
   const filteredItems = navItems.filter((item) => item.show);
