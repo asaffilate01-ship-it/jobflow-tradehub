@@ -81,9 +81,13 @@ const EvidenceGalleryPage = () => {
     toast.success("Evidence deleted");
   };
 
+  const phaseLabel = EVIDENCE_PHASES.find((p) => p.value === phaseFilter)?.label ||
+    phaseFilter.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  const subLabel = subFilter
+    ? EVIDENCE_SUBFOLDERS.find((s) => s.value === subFilter)?.label || subFilter
+    : "";
   const folderLabel = phaseFilter
-    ? EVIDENCE_SUBFOLDERS.find((s) => s.value === phaseFilter)?.label ||
-      phaseFilter.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+    ? subLabel ? `${phaseLabel} › ${subLabel}` : phaseLabel
     : "All Evidence";
 
   if (loading) {
