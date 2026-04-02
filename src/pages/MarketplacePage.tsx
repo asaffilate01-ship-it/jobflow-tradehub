@@ -196,18 +196,20 @@ const MarketplacePage = () => {
         </div>
       ) : filtered.length === 0 ? (
         <div className="glass-card p-16 text-center space-y-4">
-          <Search className="h-12 w-12 text-muted-foreground mx-auto opacity-40" />
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50 mx-auto">
+            <Search className="h-8 w-8 text-muted-foreground/30" />
+          </div>
           <h3 className="text-lg font-bold text-foreground">
             {traders.length === 0 ? "No traders registered yet" : "No traders match your search"}
           </h3>
-          <p className="text-sm text-muted-foreground max-w-md mx-auto">
+          <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
             {traders.length === 0
-              ? "Be the first tradesperson to join our marketplace."
+              ? "Be the first tradesperson to join our marketplace and start winning jobs."
               : "Try adjusting your search or browse a different category."}
           </p>
           {!user && (
-            <Button asChild variant="outline" size="sm">
-              <Link to="/signup">Register as a tradesperson</Link>
+            <Button asChild variant="outline" size="sm" className="gap-2">
+              <Link to="/signup"><ArrowRight className="h-3.5 w-3.5" /> Register as a tradesperson</Link>
             </Button>
           )}
         </div>
