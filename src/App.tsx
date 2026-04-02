@@ -25,6 +25,9 @@ import SignupPage from "./pages/SignupPage";
 import SubscriptionPage from "./pages/SubscriptionPage";
 import MessagesPage from "./pages/MessagesPage";
 import SiteEvidencePage from "./pages/SiteEvidencePage";
+import SiteEvidenceProjectPage from "./pages/SiteEvidenceProjectPage";
+import EvidenceCameraPage from "./pages/EvidenceCameraPage";
+import EvidenceGalleryPage from "./pages/EvidenceGalleryPage";
 import ComplianceCertsPage from "./pages/ComplianceCertsPage";
 import PostJobPage from "./pages/PostJobPage";
 import DriverDashboard from "./pages/DriverDashboard";
@@ -51,6 +54,13 @@ const App = () => (
             <Route path="/profile-setup" element={
               <ProtectedRoute>
                 <ProfileSetupPage />
+              </ProtectedRoute>
+            } />
+
+            {/* Full-screen camera (outside layout — no sidebar/nav) */}
+            <Route path="/site-evidence/:jobId/camera" element={
+              <ProtectedRoute allowedRoles={["trade", "admin"]}>
+                <EvidenceCameraPage />
               </ProtectedRoute>
             } />
 
@@ -85,6 +95,8 @@ const App = () => (
               <Route path="/trade-accounts" element={<TradeAccountsPage />} />
               <Route path="/materials" element={<MaterialsPage />} />
               <Route path="/site-evidence" element={<SiteEvidencePage />} />
+              <Route path="/site-evidence/:jobId" element={<SiteEvidenceProjectPage />} />
+              <Route path="/site-evidence/:jobId/gallery" element={<EvidenceGalleryPage />} />
               <Route path="/compliance" element={<ComplianceCertsPage />} />
               <Route path="/deliveries" element={<DeliveriesPage />} />
               <Route path="/messages" element={<MessagesPage />} />
