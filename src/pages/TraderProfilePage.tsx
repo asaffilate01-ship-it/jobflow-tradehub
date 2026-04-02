@@ -32,21 +32,49 @@ const TraderProfilePage = () => {
   const { user, roles } = useAuth();
   const [trader, setTrader] = useState<TraderProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [portfolioImages, setPortfolioImages] = useState<string[]>([]);
+  const [completedJobCount, setCompletedJobCount] = useState(0);
 
   const isSubscribed = roles.includes("customer") || roles.includes("admin");
 
   useEffect(() => {
-    const fetch = async () => {
+    const fetchAll = async () => {
       if (!id) return;
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, full_name, company_name, trade_specialism, rating, phone, email, services_description, service_radius_miles, years_experience, trade_bodies, verified, cover_image_url, website_url, created_at")
-        .eq("id", id)
-        .single();
-      setTrader(data as TraderProfile | null);
+      const [{ data: profile }, { data: reviewData }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("id, full_name, company_name, trade_specialism, rating, phone, email, services_description, service_radius_miles, years_experience, trade_bodies, verified, cover_image_url, website_url, created_at")
+          .eq("id", id)
+          .single(),
+        supabase
+          .from("reviews")
+          .select("*")
+          .eq("trader_profile_id", id)
+          .order("created_at", { ascending: false })
+          .limit(10),
+      ]);
+      setTrader(profile as TraderProfile | null);
+      setReviews(reviewData ?? []);
+
+      // Fetch portfolio: evidence from completed jobs by this trader
+      const { data: companies } = await supabase.from("trade_companies").select("id").eq("owner_profile_id", id);
+      const companyIds = companies?.map(c => c.id) ?? [];
+      if (companyIds.length) {
+        const { data: awards } = await supabase.from("job_awards").select("job_id").in("trade_company_id", companyIds);
+        const jobIds = awards?.map(a => a.job_id) ?? [];
+        if (jobIds.length) {
+          const [{ data: media }, { count }] = await Promise.all([
+            supabase.from("job_media").select("storage_path, media_type").in("job_id", jobIds).eq("media_type", "photo").limit(12),
+            supabase.from("jobs").select("id", { count: "exact", head: true }).in("id", jobIds).eq("status", "completed"),
+          ]);
+          setPortfolioImages((media ?? []).map(m => supabase.storage.from("job-evidence").getPublicUrl(m.storage_path).data.publicUrl));
+          setCompletedJobCount(count ?? 0);
+        }
+      }
       setLoading(false);
     };
-    fetch();
+    fetchAll();
   }, [id]);
 
   if (loading) {
