@@ -76,7 +76,7 @@ const VerifyOrderPage = () => {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="max-w-md w-full mx-auto space-y-6">
         <div className="text-center space-y-1">
-          <h1 className="text-lg font-bold tracking-tight">TradeFlow</h1>
+          <h1 className="text-lg font-bold tracking-tight">TraderOS</h1>
           <p className="text-xs text-muted-foreground">Order Verification</p>
         </div>
 
