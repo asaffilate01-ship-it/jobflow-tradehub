@@ -7,6 +7,7 @@ const TEST_ACCOUNTS = [
   { email: "driver@traderos.dev", password: "driver123!", fullName: "Dev Driver", role: "driver" },
   { email: "admin@traderos.dev", password: "admin123!", fullName: "Dev Admin", role: "admin" },
   { email: "agent@traderos.dev", password: "agent123!", fullName: "Dev Agent", role: "agent" },
+  { email: "staff@traderos.dev", password: "staff123!", fullName: "Dev Staff", role: "staff" },
 ];
 
 Deno.serve(async (req) => {

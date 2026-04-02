@@ -3,13 +3,13 @@ import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Wrench, Shield, TruckIcon, Lock, AlertTriangle, Eye, EyeOff, Home, UserCheck } from "lucide-react";
+import { Wrench, Shield, TruckIcon, Lock, AlertTriangle, Eye, EyeOff, Home, UserCheck, Users } from "lucide-react";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
 import traderosLogo from "@/assets/traderos-logo.png";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
-type Portal = "trader" | "driver" | "admin" | "customer" | "agent" | null;
+type Portal = "trader" | "driver" | "admin" | "customer" | "agent" | "staff" | null;
 
 const portalToRole: Record<Exclude<Portal, null>, AppRole> = {
   trader: "trade",
@@ -17,6 +17,7 @@ const portalToRole: Record<Exclude<Portal, null>, AppRole> = {
   admin: "admin",
   customer: "customer",
   agent: "agent",
+  staff: "staff",
 };
 
 const portalConfig = {
@@ -35,7 +36,7 @@ const portalConfig = {
     subtitle: "View deliveries & manage your runs",
     iconBg: "bg-accent/10",
     iconText: "text-accent",
-    redirect: "/driver",
+    redirect: "/dashboard",
     roleName: "driver",
   },
   admin: {
@@ -44,7 +45,7 @@ const portalConfig = {
     subtitle: "Platform management & oversight",
     iconBg: "bg-destructive/10",
     iconText: "text-destructive",
-    redirect: "/dashboard",
+    redirect: "/admin",
     roleName: "admin",
   },
   customer: {
@@ -65,6 +66,15 @@ const portalConfig = {
     redirect: "/agent",
     roleName: "agent",
   },
+  staff: {
+    icon: Users,
+    title: "Staff Login",
+    subtitle: "Access your assigned trade company tools",
+    iconBg: "bg-indigo-500/10",
+    iconText: "text-indigo-600",
+    redirect: "/dashboard",
+    roleName: "staff",
+  },
 } as const;
 
 const MAX_ATTEMPTS = 5;
@@ -76,6 +86,7 @@ const TEST_ACCOUNTS = [
   { label: "Driver", email: "driver@traderos.dev", password: "driver123!", portal: "driver" as Portal },
   { label: "Admin", email: "admin@traderos.dev", password: "admin123!", portal: "admin" as Portal },
   { label: "Agent", email: "agent@traderos.dev", password: "agent123!", portal: "agent" as Portal },
+  { label: "Staff", email: "staff@traderos.dev", password: "staff123!", portal: "staff" as Portal },
 ];
 
 const LoginPage = () => {
@@ -233,7 +244,7 @@ const LoginPage = () => {
           )}
 
           <div className="grid gap-3">
-            {(["customer", "trader", "driver", "agent", "admin"] as const).map((key) => {
+            {(["customer", "trader", "driver", "agent", "staff", "admin"] as const).map((key) => {
               const config = portalConfig[key];
               const Icon = config.icon;
               return (
