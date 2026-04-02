@@ -83,8 +83,8 @@ const LoginPage = () => {
                     onClick={() => setPortal(key as Portal)}
                     className="glass-card p-5 flex items-center gap-4 hover:border-primary/40 hover:bg-primary/5 transition-all text-left group"
                   >
-                    <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-${config.color}/10`}>
-                      <Icon className={`h-6 w-6 text-${config.color}`} />
+                    <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${config.iconBg}`}>
+                      <Icon className={`h-6 w-6 ${config.iconText}`} />
                     </div>
                     <div>
                       <div className="font-semibold text-foreground group-hover:text-primary transition-colors">
