@@ -349,8 +349,8 @@ const SmartOrderPage = () => {
           <Button size="sm" variant="outline" onClick={addItem} className="gap-1 text-xs"><Plus className="h-3 w-3" />Add item</Button>
         </div>
 
-        {/* Column headers */}
-        <div className="flex items-center gap-3 text-xs font-medium text-muted-foreground border-b border-border pb-2">
+        {/* Column headers — hidden on mobile */}
+        <div className="hidden sm:flex items-center gap-3 text-xs font-medium text-muted-foreground border-b border-border pb-2">
           <span className="w-6 text-right shrink-0">#</span>
           <span className="flex-1">Material / Product</span>
           <span className="w-20 text-center">Qty</span>
@@ -358,24 +358,75 @@ const SmartOrderPage = () => {
           <span className="w-8 shrink-0"></span>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           {items.map((item, i) => (
-            <div key={item.key} className="flex items-center gap-3">
-              <span className="text-xs text-muted-foreground w-6 text-right shrink-0 tabular-nums">{i + 1}.</span>
-              <Input placeholder="e.g. 50kg cement, 2.4m timber, plasterboard" className="flex-1" value={item.item_name} onChange={(e) => updateItem(item.key, "item_name", e.target.value)} />
-              <Input type="number" min={1} className="w-20 text-center" value={item.quantity} onChange={(e) => updateItem(item.key, "quantity", Number(e.target.value))} />
-              <select className={`${selectClass} w-24`} value={item.unit} onChange={(e) => updateItem(item.key, "unit", e.target.value)}>
-                <option value="each">each</option>
-                <option value="bag">bag</option>
-                <option value="sheet">sheet</option>
-                <option value="metre">metre</option>
-                <option value="kg">kg</option>
-                <option value="box">box</option>
-                <option value="pack">pack</option>
-              </select>
-              <Button size="sm" variant="ghost" className="h-8 w-8 p-0 shrink-0" onClick={() => removeItem(item.key)} disabled={items.length === 1}>
-                <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
-              </Button>
+            <div key={item.key} className="space-y-2 sm:space-y-0">
+              {/* Mobile: stacked layout */}
+              <div className="flex items-start gap-2 sm:hidden">
+                <span className="text-xs text-muted-foreground w-5 text-right shrink-0 tabular-nums pt-2.5">{i + 1}.</span>
+                <div className="flex-1 space-y-2">
+                  <Input
+                    placeholder="e.g. 50kg cement, 2.4m timber"
+                    value={item.item_name}
+                    onChange={(e) => updateItem(item.key, "item_name", e.target.value)}
+                  />
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number" min={1} className="w-20 text-center"
+                      value={item.quantity}
+                      onChange={(e) => updateItem(item.key, "quantity", Number(e.target.value))}
+                    />
+                    <select
+                      className={`${selectClass} flex-1`}
+                      value={item.unit}
+                      onChange={(e) => updateItem(item.key, "unit", e.target.value)}
+                    >
+                      <option value="each">each</option>
+                      <option value="bag">bag</option>
+                      <option value="sheet">sheet</option>
+                      <option value="metre">metre</option>
+                      <option value="kg">kg</option>
+                      <option value="box">box</option>
+                      <option value="pack">pack</option>
+                    </select>
+                    <Button size="sm" variant="ghost" className="h-9 w-9 p-0 shrink-0" onClick={() => removeItem(item.key)} disabled={items.length === 1}>
+                      <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Desktop: row layout */}
+              <div className="hidden sm:flex items-center gap-3">
+                <span className="text-xs text-muted-foreground w-6 text-right shrink-0 tabular-nums">{i + 1}.</span>
+                <Input
+                  placeholder="e.g. 50kg cement, 2.4m timber, plasterboard"
+                  className="flex-1 min-w-0"
+                  value={item.item_name}
+                  onChange={(e) => updateItem(item.key, "item_name", e.target.value)}
+                />
+                <Input
+                  type="number" min={1} className="w-20 text-center shrink-0"
+                  value={item.quantity}
+                  onChange={(e) => updateItem(item.key, "quantity", Number(e.target.value))}
+                />
+                <select
+                  className={`${selectClass} w-24 shrink-0`}
+                  value={item.unit}
+                  onChange={(e) => updateItem(item.key, "unit", e.target.value)}
+                >
+                  <option value="each">each</option>
+                  <option value="bag">bag</option>
+                  <option value="sheet">sheet</option>
+                  <option value="metre">metre</option>
+                  <option value="kg">kg</option>
+                  <option value="box">box</option>
+                  <option value="pack">pack</option>
+                </select>
+                <Button size="sm" variant="ghost" className="h-8 w-8 p-0 shrink-0" onClick={() => removeItem(item.key)} disabled={items.length === 1}>
+                  <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
+                </Button>
+              </div>
             </div>
           ))}
         </div>
