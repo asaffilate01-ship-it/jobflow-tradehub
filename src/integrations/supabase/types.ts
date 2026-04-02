@@ -1610,6 +1610,7 @@ export type Database = {
           full_name: string
           id: string
           is_active: boolean
+          kyc_documents: Json | null
           kyc_status: string
           phone: string | null
           phone_verified: boolean
@@ -1631,6 +1632,7 @@ export type Database = {
           full_name?: string
           id: string
           is_active?: boolean
+          kyc_documents?: Json | null
           kyc_status?: string
           phone?: string | null
           phone_verified?: boolean
@@ -1652,6 +1654,7 @@ export type Database = {
           full_name?: string
           id?: string
           is_active?: boolean
+          kyc_documents?: Json | null
           kyc_status?: string
           phone?: string | null
           phone_verified?: boolean
