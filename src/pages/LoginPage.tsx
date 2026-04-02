@@ -16,6 +16,7 @@ const portalToRole: Record<Exclude<Portal, null>, AppRole> = {
   driver: "driver",
   admin: "admin",
   customer: "customer",
+  agent: "agent",
 };
 
 const portalConfig = {
