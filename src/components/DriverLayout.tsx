@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { NavLink } from "@/components/NavLink";
 import {
   LayoutDashboard, Truck, DollarSign, User, LogOut, Package,
-  TruckIcon, Navigation, Settings,
+  TruckIcon, Navigation, Settings, Radio,
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 import {
@@ -16,11 +16,13 @@ import { useIsMobile } from "@/hooks/use-mobile";
 const driverNavItems = [
   { to: "/driver", label: "Dashboard", icon: LayoutDashboard },
   { to: "/deliveries", label: "Deliveries", icon: Package },
+  { to: "/driver/broadcasts", label: "Broadcasts", icon: Radio },
 ];
 
 const mobileNavItems = [
   { to: "/driver", label: "Dashboard", icon: LayoutDashboard },
   { to: "/deliveries", label: "Deliveries", icon: Package },
+  { to: "/driver/broadcasts", label: "Alerts", icon: Radio },
 ];
 
 function DriverSidebar() {

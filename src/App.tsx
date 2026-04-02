@@ -29,6 +29,7 @@ import ComplianceCertsPage from "./pages/ComplianceCertsPage";
 import PostJobPage from "./pages/PostJobPage";
 import DriverDashboard from "./pages/DriverDashboard";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import BroadcastsPage from "./pages/BroadcastsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -85,6 +86,7 @@ const App = () => (
               <Route path="/compliance" element={<ComplianceCertsPage />} />
               <Route path="/deliveries" element={<DeliveriesPage />} />
               <Route path="/messages" element={<MessagesPage />} />
+              <Route path="/broadcasts" element={<BroadcastsPage />} />
               <Route path="/subscription" element={<SubscriptionPage />} />
             </Route>
 
@@ -97,6 +99,7 @@ const App = () => (
               </ProtectedRoute>
             }>
               <Route path="/driver" element={<DriverDashboard />} />
+              <Route path="/driver/broadcasts" element={<BroadcastsPage />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
