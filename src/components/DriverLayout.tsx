@@ -12,6 +12,7 @@ import {
   SidebarProvider, SidebarTrigger, useSidebar,
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
+import traderosLogo from "@/assets/traderos-logo.png";
 
 const driverNavItems = [
   { to: "/driver", label: "Dashboard", icon: LayoutDashboard },
