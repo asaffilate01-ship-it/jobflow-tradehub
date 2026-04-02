@@ -42,10 +42,8 @@ const TraderDashboard = () => {
       const pendingQuotes = quotes?.filter((q) => q.status === "submitted").length ?? 0;
       const acceptedQuotes = quotes?.filter((q) => q.status === "accepted") ?? [];
       const revenue = acceptedQuotes.reduce((sum, q) => sum + (q.total_amount ?? 0), 0);
-      const completedJobs = quotes?.filter((q) => q.status === "accepted").length ?? 0;
       const awardedJobIds = awards?.map((a) => a.job_id) ?? [];
 
-      // Fetch upcoming milestones
       if (awardedJobIds.length) {
         const { data: milestones } = await supabase
           .from("job_milestones")
@@ -57,7 +55,6 @@ const TraderDashboard = () => {
           .limit(5);
         setUpcomingMilestones(milestones ?? []);
 
-        // Fetch recent daily logs
         const { data: logs } = await supabase
           .from("daily_logs")
           .select("id, log_date, work_summary, weather, crew_count, hours_on_site, job_id")
@@ -67,13 +64,12 @@ const TraderDashboard = () => {
         setRecentLogs(logs ?? []);
       }
 
-      // Evidence count
       const { count: evidenceCount } = await supabase
         .from("job_media")
         .select("id", { count: "exact", head: true })
         .eq("uploaded_by", user.id);
 
-      setStats({ activeJobs: acceptedQuotes.length, pendingQuotes, totalOrders: 0, revenue, completedJobs, evidenceCount: evidenceCount ?? 0 });
+      setStats({ activeJobs: acceptedQuotes.length, pendingQuotes, totalOrders: 0, revenue, completedJobs: 0, evidenceCount: evidenceCount ?? 0 });
       setRecentJobs(jobs ?? []);
       setLoading(false);
     };
@@ -104,37 +100,37 @@ const TraderDashboard = () => {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 page-enter">
       {/* Welcome header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         className="flex items-start justify-between"
       >
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           <h1 className="text-2xl font-bold tracking-tight">
             Welcome back{profile?.full_name ? `, ${profile.full_name.split(" ")[0]}` : ""} 👋
           </h1>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            {profile?.company_name && <span>{profile.company_name}</span>}
+          <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
+            {profile?.company_name && <span className="font-medium">{profile.company_name}</span>}
             {profile?.verified && (
-              <Badge variant="outline" className="text-[10px] border-success/30 text-success gap-1">
+              <Badge variant="outline" className="text-[10px] border-success/30 text-success gap-1 bg-success/5">
                 <CheckCircle className="h-3 w-3" /> Verified
               </Badge>
             )}
             {profile?.rating && (
-              <span className="flex items-center gap-0.5 text-primary">
+              <span className="flex items-center gap-0.5 text-primary font-medium">
                 <Star className="h-3 w-3 fill-current" /> {profile.rating}
               </span>
             )}
             {profile?.kyc_status === "approved" && (
-              <Badge variant="outline" className="text-[10px] border-primary/30 text-primary gap-1">
+              <Badge variant="outline" className="text-[10px] border-primary/30 text-primary gap-1 bg-primary/5">
                 <Shield className="h-3 w-3" /> KYC Approved
               </Badge>
             )}
           </div>
         </div>
-        <Button asChild size="sm" className="gap-2 font-semibold hidden sm:flex">
+        <Button asChild size="sm" className="gap-2 font-semibold hidden sm:flex shadow-sm">
           <Link to="/materials">
             <Package className="h-4 w-4" /> Order Materials
           </Link>
@@ -150,16 +146,18 @@ const TraderDashboard = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.08 }}
           >
-            <Link to={link} className="glass-card p-5 space-y-3 hover:border-primary/20 transition-all block group">
+            <Link to={link} className="stat-card p-5 space-y-3 hover:border-primary/20 block group">
               <div className="flex items-center justify-between">
-                <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${bgColor}`}>
+                <div className={`icon-container icon-container-md ${bgColor} group-hover:scale-105 transition-transform`}>
                   <Icon className={`h-5 w-5 ${color}`} />
                 </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-foreground">{loading ? "—" : value}</div>
-                <div className="text-xs text-muted-foreground mt-0.5">{label}</div>
+                <div className="text-2xl font-bold text-foreground tabular-nums">
+                  {loading ? <div className="skeleton-shimmer h-7 w-16" /> : value}
+                </div>
+                <div className="text-xs text-muted-foreground mt-0.5 font-medium">{label}</div>
               </div>
             </Link>
           </motion.div>
@@ -168,7 +166,7 @@ const TraderDashboard = () => {
 
       {/* Quick actions grid */}
       <div>
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Quick Actions</h2>
+        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Quick Actions</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {quickActions.map(({ to, icon: Icon, iconColor, title, desc }, i) => (
             <motion.div
@@ -177,12 +175,12 @@ const TraderDashboard = () => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 + i * 0.05 }}
             >
-              <Link to={to} className="glass-card p-4 hover:border-primary/20 transition-all group text-center block h-full">
-                <div className={`flex h-10 w-10 mx-auto items-center justify-center rounded-xl bg-card border border-border group-hover:border-primary/20 mb-2`}>
-                  <Icon className={`h-5 w-5 ${iconColor}`} />
+              <Link to={to} className="glass-card p-4 hover:border-primary/20 group text-center block h-full">
+                <div className="icon-container icon-container-md mx-auto bg-card border border-border group-hover:border-primary/20 group-hover:bg-primary/5 mb-2.5 transition-all">
+                  <Icon className={`h-5 w-5 ${iconColor} group-hover:scale-110 transition-transform`} />
                 </div>
                 <h3 className="font-semibold text-foreground text-xs group-hover:text-primary transition-colors">{title}</h3>
-                <p className="text-[10px] text-muted-foreground mt-0.5 hidden sm:block">{desc}</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5 hidden sm:block leading-relaxed">{desc}</p>
               </Link>
             </motion.div>
           ))}
@@ -190,32 +188,35 @@ const TraderDashboard = () => {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Left column — Recent logs + Upcoming milestones */}
+        {/* Left column */}
         <div className="lg:col-span-2 space-y-6">
           {/* Recent daily logs */}
-          <Card>
+          <Card className="glass-card border-border/60">
             <CardHeader className="pb-3 flex-row items-center justify-between">
               <CardTitle className="text-base flex items-center gap-2">
-                <CalendarDays className="h-4 w-4 text-primary" /> Recent Daily Logs
+                <div className="icon-container icon-container-sm bg-primary/10">
+                  <CalendarDays className="h-4 w-4 text-primary" />
+                </div>
+                Recent Daily Logs
               </CardTitle>
-              <Button asChild variant="ghost" size="sm" className="text-primary gap-1 text-xs">
+              <Button asChild variant="ghost" size="sm" className="text-primary gap-1 text-xs hover:bg-primary/5">
                 <Link to="/schedule">View all <ArrowRight className="h-3 w-3" /></Link>
               </Button>
             </CardHeader>
             <CardContent className="space-y-2">
               {loading ? (
                 <div className="space-y-2">
-                  {[1, 2].map((i) => <div key={i} className="h-14 bg-muted/30 rounded animate-pulse" />)}
+                  {[1, 2].map((i) => <div key={i} className="skeleton-shimmer h-14" />)}
                 </div>
               ) : recentLogs.length === 0 ? (
-                <div className="text-center py-6">
-                  <CalendarDays className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">No daily logs recorded yet</p>
+                <div className="empty-state py-8">
+                  <CalendarDays className="empty-state-icon" />
+                  <p className="empty-state-desc">No daily logs recorded yet. Start logging your work to keep customers informed.</p>
                 </div>
               ) : (
                 recentLogs.map((log: any) => (
-                  <div key={log.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                  <div key={log.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors group">
+                    <div className="icon-container icon-container-sm bg-primary/10 group-hover:bg-primary/15 transition-colors">
                       <CalendarDays className="h-4 w-4 text-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -232,26 +233,28 @@ const TraderDashboard = () => {
           </Card>
 
           {/* Available Jobs */}
-          <Card>
+          <Card className="glass-card border-border/60">
             <CardHeader className="pb-3 flex-row items-center justify-between">
               <CardTitle className="text-base flex items-center gap-2">
-                <Briefcase className="h-4 w-4 text-primary" /> Available Jobs
+                <div className="icon-container icon-container-sm bg-primary/10">
+                  <Briefcase className="h-4 w-4 text-primary" />
+                </div>
+                Available Jobs
               </CardTitle>
-              <Button asChild variant="ghost" size="sm" className="text-primary gap-1 text-xs">
+              <Button asChild variant="ghost" size="sm" className="text-primary gap-1 text-xs hover:bg-primary/5">
                 <Link to="/jobs">View all <ArrowRight className="h-3 w-3" /></Link>
               </Button>
             </CardHeader>
             <CardContent>
               {loading ? (
                 <div className="grid sm:grid-cols-2 gap-3">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="h-24 bg-muted/30 rounded-lg animate-pulse" />
-                  ))}
+                  {[1, 2, 3, 4].map((i) => <div key={i} className="skeleton-shimmer h-24" />)}
                 </div>
               ) : recentJobs.length === 0 ? (
-                <div className="text-center py-8">
-                  <Briefcase className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">No available jobs right now</p>
+                <div className="empty-state py-10">
+                  <Briefcase className="empty-state-icon" />
+                  <p className="empty-state-title">No available jobs</p>
+                  <p className="empty-state-desc">New jobs in your area will appear here. Check back soon!</p>
                 </div>
               ) : (
                 <div className="grid sm:grid-cols-2 gap-3">
@@ -259,8 +262,8 @@ const TraderDashboard = () => {
                     const si = statusConfig[job.status] ?? statusConfig.posted;
                     const StatusIcon = si.icon;
                     return (
-                      <Link key={job.id} to={`/jobs/${job.id}`} className="p-3 rounded-lg border border-border hover:border-primary/20 transition-all group">
-                        <div className="flex items-start justify-between mb-1">
+                      <Link key={job.id} to={`/jobs/${job.id}`} className="p-3.5 rounded-xl border border-border hover:border-primary/20 hover:shadow-sm transition-all group">
+                        <div className="flex items-start justify-between mb-1.5">
                           <h3 className="font-medium text-sm text-foreground group-hover:text-primary transition-colors line-clamp-1">{job.title}</h3>
                           <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${si.bg}`}>
                             <StatusIcon className={`h-3 w-3 ${si.color}`} />
@@ -268,11 +271,11 @@ const TraderDashboard = () => {
                         </div>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <span className="capitalize">{job.requested_trade?.replace("_", " ")}</span>
-                          <span>·</span>
+                          <span className="text-border">·</span>
                           <span>{job.city}</span>
                         </div>
                         {(job.budget_min || job.budget_max) && (
-                          <div className="text-sm font-semibold text-primary mt-1">
+                          <div className="text-sm font-bold text-primary mt-2 tabular-nums">
                             £{job.budget_min?.toLocaleString() ?? "?"} – £{job.budget_max?.toLocaleString() ?? "?"}
                           </div>
                         )}
@@ -288,26 +291,29 @@ const TraderDashboard = () => {
         {/* Right sidebar widgets */}
         <div className="space-y-6">
           {/* Upcoming milestones */}
-          <Card>
+          <Card className="glass-card border-border/60">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
-                <Activity className="h-4 w-4 text-primary" /> Upcoming Milestones
+                <div className="icon-container icon-container-sm bg-warning/10">
+                  <Activity className="h-4 w-4 text-warning" />
+                </div>
+                Upcoming Milestones
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {loading ? (
                 <div className="space-y-2">
-                  {[1, 2, 3].map((i) => <div key={i} className="h-12 bg-muted/30 rounded animate-pulse" />)}
+                  {[1, 2, 3].map((i) => <div key={i} className="skeleton-shimmer h-12" />)}
                 </div>
               ) : upcomingMilestones.length === 0 ? (
-                <div className="text-center py-6">
-                  <Activity className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
-                  <p className="text-xs text-muted-foreground">No upcoming milestones</p>
+                <div className="empty-state py-8">
+                  <Activity className="empty-state-icon" />
+                  <p className="empty-state-desc">No upcoming milestones. Win a job to see your timeline here.</p>
                 </div>
               ) : (
                 upcomingMilestones.map((m: any) => (
-                  <div key={m.id} className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/30">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-warning/10">
+                  <div key={m.id} className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                    <div className="icon-container icon-container-sm bg-warning/10">
                       <Clock className="h-4 w-4 text-warning" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -317,7 +323,7 @@ const TraderDashboard = () => {
                       </p>
                     </div>
                     {m.amount > 0 && (
-                      <span className="text-xs font-semibold text-primary">£{m.amount.toLocaleString()}</span>
+                      <span className="text-xs font-bold text-primary tabular-nums">£{m.amount.toLocaleString()}</span>
                     )}
                   </div>
                 ))
@@ -325,26 +331,29 @@ const TraderDashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Activity feed placeholder */}
-          <Card>
+          {/* Activity feed */}
+          <Card className="glass-card border-border/60">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
-                <Zap className="h-4 w-4 text-primary" /> Recent Activity
+                <div className="icon-container icon-container-sm bg-primary/10">
+                  <Zap className="h-4 w-4 text-primary" />
+                </div>
+                Recent Activity
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {[
-                  { text: "New job posted in your area", time: "2 min ago", icon: Briefcase },
-                  { text: "Quote accepted by customer", time: "1 hr ago", icon: CheckCircle },
-                  { text: "Evidence uploaded to site", time: "3 hrs ago", icon: Camera },
+                  { text: "New job posted in your area", time: "2 min ago", icon: Briefcase, color: "bg-info/10 text-info" },
+                  { text: "Quote accepted by customer", time: "1 hr ago", icon: CheckCircle, color: "bg-success/10 text-success" },
+                  { text: "Evidence uploaded to site", time: "3 hrs ago", icon: Camera, color: "bg-warning/10 text-warning" },
                 ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-2.5">
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 mt-0.5">
-                      <item.icon className="h-3 w-3 text-primary" />
+                  <div key={i} className="flex items-start gap-2.5 group">
+                    <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${item.color.split(" ")[0]} mt-0.5`}>
+                      <item.icon className={`h-3.5 w-3.5 ${item.color.split(" ")[1]}`} />
                     </div>
                     <div>
-                      <p className="text-xs text-foreground">{item.text}</p>
+                      <p className="text-xs text-foreground leading-relaxed">{item.text}</p>
                       <p className="text-[10px] text-muted-foreground">{item.time}</p>
                     </div>
                   </div>
