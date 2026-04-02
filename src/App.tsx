@@ -37,6 +37,7 @@ import KycUploadPage from "./pages/KycUploadPage";
 import AdminKycPage from "./pages/AdminKycPage";
 import SchedulePage from "./pages/SchedulePage";
 import DailyLogsPage from "./pages/DailyLogsPage";
+import CustomerPortalPage from "./pages/CustomerPortalPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -78,6 +79,11 @@ const App = () => (
                 </ProtectedRoute>
               } />
               <Route path="/jobs/:id" element={<JobDetailPage />} />
+              <Route path="/my-projects" element={
+                <ProtectedRoute allowedRoles={["customer", "admin"]}>
+                  <CustomerPortalPage />
+                </ProtectedRoute>
+              } />
               <Route path="/jobs/:jobId/quote" element={
                 <ProtectedRoute allowedRoles={["trade", "admin"]}>
                   <SubmitQuotePage />

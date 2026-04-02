@@ -32,21 +32,49 @@ const TraderProfilePage = () => {
   const { user, roles } = useAuth();
   const [trader, setTrader] = useState<TraderProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [portfolioImages, setPortfolioImages] = useState<string[]>([]);
+  const [completedJobCount, setCompletedJobCount] = useState(0);
 
   const isSubscribed = roles.includes("customer") || roles.includes("admin");
 
   useEffect(() => {
-    const fetch = async () => {
+    const fetchAll = async () => {
       if (!id) return;
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, full_name, company_name, trade_specialism, rating, phone, email, services_description, service_radius_miles, years_experience, trade_bodies, verified, cover_image_url, website_url, created_at")
-        .eq("id", id)
-        .single();
-      setTrader(data as TraderProfile | null);
+      const [{ data: profile }, { data: reviewData }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("id, full_name, company_name, trade_specialism, rating, phone, email, services_description, service_radius_miles, years_experience, trade_bodies, verified, cover_image_url, website_url, created_at")
+          .eq("id", id)
+          .single(),
+        supabase
+          .from("reviews")
+          .select("*")
+          .eq("trader_profile_id", id)
+          .order("created_at", { ascending: false })
+          .limit(10),
+      ]);
+      setTrader(profile as TraderProfile | null);
+      setReviews(reviewData ?? []);
+
+      // Fetch portfolio: evidence from completed jobs by this trader
+      const { data: companies } = await supabase.from("trade_companies").select("id").eq("owner_profile_id", id);
+      const companyIds = companies?.map(c => c.id) ?? [];
+      if (companyIds.length) {
+        const { data: awards } = await supabase.from("job_awards").select("job_id").in("trade_company_id", companyIds);
+        const jobIds = awards?.map(a => a.job_id) ?? [];
+        if (jobIds.length) {
+          const [{ data: media }, { count }] = await Promise.all([
+            supabase.from("job_media").select("storage_path, media_type").in("job_id", jobIds).eq("media_type", "photo").limit(12),
+            supabase.from("jobs").select("id", { count: "exact", head: true }).in("id", jobIds).eq("status", "completed"),
+          ]);
+          setPortfolioImages((media ?? []).map(m => supabase.storage.from("job-evidence").getPublicUrl(m.storage_path).data.publicUrl));
+          setCompletedJobCount(count ?? 0);
+        }
+      }
       setLoading(false);
     };
-    fetch();
+    fetchAll();
   }, [id]);
 
   if (loading) {
@@ -162,17 +190,53 @@ const TraderProfilePage = () => {
             </div>
           )}
 
-          {/* Placeholder for past work / reviews */}
+          {/* Portfolio / Before & After Gallery */}
           <div className="glass-card p-6 space-y-3">
-            <h2 className="text-lg font-semibold">Past Work & Reviews</h2>
-            <p className="text-sm text-muted-foreground">Photos and reviews from completed projects will appear here.</p>
-            <div className="grid grid-cols-3 gap-2">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="aspect-square rounded-lg bg-secondary/50 flex items-center justify-center">
-                  <CheckCircle className="h-6 w-6 text-muted-foreground/30" />
-                </div>
-              ))}
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Past Work Gallery</h2>
+              {completedJobCount > 0 && (
+                <span className="text-xs text-muted-foreground">{completedJobCount} completed job{completedJobCount !== 1 ? "s" : ""}</span>
+              )}
             </div>
+            {portfolioImages.length > 0 ? (
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                {portfolioImages.map((url, i) => (
+                  <div key={i} className="aspect-square rounded-lg overflow-hidden bg-secondary group relative">
+                    <img src={url} alt={`Work sample ${i + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-2">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="aspect-square rounded-lg bg-secondary/50 flex items-center justify-center">
+                    <CheckCircle className="h-6 w-6 text-muted-foreground/30" />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Reviews */}
+          <div className="glass-card p-6 space-y-3">
+            <h2 className="text-lg font-semibold">Customer Reviews</h2>
+            {reviews.length > 0 ? (
+              <div className="space-y-3">
+                {reviews.map((r: any) => (
+                  <div key={r.id} className="p-3 rounded-lg bg-secondary/40 space-y-1.5">
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star key={i} className={`h-3.5 w-3.5 ${i < r.rating ? "text-primary fill-primary" : "text-muted-foreground/30"}`} />
+                      ))}
+                      <span className="text-xs text-muted-foreground ml-2">{new Date(r.created_at).toLocaleDateString("en-GB", { month: "short", year: "numeric" })}</span>
+                    </div>
+                    {r.comment && <p className="text-sm text-muted-foreground">{r.comment}</p>}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No reviews yet.</p>
+            )}
           </div>
         </div>
 
