@@ -190,16 +190,16 @@ const SiteEvidenceProjectPage = () => {
         </motion.button>
 
         {/* Phase folders */}
-        {EVIDENCE_PHASES.map((phase, i) => {
-          const count = phaseCounts[phase.value] || 0;
+        {EVIDENCE_SUBFOLDERS.map((folder, i) => {
+          const count = phaseCounts[folder.value] || 0;
           return (
             <motion.button
-              key={phase.value}
+              key={folder.value}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: (i + 1) * 0.04 }}
               className="w-full glass-card p-4 text-left hover:border-primary/20 transition-colors"
-              onClick={() => navigate(`/site-evidence/${jobId}/gallery?phase=${phase.value}`)}
+              onClick={() => navigate(`/site-evidence/${jobId}/gallery?phase=${folder.value}`)}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -207,7 +207,7 @@ const SiteEvidenceProjectPage = () => {
                     <FolderOpen className="w-4 h-4 text-primary" />
                   </div>
                   <div>
-                    <p className="font-medium text-sm">{phase.label}</p>
+                    <p className="font-medium text-sm">{folder.label}</p>
                     <p className="text-xs text-muted-foreground">{count} items</p>
                   </div>
                 </div>
