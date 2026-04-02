@@ -4,8 +4,9 @@ import { NavLink } from "@/components/NavLink";
 import {
   LayoutDashboard, Briefcase, Package, Camera, FileCheck,
   Building2, Truck, CreditCard, MessageCircle, LogOut,
-  Wrench, Radio, Shield, Calendar, CalendarDays, Zap,
+  Radio, Shield, Calendar, CalendarDays, Zap,
 } from "lucide-react";
+import traderosLogo from "@/assets/traderos-logo.png";
 import NotificationBell from "@/components/NotificationBell";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
@@ -64,15 +65,8 @@ function TraderSidebar() {
     <Sidebar collapsible="icon" className="border-r border-border bg-card">
       <SidebarContent className="pt-4">
         {/* Logo */}
-        <div className={`px-4 mb-6 flex items-center gap-2.5 ${collapsed ? "justify-center" : ""}`}>
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary">
-            <Wrench className="h-5 w-5 text-primary-foreground" />
-          </div>
-          {!collapsed && (
-            <span className="text-lg font-bold tracking-tight text-foreground">
-              Trade<span className="text-primary">Flow</span>
-            </span>
-          )}
+        <div className={`px-4 mb-6 flex items-center ${collapsed ? "justify-center" : ""}`}>
+          <img src={traderosLogo} alt="TraderOS" className={collapsed ? "h-8" : "h-9"} />
         </div>
 
         {navGroups.map((group) => (
@@ -157,13 +151,8 @@ const TraderLayout = () => {
           <header className="sticky top-0 z-40 h-14 flex items-center justify-between gap-3 border-b border-border bg-background/80 backdrop-blur-xl px-4">
             <div className="flex items-center gap-3">
               <SidebarTrigger className="hidden md:flex" />
-              <div className="md:hidden flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                  <Wrench className="h-4 w-4 text-primary-foreground" />
-                </div>
-                <span className="text-base font-bold tracking-tight text-foreground">
-                  Trade<span className="text-primary">Flow</span>
-                </span>
+              <div className="md:hidden">
+                <img src={traderosLogo} alt="TraderOS" className="h-7" />
               </div>
             </div>
             <NotificationBell />

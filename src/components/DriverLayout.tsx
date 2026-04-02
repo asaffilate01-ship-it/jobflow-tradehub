@@ -12,6 +12,7 @@ import {
   SidebarProvider, SidebarTrigger, useSidebar,
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
+import traderosLogo from "@/assets/traderos-logo.png";
 
 const driverNavItems = [
   { to: "/driver", label: "Dashboard", icon: LayoutDashboard },
@@ -33,15 +34,8 @@ function DriverSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r border-border bg-card">
       <SidebarContent className="pt-4">
-        <div className={`px-4 mb-6 flex items-center gap-2.5 ${collapsed ? "justify-center" : ""}`}>
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent">
-            <TruckIcon className="h-5 w-5 text-accent-foreground" />
-          </div>
-          {!collapsed && (
-            <span className="text-lg font-bold tracking-tight text-foreground">
-              Driver<span className="text-accent">Hub</span>
-            </span>
-          )}
+        <div className={`px-4 mb-6 flex items-center ${collapsed ? "justify-center" : ""}`}>
+          <img src={traderosLogo} alt="TraderOS" className={collapsed ? "h-8" : "h-9"} />
         </div>
 
         <SidebarGroup>
@@ -121,13 +115,8 @@ const DriverLayout = () => {
           <header className="sticky top-0 z-40 h-14 flex items-center justify-between gap-3 border-b border-border bg-background/80 backdrop-blur-xl px-4">
             <div className="flex items-center gap-3">
               <SidebarTrigger className="hidden md:flex" />
-              <div className="md:hidden flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent">
-                  <TruckIcon className="h-4 w-4 text-accent-foreground" />
-                </div>
-                <span className="text-base font-bold tracking-tight text-foreground">
-                  Driver<span className="text-accent">Hub</span>
-                </span>
+              <div className="md:hidden">
+                <img src={traderosLogo} alt="TraderOS" className="h-7" />
               </div>
             </div>
             <NotificationBell />

@@ -295,7 +295,7 @@ const SmartOrderPage = () => {
             </div>
             <div className="text-right text-xs text-muted-foreground">
               <div>Materials paid direct to merchants</div>
-              <div>Platform delivery fees paid to TradeFlow</div>
+              <div>Platform delivery fees paid to TraderOS</div>
             </div>
           </div>
           <Button className="w-full font-semibold gap-2 h-12 text-base" onClick={handleAcceptQuote}>

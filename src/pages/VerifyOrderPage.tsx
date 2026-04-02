@@ -76,7 +76,7 @@ const VerifyOrderPage = () => {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="max-w-md w-full mx-auto space-y-6">
         <div className="text-center space-y-1">
-          <h1 className="text-lg font-bold tracking-tight">TradeFlow</h1>
+          <h1 className="text-lg font-bold tracking-tight">TraderOS</h1>
           <p className="text-xs text-muted-foreground">Order Verification</p>
         </div>
 
@@ -129,7 +129,7 @@ const VerifyOrderPage = () => {
           </div>
 
           <div className="text-center text-[10px] text-muted-foreground pt-2">
-            TradeFlow Platform • Verified at {format(new Date(), "HH:mm dd/MM/yyyy")}
+            TraderOS Platform • Verified at {format(new Date(), "HH:mm dd/MM/yyyy")}
           </div>
         </div>
       </div>

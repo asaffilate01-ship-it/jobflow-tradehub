@@ -192,7 +192,7 @@ Deno.serve(async (req) => {
         item_count: items.length,
         subtotal: items.reduce((s, i) => s + i.line_total, 0),
         delivery_options: [
-          { method: "platform_driver", label: "TradeFlow Delivery", cost: estimatedDeliveryCost },
+          { method: "platform_driver", label: "TraderOS Delivery", cost: estimatedDeliveryCost },
           { method: "merchant_delivery", label: "Merchant Delivery", cost: 0 },
           { method: "trade_collect", label: "Self Collect", cost: 0 },
         ],

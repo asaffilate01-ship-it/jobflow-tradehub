@@ -1,6 +1,6 @@
 {
-  "name": "TradeFlow",
-  "short_name": "TradeFlow",
+  "name": "TraderOS",
+  "short_name": "TraderOS",
   "description": "Trade job management, materials ordering, and delivery logistics platform",
   "start_url": "/",
   "display": "standalone",

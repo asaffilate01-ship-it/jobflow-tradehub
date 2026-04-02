@@ -28,7 +28,7 @@ async function sendWebPush(
 ): Promise<{ success: boolean; error?: string; statusCode?: number }> {
   const vapidPrivateKey = Deno.env.get("VAPID_PRIVATE_KEY");
   const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY");
-  const vapidSubject = Deno.env.get("VAPID_SUBJECT") || "mailto:push@tradeflow.app";
+  const vapidSubject = Deno.env.get("VAPID_SUBJECT") || "mailto:push@traderos.app";
 
   if (!vapidPrivateKey || !vapidPublicKey) {
     return { success: false, error: "VAPID keys not configured" };
@@ -158,7 +158,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const payload = { title, body: notifBody || "", link: link || "/", tag: tag || "tradeflow" };
+    const payload = { title, body: notifBody || "", link: link || "/", tag: tag || "traderos" };
     let sent = 0;
     let failed = 0;
     const expiredEndpoints: string[] = [];
