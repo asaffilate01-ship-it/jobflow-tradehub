@@ -4,8 +4,9 @@ import { NavLink } from "@/components/NavLink";
 import {
   LayoutDashboard, Briefcase, Package, Camera, FileCheck,
   Building2, Truck, CreditCard, MessageCircle, LogOut, ChevronLeft,
-  Menu, Wrench,
+  Menu, Wrench, Radio,
 } from "lucide-react";
+import NotificationBell from "@/components/NotificationBell";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
   SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
