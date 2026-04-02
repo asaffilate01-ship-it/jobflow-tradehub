@@ -36,7 +36,7 @@ const portalConfig = {
     subtitle: "View deliveries & manage your runs",
     iconBg: "bg-accent/10",
     iconText: "text-accent",
-    redirect: "/driver",
+    redirect: "/dashboard",
     roleName: "driver",
   },
   admin: {
@@ -45,7 +45,7 @@ const portalConfig = {
     subtitle: "Platform management & oversight",
     iconBg: "bg-destructive/10",
     iconText: "text-destructive",
-    redirect: "/dashboard",
+    redirect: "/admin",
     roleName: "admin",
   },
   customer: {
@@ -65,6 +65,15 @@ const portalConfig = {
     iconText: "text-emerald-600",
     redirect: "/agent",
     roleName: "agent",
+  },
+  staff: {
+    icon: Users,
+    title: "Staff Login",
+    subtitle: "Access your assigned trade company tools",
+    iconBg: "bg-indigo-500/10",
+    iconText: "text-indigo-600",
+    redirect: "/dashboard",
+    roleName: "staff",
   },
 } as const;
 
