@@ -99,6 +99,7 @@ const App = () => (
               </ProtectedRoute>
             }>
               <Route path="/driver" element={<DriverDashboard />} />
+              <Route path="/driver/broadcasts" element={<BroadcastsPage />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />

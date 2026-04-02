@@ -24,6 +24,7 @@ const traderNavItems = [
   { to: "/trade-accounts", label: "Trade Accounts", icon: Building2 },
   { to: "/deliveries", label: "Deliveries", icon: Truck },
   { to: "/messages", label: "Messages", icon: MessageCircle },
+  { to: "/broadcasts", label: "Broadcasts", icon: Radio },
   { to: "/subscription", label: "Subscription", icon: CreditCard },
 ];
 
