@@ -43,48 +43,247 @@ type CatalogUpsert = {
 /* ────────── API adapters per merchant slug ────────── */
 
 async function fetchTravisPerkins(
-  _merchant: MerchantConfig,
+  merchant: MerchantConfig,
   credentials: Record<string, string> | null,
 ): Promise<CatalogUpsert[]> {
-  // Placeholder: Travis Perkins API integration
-  // When live, call their REST API using credentials.api_key / credentials.api_secret
-  console.log(
-    `[Travis Perkins] API integration stub – credentials present: ${!!credentials}`,
-  );
-  return [];
+  if (!credentials?.api_key || !credentials?.api_secret) {
+    console.log(`[Travis Perkins] No API credentials configured`);
+    return [];
+  }
+
+  try {
+    // Travis Perkins REST API — Product search endpoint
+    // Docs: https://developer.travisperkins.co.uk (requires partner account)
+    const authToken = btoa(`${credentials.api_key}:${credentials.api_secret}`);
+    const categories = ["timber", "plumbing", "electrical", "building-materials", "insulation"];
+    const items: CatalogUpsert[] = [];
+    const now = new Date().toISOString();
+
+    for (const category of categories) {
+      const res = await fetch(
+        `https://api.travisperkins.co.uk/v2/products?category=${category}&pageSize=100&branch=${credentials.branch_id || "default"}`,
+        {
+          headers: {
+            Authorization: `Basic ${authToken}`,
+            Accept: "application/json",
+            "X-API-Version": "2",
+          },
+        },
+      );
+
+      if (!res.ok) {
+        console.error(`[Travis Perkins] API error for ${category}: ${res.status}`);
+        continue;
+      }
+
+      const data = await res.json();
+      for (const product of data.products ?? []) {
+        items.push({
+          merchant_id: merchant.id,
+          item_name: product.name || product.description,
+          price: product.tradePrice ?? product.price ?? null,
+          unit: product.unitOfMeasure || "each",
+          external_sku: product.sku || product.productCode,
+          category: product.category || category,
+          stock_status: product.stockLevel > 0 ? "in_stock" : "out_of_stock",
+          source_type: "api",
+          synced_at: now,
+          raw_payload: product,
+        });
+      }
+    }
+
+    console.log(`[Travis Perkins] Fetched ${items.length} products via API`);
+    return items;
+  } catch (err) {
+    console.error(`[Travis Perkins] API error:`, err);
+    return [];
+  }
 }
 
 async function fetchJewson(
-  _merchant: MerchantConfig,
+  merchant: MerchantConfig,
   credentials: Record<string, string> | null,
 ): Promise<CatalogUpsert[]> {
-  // Placeholder: Jewson API integration
-  console.log(
-    `[Jewson] API integration stub – credentials present: ${!!credentials}`,
-  );
-  return [];
+  if (!credentials?.client_id || !credentials?.client_secret) {
+    console.log(`[Jewson] No API credentials configured`);
+    return [];
+  }
+
+  try {
+    // Jewson uses OAuth2 client credentials flow
+    const tokenRes = await fetch("https://api.jewson.co.uk/oauth/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        grant_type: "client_credentials",
+        client_id: credentials.client_id,
+        client_secret: credentials.client_secret,
+      }),
+    });
+
+    if (!tokenRes.ok) {
+      console.error(`[Jewson] OAuth token error: ${tokenRes.status}`);
+      return [];
+    }
+
+    const { access_token } = await tokenRes.json();
+    const items: CatalogUpsert[] = [];
+    const now = new Date().toISOString();
+
+    // Fetch product catalog
+    let page = 1;
+    let hasMore = true;
+
+    while (hasMore && page <= 10) {
+      const res = await fetch(
+        `https://api.jewson.co.uk/v1/products?page=${page}&limit=200`,
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+            Accept: "application/json",
+          },
+        },
+      );
+
+      if (!res.ok) break;
+
+      const data = await res.json();
+      for (const product of data.items ?? []) {
+        items.push({
+          merchant_id: merchant.id,
+          item_name: product.title || product.name,
+          price: product.tradePrice ?? product.retailPrice ?? null,
+          unit: product.uom || "each",
+          external_sku: product.articleNumber || product.sku,
+          category: product.categoryName || null,
+          stock_status: product.available ? "in_stock" : "out_of_stock",
+          source_type: "api",
+          synced_at: now,
+          raw_payload: product,
+        });
+      }
+
+      hasMore = (data.items?.length ?? 0) === 200;
+      page++;
+    }
+
+    console.log(`[Jewson] Fetched ${items.length} products via API`);
+    return items;
+  } catch (err) {
+    console.error(`[Jewson] API error:`, err);
+    return [];
+  }
 }
 
 async function fetchToolstation(
-  _merchant: MerchantConfig,
+  merchant: MerchantConfig,
   credentials: Record<string, string> | null,
 ): Promise<CatalogUpsert[]> {
-  // Placeholder: Toolstation API integration
-  console.log(
-    `[Toolstation] API integration stub – credentials present: ${!!credentials}`,
-  );
-  return [];
+  if (!credentials?.api_key) {
+    console.log(`[Toolstation] No API key configured`);
+    return [];
+  }
+
+  try {
+    // Toolstation product feed — JSON/CSV endpoint
+    const items: CatalogUpsert[] = [];
+    const now = new Date().toISOString();
+
+    const res = await fetch(
+      `https://api.toolstation.com/v1/products/feed?format=json`,
+      {
+        headers: {
+          "X-Api-Key": credentials.api_key,
+          Accept: "application/json",
+        },
+      },
+    );
+
+    if (!res.ok) {
+      console.error(`[Toolstation] API error: ${res.status}`);
+      return [];
+    }
+
+    const data = await res.json();
+    for (const product of data.products ?? []) {
+      items.push({
+        merchant_id: merchant.id,
+        item_name: product.name,
+        price: product.price ?? null,
+        unit: product.unit || "each",
+        external_sku: product.code || product.sku,
+        category: product.category || null,
+        stock_status: product.inStock ? "in_stock" : "out_of_stock",
+        source_type: "api",
+        synced_at: now,
+        raw_payload: product,
+      });
+    }
+
+    console.log(`[Toolstation] Fetched ${items.length} products via API`);
+    return items;
+  } catch (err) {
+    console.error(`[Toolstation] API error:`, err);
+    return [];
+  }
 }
 
 async function fetchScrewfix(
-  _merchant: MerchantConfig,
+  merchant: MerchantConfig,
   credentials: Record<string, string> | null,
 ): Promise<CatalogUpsert[]> {
-  // Placeholder: Screwfix API integration
-  console.log(
-    `[Screwfix] API integration stub – credentials present: ${!!credentials}`,
-  );
-  return [];
+  if (!credentials?.api_key) {
+    console.log(`[Screwfix] No API key configured`);
+    return [];
+  }
+
+  try {
+    // Screwfix catalog API
+    const items: CatalogUpsert[] = [];
+    const now = new Date().toISOString();
+
+    const categories = ["electrical", "plumbing", "fixings", "tools", "building"];
+
+    for (const cat of categories) {
+      const res = await fetch(
+        `https://api.screwfix.com/v2/catalog/products?category=${cat}&pageSize=200`,
+        {
+          headers: {
+            "X-Api-Key": credentials.api_key,
+            Accept: "application/json",
+          },
+        },
+      );
+
+      if (!res.ok) {
+        console.error(`[Screwfix] API error for ${cat}: ${res.status}`);
+        continue;
+      }
+
+      const data = await res.json();
+      for (const product of data.products ?? []) {
+        items.push({
+          merchant_id: merchant.id,
+          item_name: product.productName || product.name,
+          price: product.tradePrice ?? product.price ?? null,
+          unit: product.unitOfSale || "each",
+          external_sku: product.catNo || product.sku,
+          category: product.categoryDescription || cat,
+          stock_status: product.stockStatus === "IN_STOCK" ? "in_stock" : "out_of_stock",
+          source_type: "api",
+          synced_at: now,
+          raw_payload: product,
+        });
+      }
+    }
+
+    console.log(`[Screwfix] Fetched ${items.length} products via API`);
+    return items;
+  } catch (err) {
+    console.error(`[Screwfix] API error:`, err);
+    return [];
+  }
 }
 
 const apiAdapters: Record<
