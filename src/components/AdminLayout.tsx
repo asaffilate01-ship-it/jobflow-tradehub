@@ -80,7 +80,7 @@ function AdminSidebar() {
                       <NavLink
                         to={item.to}
                         end={item.to === "/admin"}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-foreground hover:text-primary hover:bg-secondary/50 transition-colors"
                         activeClassName="bg-primary/10 text-primary border-l-2 border-primary"
                       >
                         <item.icon className="h-4.5 w-4.5 shrink-0" />
