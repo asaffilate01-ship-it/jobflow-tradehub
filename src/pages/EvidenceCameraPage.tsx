@@ -144,7 +144,7 @@ const EvidenceCameraPage = () => {
     canvas.toBlob(async (blob) => {
       if (!blob) { setUploading(false); return; }
 
-      const fileName = `${jobId}/${subfolder}/${Date.now()}.jpg`;
+      const fileName = `${jobId}/${phase}/${subfolder}/${Date.now()}.jpg`;
       const { error: uploadErr } = await supabase.storage
         .from("job-evidence")
         .upload(fileName, blob, { contentType: "image/jpeg" });
