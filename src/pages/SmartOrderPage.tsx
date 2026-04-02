@@ -349,12 +349,21 @@ const SmartOrderPage = () => {
           <Button size="sm" variant="outline" onClick={addItem} className="gap-1 text-xs"><Plus className="h-3 w-3" />Add item</Button>
         </div>
 
-        <div className="space-y-3">
+        {/* Column headers */}
+        <div className="flex items-center gap-3 text-xs font-medium text-muted-foreground border-b border-border pb-2">
+          <span className="w-6 text-right shrink-0">#</span>
+          <span className="flex-1">Material / Product</span>
+          <span className="w-20 text-center">Qty</span>
+          <span className="w-24 text-center">Unit</span>
+          <span className="w-8 shrink-0"></span>
+        </div>
+
+        <div className="space-y-2">
           {items.map((item, i) => (
             <div key={item.key} className="flex items-center gap-3">
-              <span className="text-xs text-muted-foreground w-6 text-right shrink-0">{i + 1}.</span>
+              <span className="text-xs text-muted-foreground w-6 text-right shrink-0 tabular-nums">{i + 1}.</span>
               <Input placeholder="e.g. 50kg cement, 2.4m timber, plasterboard" className="flex-1" value={item.item_name} onChange={(e) => updateItem(item.key, "item_name", e.target.value)} />
-              <Input type="number" min={1} className="w-20" value={item.quantity} onChange={(e) => updateItem(item.key, "quantity", Number(e.target.value))} />
+              <Input type="number" min={1} className="w-20 text-center" value={item.quantity} onChange={(e) => updateItem(item.key, "quantity", Number(e.target.value))} />
               <select className={`${selectClass} w-24`} value={item.unit} onChange={(e) => updateItem(item.key, "unit", e.target.value)}>
                 <option value="each">each</option>
                 <option value="bag">bag</option>
