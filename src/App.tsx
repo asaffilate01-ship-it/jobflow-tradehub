@@ -37,6 +37,7 @@ import KycUploadPage from "./pages/KycUploadPage";
 import AdminKycPage from "./pages/AdminKycPage";
 import SchedulePage from "./pages/SchedulePage";
 import DailyLogsPage from "./pages/DailyLogsPage";
+import CustomerPortalPage from "./pages/CustomerPortalPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
