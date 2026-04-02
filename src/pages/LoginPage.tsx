@@ -75,6 +75,7 @@ const TEST_ACCOUNTS = [
   { label: "Customer", email: "customer@traderos.dev", password: "customer123!", portal: "customer" as Portal },
   { label: "Driver", email: "driver@traderos.dev", password: "driver123!", portal: "driver" as Portal },
   { label: "Admin", email: "admin@traderos.dev", password: "admin123!", portal: "admin" as Portal },
+  { label: "Agent", email: "agent@traderos.dev", password: "agent123!", portal: "agent" as Portal },
 ];
 
 const LoginPage = () => {
