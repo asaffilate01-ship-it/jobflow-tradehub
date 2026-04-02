@@ -99,7 +99,9 @@ const App = () => (
               } />
               <Route path="/materials" element={
                 <ProtectedRoute allowedRoles={["trade", "admin"]}>
-                  <MaterialsPage />
+                  <KycGate>
+                    <MaterialsPage />
+                  </KycGate>
                 </ProtectedRoute>
               } />
               <Route path="/basic-cam" element={
