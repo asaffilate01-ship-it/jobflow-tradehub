@@ -9,7 +9,7 @@ import type { Database } from "@/integrations/supabase/types";
 import traderosLogo from "@/assets/traderos-logo.png";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
-type Portal = "trader" | "driver" | "admin" | "customer" | "agent" | null;
+type Portal = "trader" | "driver" | "admin" | "customer" | "agent" | "staff" | null;
 
 const portalToRole: Record<Exclude<Portal, null>, AppRole> = {
   trader: "trade",
