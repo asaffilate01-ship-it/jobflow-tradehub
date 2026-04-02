@@ -114,7 +114,7 @@ const MarketplacePage = () => {
           </div>
           <div className="flex gap-2 shrink-0">
             {!user && (
-              <Button asChild variant="outline" size="sm" className="gap-2 font-semibold">
+              <Button asChild variant="outline" size="sm" className="gap-2 font-semibold border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                 <Link to="/signup">
                   List your trade
                   <ArrowRight className="h-3.5 w-3.5" />
