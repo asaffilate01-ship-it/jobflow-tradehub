@@ -1666,6 +1666,135 @@ export type Database = {
           },
         ]
       }
+      price_quote_items: {
+        Row: {
+          alternatives: Json
+          best_merchant_id: string | null
+          best_merchant_name: string | null
+          best_price: number
+          delivery_cost: number
+          delivery_method: string
+          has_trade_account: boolean
+          id: string
+          item_name: string
+          line_total: number
+          price_quote_id: string
+          quantity: number
+          retail_price: number | null
+          trade_account_price: number | null
+          unit: string
+        }
+        Insert: {
+          alternatives?: Json
+          best_merchant_id?: string | null
+          best_merchant_name?: string | null
+          best_price?: number
+          delivery_cost?: number
+          delivery_method?: string
+          has_trade_account?: boolean
+          id?: string
+          item_name: string
+          line_total?: number
+          price_quote_id: string
+          quantity?: number
+          retail_price?: number | null
+          trade_account_price?: number | null
+          unit?: string
+        }
+        Update: {
+          alternatives?: Json
+          best_merchant_id?: string | null
+          best_merchant_name?: string | null
+          best_price?: number
+          delivery_cost?: number
+          delivery_method?: string
+          has_trade_account?: boolean
+          id?: string
+          item_name?: string
+          line_total?: number
+          price_quote_id?: string
+          quantity?: number
+          retail_price?: number | null
+          trade_account_price?: number | null
+          unit?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_quote_items_best_merchant_id_fkey"
+            columns: ["best_merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "price_quote_items_price_quote_id_fkey"
+            columns: ["price_quote_id"]
+            isOneToOne: false
+            referencedRelation: "price_quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      price_quotes: {
+        Row: {
+          comparison_data: Json
+          created_at: string
+          delivery_address: string
+          delivery_postcode: string
+          id: string
+          job_id: string | null
+          requested_by: string
+          status: string
+          total_cost: number
+          total_delivery_cost: number
+          trade_company_id: string
+          updated_at: string
+        }
+        Insert: {
+          comparison_data?: Json
+          created_at?: string
+          delivery_address?: string
+          delivery_postcode: string
+          id?: string
+          job_id?: string | null
+          requested_by: string
+          status?: string
+          total_cost?: number
+          total_delivery_cost?: number
+          trade_company_id: string
+          updated_at?: string
+        }
+        Update: {
+          comparison_data?: Json
+          created_at?: string
+          delivery_address?: string
+          delivery_postcode?: string
+          id?: string
+          job_id?: string | null
+          requested_by?: string
+          status?: string
+          total_cost?: number
+          total_delivery_cost?: number
+          trade_company_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_quotes_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "price_quotes_trade_company_id_fkey"
+            columns: ["trade_company_id"]
+            isOneToOne: false
+            referencedRelation: "trade_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           company_name: string | null
@@ -2095,9 +2224,13 @@ export type Database = {
           account_name: string | null
           account_reference: string
           created_at: string
+          discount_percentage: number | null
+          encrypted_credentials: string | null
           id: string
           merchant_id: string
           metadata: Json
+          portal_url: string | null
+          portal_username: string | null
           trade_company_id: string
           verified: boolean
         }
@@ -2105,9 +2238,13 @@ export type Database = {
           account_name?: string | null
           account_reference: string
           created_at?: string
+          discount_percentage?: number | null
+          encrypted_credentials?: string | null
           id?: string
           merchant_id: string
           metadata?: Json
+          portal_url?: string | null
+          portal_username?: string | null
           trade_company_id: string
           verified?: boolean
         }
@@ -2115,9 +2252,13 @@ export type Database = {
           account_name?: string | null
           account_reference?: string
           created_at?: string
+          discount_percentage?: number | null
+          encrypted_credentials?: string | null
           id?: string
           merchant_id?: string
           metadata?: Json
+          portal_url?: string | null
+          portal_username?: string | null
           trade_company_id?: string
           verified?: boolean
         }
