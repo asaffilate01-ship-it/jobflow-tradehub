@@ -29,6 +29,9 @@ import plastererIcon from "@/assets/icons/plasterer-3d.png";
 import painterIcon from "@/assets/icons/painter-3d.png";
 import gasEngineerIcon from "@/assets/icons/gas-engineer-3d.png";
 import landscaperIcon from "@/assets/icons/landscaper-3d.png";
+import removalsIcon from "@/assets/icons/removals-3d.png";
+import rubbishCollectionIcon from "@/assets/icons/rubbish-collection-3d.png";
+import cleanerIcon from "@/assets/icons/cleaner-3d.png";
 
 const tradeCategories = [
   { label: "Plumber", slug: "plumber", img: plumberIcon },
@@ -42,6 +45,9 @@ const tradeCategories = [
   { label: "Painter", slug: "painter", img: painterIcon },
   { label: "Gas Engineer", slug: "gas_engineer", img: gasEngineerIcon },
   { label: "Landscaper", slug: "landscaper", img: landscaperIcon },
+  { label: "Removals", slug: "removals", img: removalsIcon },
+  { label: "Rubbish Collection", slug: "rubbish_collection", img: rubbishCollectionIcon },
+  { label: "Cleaner", slug: "cleaner", img: cleanerIcon },
 ];
 
 const stats = [
