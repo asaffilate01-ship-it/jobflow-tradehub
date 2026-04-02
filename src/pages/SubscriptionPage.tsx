@@ -90,7 +90,7 @@ const SubscriptionPage = () => {
     <div className="space-y-8">
       <div className="text-center">
         <h1 className="text-3xl font-bold tracking-tight">Choose Your Plan</h1>
-        <p className="text-muted-foreground mt-2">Unlock the full TradeFlow platform</p>
+        <p className="text-muted-foreground mt-2">Unlock the full TraderOS platform</p>
       </div>
 
       {currentTier !== "free" && (

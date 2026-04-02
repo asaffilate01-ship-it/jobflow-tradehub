@@ -102,7 +102,7 @@ const MarketplacePage = () => {
           <div className="space-y-2">
             <Badge variant="outline" className="text-xs font-medium gap-1.5 py-1 px-3 mb-2">
               <Users className="h-3 w-3" />
-              TradeFlow Marketplace
+              TraderOS Marketplace
             </Badge>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Find a Tradesperson</h1>
             <p className="text-sm text-muted-foreground max-w-lg">

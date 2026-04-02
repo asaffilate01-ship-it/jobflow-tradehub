@@ -592,7 +592,7 @@ const LandingPage = () => {
         >
           <h2 className="text-3xl sm:text-4xl font-bold">Ready to get started?</h2>
           <p className="text-muted-foreground leading-relaxed text-lg">
-            Whether you need work done or you're a tradesperson looking for jobs — TradeFlow has you covered.
+            Whether you need work done or you're a tradesperson looking for jobs — TraderOS has you covered.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Button asChild size="lg" className="font-semibold gap-2 h-13 px-8 shadow-lg text-base">

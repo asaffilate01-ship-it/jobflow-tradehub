@@ -237,7 +237,7 @@ const OrderReceiptPage = () => {
 
         {/* Footer */}
         <div className="text-center text-[10px] text-muted-foreground pt-2 border-t border-border">
-          TradeFlow Platform • Verified Digital Receipt
+          TraderOS Platform • Verified Digital Receipt
         </div>
       </div>
     </div>
