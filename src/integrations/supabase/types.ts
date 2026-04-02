@@ -14,6 +14,71 @@ export type Database = {
   }
   public: {
     Tables: {
+      broadcast_channels: {
+        Row: {
+          audience_role: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          audience_role?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          audience_role?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      broadcast_messages: {
+        Row: {
+          body: string | null
+          channel_id: string
+          created_at: string
+          id: string
+          priority: string
+          sent_by: string | null
+          title: string
+        }
+        Insert: {
+          body?: string | null
+          channel_id: string
+          created_at?: string
+          id?: string
+          priority?: string
+          sent_by?: string | null
+          title: string
+        }
+        Update: {
+          body?: string | null
+          channel_id?: string
+          created_at?: string
+          id?: string
+          priority?: string
+          sent_by?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "broadcast_messages_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "broadcast_channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       change_orders: {
         Row: {
           cost_delta: number
@@ -1354,6 +1419,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          link: string | null
+          metadata: Json
+          read_at: string | null
+          recipient_id: string
+          title: string
+          type: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          metadata?: Json
+          read_at?: string | null
+          recipient_id: string
+          title: string
+          type?: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          metadata?: Json
+          read_at?: string | null
+          recipient_id?: string
+          title?: string
+          type?: string
+        }
+        Relationships: []
       }
       order_items: {
         Row: {
