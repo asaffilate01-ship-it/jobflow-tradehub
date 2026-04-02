@@ -170,8 +170,12 @@ const EvidenceCameraPage = () => {
     }, "image/jpeg", 0.92);
   };
 
-  const allElements = Object.entries(EVIDENCE_ELEMENTS).flatMap(([group, items]) =>
-    items.map((item) => ({ group, item }))
+  const subfolderLabel = EVIDENCE_SUBFOLDERS.find(sf => sf.value === subfolder)?.label;
+  const filteredSurveyTypes = subfolderLabel
+    ? Object.entries(EVIDENCE_SURVEY_TYPES).filter(([group]) => group === subfolderLabel)
+    : Object.entries(EVIDENCE_SURVEY_TYPES);
+  const allElements = filteredSurveyTypes.flatMap(([group, items]) =>
+    (items as readonly string[]).map((item) => ({ group, item }))
   );
 
   return (
