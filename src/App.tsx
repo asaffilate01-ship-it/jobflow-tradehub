@@ -53,10 +53,11 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <Routes>
-            {/* Public auth pages */}
+            {/* Public pages */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/verify-order/:orderId" element={<VerifyOrderPage />} />
             <Route path="/profile-setup" element={
               <ProtectedRoute>
                 <ProfileSetupPage />
