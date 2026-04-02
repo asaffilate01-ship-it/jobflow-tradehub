@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { 
-  Briefcase, Truck, Home, Menu, X, Users, LogIn, LogOut, Search
+  Briefcase, Truck, Home, Menu, X, Users, LogIn, LogOut, Search, FolderOpen
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
