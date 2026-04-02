@@ -41,8 +41,9 @@ const EvidenceGalleryPage = () => {
         .eq("job_id", jobId)
         .order("created_at", { ascending: false });
 
-      // Filter by phase folder if specified
-      if (phaseFilter) {
+      if (phaseFilter && subFilter) {
+        query = query.like("storage_path", `${jobId}/${phaseFilter}/${subFilter}/%`);
+      } else if (phaseFilter) {
         query = query.like("storage_path", `${jobId}/${phaseFilter}/%`);
       }
 
