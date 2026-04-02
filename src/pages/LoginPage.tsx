@@ -17,6 +17,7 @@ const portalToRole: Record<Exclude<Portal, null>, AppRole> = {
   admin: "admin",
   customer: "customer",
   agent: "agent",
+  staff: "staff",
 };
 
 const portalConfig = {
