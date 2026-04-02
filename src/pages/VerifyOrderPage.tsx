@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, XCircle, Clock, Package, Truck, MapPin } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Package } from "lucide-react";
 import { format } from "date-fns";
 
 const paidStatuses = ["confirmed", "ready_for_pickup", "collected", "delivered"];
@@ -12,7 +12,7 @@ const statusDisplay: Record<string, { label: string; color: string; icon: typeof
   submitted: { label: "Submitted", color: "text-warning", icon: Clock },
   confirmed: { label: "Paid & Confirmed", color: "text-success", icon: CheckCircle },
   ready_for_pickup: { label: "Ready for Pickup", color: "text-success", icon: Package },
-  collected: { label: "Collected", color: "text-info", icon: Truck },
+  collected: { label: "Collected", color: "text-info", icon: CheckCircle },
   delivered: { label: "Delivered", color: "text-success", icon: CheckCircle },
   cancelled: { label: "Cancelled", color: "text-destructive", icon: XCircle },
 };
@@ -26,19 +26,11 @@ const VerifyOrderPage = () => {
   useEffect(() => {
     if (!orderId) return;
 
-    // Public verification — uses anon key, relies on RLS or a public function
-    // For now we'll attempt to read limited info. If RLS blocks, we use an edge function.
     const fetchOrder = async () => {
-      const { data, error: err } = await supabase
-        .from("material_orders")
-        .select(`
-          id, order_status, goods_total, merchant_order_reference, created_at, delivery_mode, urgency,
-          delivery_address, pickup_address,
-          merchants(name),
-          order_items(item_name, quantity, unit_price, unit)
-        `)
-        .eq("id", orderId)
-        .single();
+      // Use the secure RPC function that only returns safe fields
+      const { data, error: err } = await supabase.rpc("verify_order_status", {
+        order_id: orderId,
+      });
 
       if (err || !data) {
         setError(true);
@@ -79,13 +71,10 @@ const VerifyOrderPage = () => {
   const isPaid = paidStatuses.includes(order.order_status);
   const sd = statusDisplay[order.order_status] || statusDisplay.draft;
   const StatusIcon = sd.icon;
-  const grandTotal = order.goods_total;
-  const items = order.order_items ?? [];
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="max-w-md w-full mx-auto space-y-6">
-        {/* Logo / header */}
         <div className="text-center space-y-1">
           <h1 className="text-lg font-bold tracking-tight">TradeFlow</h1>
           <p className="text-xs text-muted-foreground">Order Verification</p>
@@ -107,7 +96,7 @@ const VerifyOrderPage = () => {
           <div className="text-center space-y-1 border-y border-border py-4">
             <div className="text-xs text-muted-foreground uppercase tracking-widest">Reference</div>
             <div className="font-mono text-xl font-bold tracking-wider">
-              {order.merchant_order_reference || order.id.slice(0, 12).toUpperCase()}
+              {order.merchant_order_reference || order.id?.slice(0, 12).toUpperCase()}
             </div>
           </div>
 
@@ -115,50 +104,28 @@ const VerifyOrderPage = () => {
           <div className="space-y-3 text-sm">
             <div className="flex items-center gap-2">
               <Package className="h-4 w-4 text-muted-foreground" />
-              <span>{order.merchants?.name ?? "Unknown Merchant"}</span>
-            </div>
-            {order.pickup_address && (
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">Pickup: {order.pickup_address}</span>
-              </div>
-            )}
-            <div className="flex items-center gap-2">
-              <Truck className="h-4 w-4 text-muted-foreground" />
-              <div className="flex gap-2">
-                <Badge variant="outline" className="text-[10px]">{order.delivery_mode.replace(/_/g, " ")}</Badge>
-                <Badge variant="outline" className="text-[10px] capitalize">{order.urgency}</Badge>
-              </div>
+              <span>{order.merchant_name ?? "Unknown Merchant"}</span>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-muted-foreground" />
               <span className="text-muted-foreground">
-                {format(new Date(order.created_at), "dd MMM yyyy, HH:mm")}
+                {order.created_at ? format(new Date(order.created_at), "dd MMM yyyy, HH:mm") : "—"}
               </span>
             </div>
           </div>
-
-          {/* Items */}
-          {items.length > 0 && (
-            <div className="border-t border-border pt-4 space-y-2">
-              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Items</div>
-              {items.map((item: any, i: number) => (
-                <div key={i} className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">
-                    {item.quantity}x {item.item_name}
-                  </span>
-                  <span>£{(item.quantity * item.unit_price).toFixed(2)}</span>
-                </div>
-              ))}
-            </div>
-          )}
 
           {/* Total */}
           <div className="border-t border-border pt-4">
             <div className="flex justify-between font-bold text-lg">
               <span>Total</span>
-              <span className="text-primary">£{grandTotal.toFixed(2)}</span>
+              <span className="text-primary">£{Number(order.goods_total || 0).toFixed(2)}</span>
             </div>
+          </div>
+
+          <div className="text-center">
+            <Badge variant={isPaid ? "default" : "secondary"} className="text-xs">
+              {isPaid ? "✓ Safe to release goods" : "⏳ Awaiting payment"}
+            </Badge>
           </div>
 
           <div className="text-center text-[10px] text-muted-foreground pt-2">

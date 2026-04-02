@@ -2440,6 +2440,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      verify_order_status: { Args: { order_id: string }; Returns: Json }
     }
     Enums: {
       accounting_entry_type:
