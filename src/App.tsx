@@ -35,6 +35,8 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import BroadcastsPage from "./pages/BroadcastsPage";
 import KycUploadPage from "./pages/KycUploadPage";
 import AdminKycPage from "./pages/AdminKycPage";
+import SchedulePage from "./pages/SchedulePage";
+import DailyLogsPage from "./pages/DailyLogsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
