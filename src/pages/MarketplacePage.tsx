@@ -179,16 +179,16 @@ const MarketplacePage = () => {
       {loading ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="glass-card h-80 animate-pulse rounded-xl">
-              <div className="h-24 bg-secondary/50 rounded-t-xl" />
+            <div key={i} className="glass-card rounded-xl overflow-hidden">
+              <div className="h-28 skeleton-shimmer rounded-none" />
               <div className="p-5 space-y-3">
-                <div className="h-5 bg-secondary/50 rounded-lg w-3/4" />
-                <div className="h-4 bg-secondary/40 rounded-lg w-1/2" />
-                <div className="h-3 bg-secondary/30 rounded-lg w-full" />
-                <div className="h-3 bg-secondary/30 rounded-lg w-2/3" />
+                <div className="skeleton-shimmer h-5 w-3/4" />
+                <div className="skeleton-shimmer h-4 w-1/2" />
+                <div className="skeleton-shimmer h-3 w-full" />
+                <div className="skeleton-shimmer h-3 w-2/3" />
                 <div className="flex gap-2 pt-2">
-                  <div className="h-6 bg-secondary/30 rounded-full w-16" />
-                  <div className="h-6 bg-secondary/30 rounded-full w-20" />
+                  <div className="skeleton-shimmer h-6 w-16 rounded-full" />
+                  <div className="skeleton-shimmer h-6 w-20 rounded-full" />
                 </div>
               </div>
             </div>
