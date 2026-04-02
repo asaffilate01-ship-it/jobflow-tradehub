@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 import {
   Star, MapPin, Search, Shield, Award, Clock, ArrowRight,
   Wrench, Zap, HardHat, Home, Grid3X3, Hammer, BrickWall,
-  Paintbrush, Flame, TreePine, Filter, SlidersHorizontal,
+  Paintbrush, Flame, TreePine, SlidersHorizontal, Users, CheckCircle,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { motion } from "framer-motion";
 import { StaggerContainer, StaggerItem, ScaleOnHover } from "@/components/MotionWrapper";
 
 const tradeCategories = [
@@ -93,22 +94,53 @@ const MarketplacePage = () => {
 
   return (
     <div className="space-y-8">
-      {/* Page header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Find a Tradesperson</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Browse verified, rated tradespeople by category
-          </p>
+      {/* Hero header */}
+      <div className="glass-card p-8 sm:p-10 relative overflow-hidden">
+        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary mb-2">
+              <Users className="h-3 w-3" />
+              TradeFlow Marketplace
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Find a Tradesperson</h1>
+            <p className="text-sm text-muted-foreground max-w-lg">
+              Browse verified, rated tradespeople across the UK. Compare profiles, check reviews, and get quotes.
+            </p>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            {!user && (
+              <Button asChild variant="outline" size="sm" className="gap-2">
+                <Link to="/signup">
+                  List your trade
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </Button>
+            )}
+            <Button asChild size="sm" className="gap-2">
+              <Link to="/post-job">
+                Post a job
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </Button>
+          </div>
         </div>
-        {!user && (
-          <Button asChild variant="outline" size="sm" className="gap-2 shrink-0">
-            <Link to="/signup">
-              List your trade
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </Button>
-        )}
+
+        {/* Quick stats */}
+        <div className="flex flex-wrap gap-6 mt-6 pt-6 border-t border-border">
+          {[
+            { icon: Shield, label: "Verified traders", value: "500+" },
+            { icon: Star, label: "Avg. rating", value: "4.8★" },
+            { icon: CheckCircle, label: "Jobs completed", value: "2,400+" },
+            { icon: Clock, label: "Avg. response", value: "< 2hrs" },
+          ].map(({ icon: Icon, label, value }) => (
+            <div key={label} className="flex items-center gap-2">
+              <Icon className="h-4 w-4 text-primary" />
+              <span className="text-sm font-semibold text-foreground">{value}</span>
+              <span className="text-xs text-muted-foreground">{label}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Search bar */}
@@ -124,7 +156,7 @@ const MarketplacePage = () => {
         </div>
       </div>
 
-      {/* Category pills with icons */}
+      {/* Category pills */}
       <div className="flex flex-wrap gap-2">
         {tradeCategories.map(({ slug, label, icon: Icon }) => (
           <button
@@ -151,7 +183,7 @@ const MarketplacePage = () => {
         </p>
       )}
 
-      {/* Trader cards grid */}
+      {/* Trader cards */}
       {loading ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -192,78 +224,74 @@ const MarketplacePage = () => {
                   to={`/trader/${trader.id}`}
                   className="glass-card overflow-hidden hover:border-primary/30 hover:shadow-lg transition-all group block"
                 >
-              {/* Cover */}
-              <div className="h-24 bg-gradient-to-br from-primary/20 via-accent/10 to-secondary relative">
-                {trader.cover_image_url && (
-                  <img src={trader.cover_image_url} alt="" className="w-full h-full object-cover" />
-                )}
-                {trader.verified && (
-                  <Badge className="absolute top-3 right-3 bg-success/90 text-white border-0 gap-1 text-[10px]">
-                    <Shield className="h-3 w-3" />
-                    Verified
-                  </Badge>
-                )}
-                <div className="absolute -bottom-6 left-5">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-secondary border-2 border-background text-primary font-bold text-xl shadow-md">
-                    {trader.full_name.charAt(0).toUpperCase()}
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-5 pt-10 space-y-3">
-                <div>
-                  <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors text-base">
-                    {trader.full_name}
-                  </h3>
-                  {trader.company_name && (
-                    <p className="text-sm text-muted-foreground">{trader.company_name}</p>
-                  )}
-                </div>
-
-                {/* Trade, rating, experience */}
-                <div className="flex flex-wrap items-center gap-2.5 text-sm">
-                  {trader.trade_specialism && (
-                    <Badge variant="outline" className="capitalize text-xs font-medium gap-1 py-0.5">
-                      {trader.trade_specialism.replace("_", " ")}
-                    </Badge>
-                  )}
-                  <span className="flex items-center gap-1 text-muted-foreground">
-                    <Star className="h-3.5 w-3.5 text-primary fill-primary" />
-                    <span className="font-medium text-foreground">{trader.rating?.toFixed(1) ?? "5.0"}</span>
-                  </span>
-                  {trader.years_experience && (
-                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Clock className="h-3 w-3" />
-                      {trader.years_experience} yrs
-                    </span>
-                  )}
-                </div>
-
-                {/* Services snippet */}
-                {trader.services_description && (
-                  <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">{trader.services_description}</p>
-                )}
-
-                {/* Trade bodies */}
-                {trader.trade_bodies && trader.trade_bodies.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5">
-                    {trader.trade_bodies.slice(0, 3).map((body) => (
-                      <Badge key={body} variant="outline" className="text-[10px] gap-1 py-0 bg-secondary/50">
-                        <Award className="h-2.5 w-2.5" />
-                        {body}
+                  {/* Cover */}
+                  <div className="h-24 bg-gradient-to-br from-primary/20 via-accent/10 to-secondary relative">
+                    {trader.cover_image_url && (
+                      <img src={trader.cover_image_url} alt="" className="w-full h-full object-cover" />
+                    )}
+                    {trader.verified && (
+                      <Badge className="absolute top-3 right-3 bg-success/90 text-white border-0 gap-1 text-[10px]">
+                        <Shield className="h-3 w-3" />
+                        Verified
                       </Badge>
-                    ))}
+                    )}
+                    <div className="absolute -bottom-6 left-5">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-secondary border-2 border-background text-primary font-bold text-xl shadow-md">
+                        {trader.full_name.charAt(0).toUpperCase()}
+                      </div>
+                    </div>
                   </div>
-                )}
 
-                {/* Radius */}
-                {trader.service_radius_miles && (
-                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground pt-1 border-t border-border">
-                    <MapPin className="h-3 w-3" />
-                    Covers {trader.service_radius_miles} mile radius
+                  <div className="p-5 pt-10 space-y-3">
+                    <div>
+                      <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors text-base">
+                        {trader.full_name}
+                      </h3>
+                      {trader.company_name && (
+                        <p className="text-sm text-muted-foreground">{trader.company_name}</p>
+                      )}
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2.5 text-sm">
+                      {trader.trade_specialism && (
+                        <Badge variant="outline" className="capitalize text-xs font-medium gap-1 py-0.5">
+                          {trader.trade_specialism.replace("_", " ")}
+                        </Badge>
+                      )}
+                      <span className="flex items-center gap-1 text-muted-foreground">
+                        <Star className="h-3.5 w-3.5 text-primary fill-primary" />
+                        <span className="font-medium text-foreground">{trader.rating?.toFixed(1) ?? "5.0"}</span>
+                      </span>
+                      {trader.years_experience && (
+                        <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Clock className="h-3 w-3" />
+                          {trader.years_experience} yrs
+                        </span>
+                      )}
+                    </div>
+
+                    {trader.services_description && (
+                      <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">{trader.services_description}</p>
+                    )}
+
+                    {trader.trade_bodies && trader.trade_bodies.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {trader.trade_bodies.slice(0, 3).map((body) => (
+                          <Badge key={body} variant="outline" className="text-[10px] gap-1 py-0 bg-secondary/50">
+                            <Award className="h-2.5 w-2.5" />
+                            {body}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+
+                    {trader.service_radius_miles && (
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground pt-1 border-t border-border">
+                        <MapPin className="h-3 w-3" />
+                        Covers {trader.service_radius_miles} mile radius
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
                 </Link>
               </ScaleOnHover>
             </StaggerItem>
