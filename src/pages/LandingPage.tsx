@@ -250,7 +250,7 @@ const LandingPage = () => {
                   Search
                 </Button>
               </div>
-              <p className="text-xs text-primary-foreground/60 mt-3">
+              <p className="text-xs text-white/50 mt-3">
                 Popular: <Link to="/marketplace?category=plumber" className="text-primary hover:underline">Plumber</Link>
                 {" · "}<Link to="/marketplace?category=electrician" className="text-primary hover:underline">Electrician</Link>
                 {" · "}<Link to="/marketplace?category=builder" className="text-primary hover:underline">Builder</Link>
