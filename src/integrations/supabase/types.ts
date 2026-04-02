@@ -377,6 +377,71 @@ export type Database = {
           },
         ]
       }
+      daily_logs: {
+        Row: {
+          author_id: string
+          created_at: string
+          crew_count: number | null
+          crew_names: string[] | null
+          hours_on_site: number | null
+          id: string
+          job_id: string
+          log_date: string
+          notes: string | null
+          photos: string[] | null
+          safety_incidents: string | null
+          temperature_c: number | null
+          updated_at: string
+          weather: string | null
+          wind: string | null
+          work_summary: string
+        }
+        Insert: {
+          author_id: string
+          created_at?: string
+          crew_count?: number | null
+          crew_names?: string[] | null
+          hours_on_site?: number | null
+          id?: string
+          job_id: string
+          log_date?: string
+          notes?: string | null
+          photos?: string[] | null
+          safety_incidents?: string | null
+          temperature_c?: number | null
+          updated_at?: string
+          weather?: string | null
+          wind?: string | null
+          work_summary?: string
+        }
+        Update: {
+          author_id?: string
+          created_at?: string
+          crew_count?: number | null
+          crew_names?: string[] | null
+          hours_on_site?: number | null
+          id?: string
+          job_id?: string
+          log_date?: string
+          notes?: string | null
+          photos?: string[] | null
+          safety_incidents?: string | null
+          temperature_c?: number | null
+          updated_at?: string
+          weather?: string | null
+          wind?: string | null
+          work_summary?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_logs_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deliveries: {
         Row: {
           actual_distance_miles: number | null
