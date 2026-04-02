@@ -36,13 +36,8 @@ const AppNav = () => {
   return (
     <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary shadow-sm group-hover:shadow-md transition-shadow">
-            <Truck className="h-5 w-5 text-primary-foreground" />
-          </div>
-          <span className="text-lg font-bold tracking-tight text-foreground">
-            Trade<span className="text-primary">Flow</span>
-          </span>
+        <Link to="/" className="flex items-center gap-2 group">
+          <img src={traderosLogo} alt="TraderOS" className="h-9 group-hover:opacity-90 transition-opacity" />
         </Link>
 
         {/* Desktop nav */}

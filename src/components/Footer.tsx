@@ -118,7 +118,7 @@ const Footer = () => (
 
       <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
         <p className="text-xs text-muted-foreground">
-          © {new Date().getFullYear()} TradeFlow. All rights reserved.
+          © {new Date().getFullYear()} TraderOS. All rights reserved.
         </p>
         <p className="text-xs text-muted-foreground">
           Built in the UK 🇬🇧
