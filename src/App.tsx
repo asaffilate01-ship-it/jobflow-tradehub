@@ -30,6 +30,8 @@ import PostJobPage from "./pages/PostJobPage";
 import DriverDashboard from "./pages/DriverDashboard";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import BroadcastsPage from "./pages/BroadcastsPage";
+import KycUploadPage from "./pages/KycUploadPage";
+import AdminKycPage from "./pages/AdminKycPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
