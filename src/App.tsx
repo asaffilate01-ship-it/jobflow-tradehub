@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "./contexts/AuthContext";
 import AppLayout from "./components/AppLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import KycGate from "./components/KycGate";
 import LandingPage from "./pages/LandingPage";
 import JobsPage from "./pages/JobsPage";
 import JobDetailPage from "./pages/JobDetailPage";
@@ -86,7 +87,9 @@ const App = () => (
               {/* Trade-only pages */}
               <Route path="/dashboard" element={
                 <ProtectedRoute allowedRoles={["trade", "admin"]}>
-                  <TraderDashboard />
+                  <KycGate>
+                    <TraderDashboard />
+                  </KycGate>
                 </ProtectedRoute>
               } />
               <Route path="/trade-accounts" element={
@@ -96,7 +99,9 @@ const App = () => (
               } />
               <Route path="/materials" element={
                 <ProtectedRoute allowedRoles={["trade", "admin"]}>
-                  <MaterialsPage />
+                  <KycGate>
+                    <MaterialsPage />
+                  </KycGate>
                 </ProtectedRoute>
               } />
               <Route path="/basic-cam" element={
@@ -120,7 +125,9 @@ const App = () => (
               {/* Driver dashboard */}
               <Route path="/driver" element={
                 <ProtectedRoute allowedRoles={["driver", "admin"]}>
-                  <DriverDashboard />
+                  <KycGate>
+                    <DriverDashboard />
+                  </KycGate>
                 </ProtectedRoute>
               } />
             </Route>

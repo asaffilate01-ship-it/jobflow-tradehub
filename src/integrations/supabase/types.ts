@@ -1509,7 +1509,9 @@ export type Database = {
           full_name: string
           id: string
           is_active: boolean
+          kyc_status: string
           phone: string | null
+          phone_verified: boolean
           rating: number | null
           service_radius_miles: number | null
           services_description: string | null
@@ -1528,7 +1530,9 @@ export type Database = {
           full_name?: string
           id: string
           is_active?: boolean
+          kyc_status?: string
           phone?: string | null
+          phone_verified?: boolean
           rating?: number | null
           service_radius_miles?: number | null
           services_description?: string | null
@@ -1547,7 +1551,9 @@ export type Database = {
           full_name?: string
           id?: string
           is_active?: boolean
+          kyc_status?: string
           phone?: string | null
+          phone_verified?: boolean
           rating?: number | null
           service_radius_miles?: number | null
           services_description?: string | null
