@@ -56,6 +56,15 @@ const portalConfig = {
     redirect: "/",
     roleName: "customer",
   },
+  agent: {
+    icon: UserCheck,
+    title: "Agent Login",
+    subtitle: "Referrals, commission & analytics",
+    iconBg: "bg-emerald-500/10",
+    iconText: "text-emerald-600",
+    redirect: "/agent",
+    roleName: "agent",
+  },
 } as const;
 
 const MAX_ATTEMPTS = 5;
