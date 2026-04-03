@@ -43,8 +43,8 @@ const TraderProfilePage = () => {
       if (!id) return;
       const [{ data: profile }, { data: reviewData }] = await Promise.all([
         supabase
-          .from("profiles")
-          .select("id, full_name, company_name, trade_specialism, rating, phone, email, services_description, service_radius_miles, years_experience, trade_bodies, verified, cover_image_url, website_url, created_at")
+          .from("trader_profiles_public")
+          .select("id, full_name, company_name, trade_specialism, rating, services_description, service_radius_miles, years_experience, trade_bodies, verified, cover_image_url, website_url, created_at")
           .eq("id", id)
           .single(),
         supabase

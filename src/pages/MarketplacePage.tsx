@@ -58,10 +58,8 @@ const MarketplacePage = () => {
     const fetchTraders = async () => {
       setLoading(true);
       let query = supabase
-        .from("profiles")
-        .select("id, full_name, company_name, trade_specialism, rating, services_description, service_radius_miles, years_experience, trade_bodies, verified, cover_image_url")
-        .eq("is_active", true)
-        .not("trade_specialism", "is", null);
+        .from("trader_profiles_public")
+        .select("id, full_name, company_name, trade_specialism, rating, services_description, service_radius_miles, years_experience, trade_bodies, verified, cover_image_url");
 
       if (category !== "all") {
         query = query.eq("trade_specialism", category as any);
