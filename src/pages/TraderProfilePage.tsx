@@ -15,8 +15,6 @@ type TraderProfile = {
   company_name: string | null;
   trade_specialism: string | null;
   rating: number | null;
-  phone: string | null;
-  email: string | null;
   services_description: string | null;
   service_radius_miles: number | null;
   years_experience: number | null;
