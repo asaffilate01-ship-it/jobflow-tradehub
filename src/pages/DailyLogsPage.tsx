@@ -46,6 +46,7 @@ const DailyLogsPage = () => {
   const { user } = useAuth();
   const [logs, setLogs] = useState<DailyLog[]>([]);
   const [job, setJob] = useState<any>(null);
+  const [jobs, setJobs] = useState<{ id: string; title: string; city: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingLog, setEditingLog] = useState<DailyLog | null>(null);
@@ -64,14 +65,23 @@ const DailyLogsPage = () => {
   const [safetyIncidents, setSafetyIncidents] = useState("");
 
   useEffect(() => {
-    if (!jobId) return;
     const fetchData = async () => {
-      const [{ data: jobData }, { data: logsData }] = await Promise.all([
-        supabase.from("jobs").select("id, title, status, city").eq("id", jobId).single(),
-        supabase.from("daily_logs").select("*").eq("job_id", jobId).order("log_date", { ascending: false }),
-      ]);
-      setJob(jobData);
-      setLogs((logsData as DailyLog[]) ?? []);
+      if (jobId) {
+        const [{ data: jobData }, { data: logsData }] = await Promise.all([
+          supabase.from("jobs").select("id, title, status, city").eq("id", jobId).single(),
+          supabase.from("daily_logs").select("*").eq("job_id", jobId).order("log_date", { ascending: false }),
+        ]);
+        setJob(jobData);
+        setLogs((logsData as DailyLog[]) ?? []);
+      } else {
+        // No jobId — show job picker with recent logs
+        const { data: jobsData } = await supabase
+          .from("jobs")
+          .select("id, title, city")
+          .in("status", ["awarded", "active"])
+          .order("updated_at", { ascending: false });
+        setJobs((jobsData as any[]) ?? []);
+      }
       setLoading(false);
     };
     fetchData();
