@@ -71,7 +71,7 @@ function AdminSidebar() {
 
         {navGroups.map((group) => (
           <SidebarGroup key={group.label}>
-            <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>{group.label}</SidebarGroupLabel>
+            <SidebarGroupLabel className={collapsed ? "sr-only" : "admin-sidebar-text"}>{group.label}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {group.items.map((item) => (
@@ -80,8 +80,8 @@ function AdminSidebar() {
                       <NavLink
                         to={item.to}
                         end={item.to === "/admin"}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-white hover:text-primary hover:bg-secondary/50 transition-colors"
-                        activeClassName="bg-primary/10 text-primary border-l-2 border-primary"
+                        className="admin-nav-link flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-secondary/50 transition-colors"
+                        activeClassName="bg-primary/10 border-l-2 border-primary"
                       >
                         <item.icon className="h-4.5 w-4.5 shrink-0" />
                         {!collapsed && <span>{item.label}</span>}
@@ -97,7 +97,7 @@ function AdminSidebar() {
         <div className="mt-auto p-4">
           <button
             onClick={() => signOut()}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors w-full ${collapsed ? "justify-center" : ""}`}
+            className={`admin-sidebar-action flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium hover:bg-destructive/10 transition-colors w-full ${collapsed ? "justify-center" : ""}`}
           >
             <LogOut className="h-4 w-4 shrink-0" />
             {!collapsed && <span>Sign out</span>}
