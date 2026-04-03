@@ -15,8 +15,6 @@ type TraderProfile = {
   company_name: string | null;
   trade_specialism: string | null;
   rating: number | null;
-  phone: string | null;
-  email: string | null;
   services_description: string | null;
   service_radius_miles: number | null;
   years_experience: number | null;
@@ -43,8 +41,8 @@ const TraderProfilePage = () => {
       if (!id) return;
       const [{ data: profile }, { data: reviewData }] = await Promise.all([
         supabase
-          .from("profiles")
-          .select("id, full_name, company_name, trade_specialism, rating, phone, email, services_description, service_radius_miles, years_experience, trade_bodies, verified, cover_image_url, website_url, created_at")
+          .from("trader_profiles_public")
+          .select("id, full_name, company_name, trade_specialism, rating, services_description, service_radius_miles, years_experience, trade_bodies, verified, cover_image_url, website_url, created_at")
           .eq("id", id)
           .single(),
         supabase
@@ -246,18 +244,6 @@ const TraderProfilePage = () => {
             <h2 className="text-lg font-semibold">Contact this trader</h2>
             {isSubscribed || (user && roles.includes("trade")) ? (
               <div className="space-y-3">
-                {trader.phone && (
-                  <a href={`tel:${trader.phone}`} className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                    <Phone className="h-4 w-4 text-primary" />
-                    {trader.phone}
-                  </a>
-                )}
-                {trader.email && (
-                  <a href={`mailto:${trader.email}`} className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                    <Mail className="h-4 w-4 text-primary" />
-                    {trader.email}
-                  </a>
-                )}
                 {trader.website_url && (
                   <a href={trader.website_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors">
                     <Globe className="h-4 w-4 text-primary" />
