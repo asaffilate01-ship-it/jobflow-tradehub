@@ -249,6 +249,27 @@
   .icon-container-lg { @apply h-12 w-12; }
   .icon-container-xl { @apply h-14 w-14; }
 
+  .admin-sidebar-text {
+    color: hsl(var(--sidebar-primary-foreground));
+  }
+
+  .admin-nav-link {
+    color: hsl(var(--sidebar-primary-foreground));
+  }
+
+  .admin-nav-link:hover,
+  .admin-nav-link[aria-current="page"] {
+    color: hsl(var(--primary));
+  }
+
+  .admin-sidebar-action {
+    color: hsl(var(--sidebar-primary-foreground));
+  }
+
+  .admin-sidebar-action:hover {
+    color: hsl(var(--destructive));
+  }
+
   /* Empty state styling */
   .empty-state {
     @apply flex flex-col items-center justify-center py-12 px-4 text-center;
