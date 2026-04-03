@@ -167,7 +167,44 @@ const DailyLogsPage = () => {
   const WeatherIcon = weatherOptions.find((w) => w.value === weather)?.icon ?? Sun;
 
   if (loading) {
+  // No jobId — show job picker
+  if (!jobId) {
     return (
+      <div className="space-y-6">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold tracking-tight">Daily Logs</h1>
+          <p className="text-sm text-muted-foreground">Select a job to view or create daily logs</p>
+        </div>
+        {jobs.length === 0 ? (
+          <div className="glass-card p-12 text-center space-y-3">
+            <CalendarDays className="h-12 w-12 text-muted-foreground/30 mx-auto" />
+            <h3 className="text-lg font-semibold">No active jobs</h3>
+            <p className="text-sm text-muted-foreground">Daily logs are available once you have an awarded or active job.</p>
+          </div>
+        ) : (
+          <div className="grid sm:grid-cols-2 gap-3">
+            {jobs.map((j) => (
+              <Link
+                key={j.id}
+                to={`/daily-logs/${j.id}`}
+                className="glass-card p-5 flex items-center gap-4 hover:border-primary/40 hover:bg-primary/5 transition-all group"
+              >
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                  <CalendarDays className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <div className="font-semibold text-foreground group-hover:text-primary transition-colors">{j.title}</div>
+                  <div className="text-xs text-muted-foreground">{j.city}</div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
           <div key={i} className="glass-card p-6 animate-pulse space-y-3">
