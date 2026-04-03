@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "./contexts/AuthContext";
 import AppLayout from "./components/AppLayout";
+import ScrollToTop from "./components/ScrollToTop";
 import TraderLayout from "./components/TraderLayout";
 import DriverLayout from "./components/DriverLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -64,6 +65,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <ScrollToTop />
         <AuthProvider>
           <Routes>
             {/* Public pages */}
