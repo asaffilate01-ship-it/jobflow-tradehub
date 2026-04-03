@@ -244,18 +244,6 @@ const TraderProfilePage = () => {
             <h2 className="text-lg font-semibold">Contact this trader</h2>
             {isSubscribed || (user && roles.includes("trade")) ? (
               <div className="space-y-3">
-                {trader.phone && (
-                  <a href={`tel:${trader.phone}`} className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                    <Phone className="h-4 w-4 text-primary" />
-                    {trader.phone}
-                  </a>
-                )}
-                {trader.email && (
-                  <a href={`mailto:${trader.email}`} className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                    <Mail className="h-4 w-4 text-primary" />
-                    {trader.email}
-                  </a>
-                )}
                 {trader.website_url && (
                   <a href={trader.website_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors">
                     <Globe className="h-4 w-4 text-primary" />
