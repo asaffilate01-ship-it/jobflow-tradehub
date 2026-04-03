@@ -36,7 +36,7 @@ const portalConfig = {
     subtitle: "View deliveries & manage your runs",
     iconBg: "bg-accent/10",
     iconText: "text-accent",
-    redirect: "/dashboard",
+    redirect: "/driver",
     roleName: "driver",
   },
   admin: {
