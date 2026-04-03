@@ -423,12 +423,19 @@ const SmartOrderPage = () => {
                   onChange={(e) => updateItem(item.key, "unit", e.target.value)}
                 >
                   <option value="each">each</option>
-                  <option value="bag">bag</option>
+                  <option value="bag">bag (25kg)</option>
                   <option value="sheet">sheet</option>
                   <option value="metre">metre</option>
+                  <option value="length">length</option>
                   <option value="kg">kg</option>
+                  <option value="tonne">tonne</option>
                   <option value="box">box</option>
                   <option value="pack">pack</option>
+                  <option value="roll">roll</option>
+                  <option value="tin">tin</option>
+                  <option value="litre">litre</option>
+                  <option value="pallet">pallet</option>
+                  <option value="bundle">bundle</option>
                 </select>
                 <Button size="sm" variant="ghost" className="h-8 w-8 p-0 shrink-0" onClick={() => removeItem(item.key)} disabled={items.length === 1}>
                   <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
