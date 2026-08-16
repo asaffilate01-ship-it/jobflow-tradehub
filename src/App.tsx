@@ -97,25 +97,26 @@ const App = () => (
               <Route path="/dashboard" element={<TraderDashboard />} />
               <Route path="/jobs" element={<JobsPage />} />
               <Route path="/jobs/:id" element={<JobDetailPage />} />
-              <Route path="/jobs/:jobId/quote" element={<SubmitQuotePage />} />
-              <Route path="/trade-accounts" element={<TradeAccountsPage />} />
-              <Route path="/materials" element={<MaterialsPage />} />
-              <Route path="/smart-order" element={<SmartOrderPage />} />
-              <Route path="/site-evidence" element={<SiteEvidencePage />} />
-              <Route path="/site-evidence/:jobId" element={<SiteEvidenceProjectPage />} />
-              <Route path="/site-evidence/:jobId/gallery" element={<EvidenceGalleryPage />} />
-              <Route path="/compliance" element={<ComplianceCertsPage />} />
-              <Route path="/deliveries" element={<DeliveriesPage />} />
-              <Route path="/messages" element={<MessagesPage />} />
+              <Route path="/jobs/:jobId/quote" element={<TierGate required="basic" feature="Quoting"><SubmitQuotePage /></TierGate>} />
+              <Route path="/trade-accounts" element={<TierGate required="premium" feature="Trade accounts"><TradeAccountsPage /></TierGate>} />
+              <Route path="/materials" element={<TierGate required="premium" feature="Material ordering"><MaterialsPage /></TierGate>} />
+              <Route path="/smart-order" element={<TierGate required="premium" feature="Smart ordering"><SmartOrderPage /></TierGate>} />
+              <Route path="/site-evidence" element={<TierGate required="premium" feature="Site evidence"><SiteEvidencePage /></TierGate>} />
+              <Route path="/site-evidence/:jobId" element={<TierGate required="premium" feature="Site evidence"><SiteEvidenceProjectPage /></TierGate>} />
+              <Route path="/site-evidence/:jobId/gallery" element={<TierGate required="premium" feature="Site evidence"><EvidenceGalleryPage /></TierGate>} />
+              <Route path="/compliance" element={<TierGate required="premium" feature="Compliance certificates"><ComplianceCertsPage /></TierGate>} />
+              <Route path="/deliveries" element={<TierGate required="premium" feature="Deliveries"><DeliveriesPage /></TierGate>} />
+              <Route path="/messages" element={<TierGate required="basic" feature="Messaging"><MessagesPage /></TierGate>} />
               <Route path="/broadcasts" element={<BroadcastsPage />} />
               <Route path="/subscription" element={<SubscriptionPage />} />
               <Route path="/kyc-upload" element={<KycUploadPage />} />
-              <Route path="/schedule" element={<SchedulePage />} />
-              <Route path="/daily-logs" element={<DailyLogsPage />} />
-              <Route path="/daily-logs/:jobId" element={<DailyLogsPage />} />
+              <Route path="/schedule" element={<TierGate required="premium" feature="Scheduling"><SchedulePage /></TierGate>} />
+              <Route path="/daily-logs" element={<TierGate required="premium" feature="Daily logs"><DailyLogsPage /></TierGate>} />
+              <Route path="/daily-logs/:jobId" element={<TierGate required="premium" feature="Daily logs"><DailyLogsPage /></TierGate>} />
               <Route path="/orders/:orderId/receipt" element={<OrderReceiptPage />} />
-              <Route path="/accounting" element={<AccountingPage />} />
+              <Route path="/accounting" element={<TierGate required="premium" feature="Accounting"><AccountingPage /></TierGate>} />
             </Route>
+
 
             {/* Public / Customer layout (top nav) */}
             <Route element={<AppLayout />}>
