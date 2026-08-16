@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { logAudit } from "@/lib/audit";
+import { notify, getJobCustomer } from "@/lib/notify";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -90,6 +92,20 @@ const SubmitQuotePage = () => {
 
     // Update job status
     await supabase.from("jobs").update({ status: "quoted" }).eq("id", jobId).eq("status", "posted");
+
+    // Notify the customer + audit trail
+    const { customerId, title: jobTitle } = await getJobCustomer(jobId);
+    if (customerId) {
+      await notify({
+        recipientId: customerId,
+        title: "New quote received",
+        body: `You have a new quote${jobTitle ? ` on "${jobTitle}"` : ""}.`,
+        link: `/jobs/${jobId}`,
+        type: "quote",
+        channels: ["in_app", "email"],
+      });
+    }
+    await logAudit({ action: "quote.submit", entityType: "quote", entityId: quote?.id, metadata: { job_id: jobId, total: totalAmount || totalLines } });
 
     toast.success("Quote submitted!");
     setSubmitting(false);

@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { logAudit } from "@/lib/audit";
+import { notify, notifyRole } from "@/lib/notify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -70,7 +72,7 @@ const PostJobPage = () => {
   const handleSubmit = async () => {
     if (!user) return;
     setSubmitting(true);
-    const { error } = await supabase.from("jobs").insert({
+    const { data: inserted, error } = await supabase.from("jobs").insert({
       customer_profile_id: user.id,
       requested_trade: form.trade as TradeType,
       title: form.title,
@@ -88,7 +90,9 @@ const PostJobPage = () => {
       setSubmitting(false);
       return;
     }
-    toast.success("Job posted! Traders will start quoting soon.");
+    }).select("id").single();
+
+    if (false) {
     navigate("/jobs");
   };
 

@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { logAudit } from "@/lib/audit";
+import { notify, getCompanyOwner } from "@/lib/notify";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -92,6 +94,21 @@ const JobDetailPage = () => {
     await supabase.from("job_awards").insert({ job_id: id!, accepted_quote_id: quoteId, trade_company_id: tradeCompanyId });
     // Update job status
     await supabase.from("jobs").update({ status: "awarded", trade_company_id: tradeCompanyId }).eq("id", id!);
+
+    // Notify winning trade + audit
+    const ownerId = await getCompanyOwner(tradeCompanyId);
+    if (ownerId) {
+      await notify({
+        recipientId: ownerId,
+        title: "Your quote was accepted",
+        body: `You have been awarded the job${job?.title ? ` "${job.title}"` : ""}.`,
+        link: `/jobs/${id}`,
+        type: "quote_accepted",
+        channels: ["in_app", "email"],
+      });
+    }
+    await logAudit({ action: "quote.accept", entityType: "job", entityId: id, metadata: { quote_id: quoteId, trade_company_id: tradeCompanyId } });
+
     toast.success("Quote accepted! Job awarded.");
     window.location.reload();
   };
@@ -390,6 +407,17 @@ const JobDetailPage = () => {
                     <Button size="sm" className="font-semibold" onClick={() => handleAcceptQuote(q.id, q.trade_company_id)}>Accept quote</Button>
                     <Button size="sm" variant="outline" onClick={async () => {
                       await supabase.from("quotes").update({ status: "rejected" }).eq("id", q.id);
+                      const rejOwner = await getCompanyOwner(q.trade_company_id);
+                      if (rejOwner) {
+                        await notify({
+                          recipientId: rejOwner,
+                          title: "Quote not selected",
+                          body: `Your quote${job?.title ? ` for "${job.title}"` : ""} was not selected this time.`,
+                          link: `/jobs/${id}`,
+                          type: "quote_rejected",
+                        });
+                      }
+                      await logAudit({ action: "quote.reject", entityType: "quote", entityId: q.id, metadata: { job_id: id } });
                       window.location.reload();
                     }}>Reject</Button>
                   </div>
