@@ -89,11 +89,17 @@ const SubscriptionPage = () => {
               </span>
             )}
           </div>
-          <Button variant="outline" size="sm" onClick={handleManage} className="gap-1">
-            <ExternalLink className="h-3.5 w-3.5" /> Manage Subscription
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={refresh} className="gap-1">
+              <RefreshCw className="h-3.5 w-3.5" /> Refresh
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleManage} className="gap-1">
+              <ExternalLink className="h-3.5 w-3.5" /> Manage Subscription
+            </Button>
+          </div>
         </div>
       )}
+
 
       <div className="grid md:grid-cols-3 gap-6">
         {(Object.entries(SUBSCRIPTION_TIERS) as [SubscriptionTier, typeof SUBSCRIPTION_TIERS[SubscriptionTier]][]).map(
