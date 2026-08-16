@@ -83,17 +83,33 @@ const PostJobPage = () => {
       budget_min: form.budget_min ? Number(form.budget_min) : null,
       budget_max: form.budget_max ? Number(form.budget_max) : null,
       target_start_date: form.target_start_date || null,
-    });
+    }).select("id").single();
 
     if (error) {
       toast.error("Failed to post job: " + error.message);
       setSubmitting(false);
       return;
     }
-    }).select("id").single();
 
-    if (false) {
-    navigate("/jobs");
+    // Alert matching trades + confirm to the customer
+    await notifyRole({
+      audienceRole: "trade",
+      title: "New job posted",
+      body: `${form.title} — ${form.city} ${form.postcode}`,
+      link: inserted?.id ? `/jobs/${inserted.id}` : "/jobs",
+      type: "job_posted",
+    });
+    await notify({
+      recipientId: user.id,
+      title: "Job posted",
+      body: `"${form.title}" is live. You'll be notified as quotes come in.`,
+      link: inserted?.id ? `/jobs/${inserted.id}` : "/my-projects",
+      type: "job",
+    });
+    await logAudit({ action: "job.create", entityType: "job", entityId: inserted?.id, metadata: { trade: form.trade, city: form.city } });
+
+    toast.success("Job posted! Traders will start quoting soon.");
+    navigate("/my-projects");
   };
 
   const steps = [
