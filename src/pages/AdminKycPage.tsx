@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { logAudit } from "@/lib/audit";
+import { notify } from "@/lib/notify";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -109,6 +111,17 @@ const AdminKycPage = () => {
     if (error) {
       toast.error(error.message);
     } else {
+      await notify({
+        recipientId: userId,
+        title: status === "approved" ? "Verification approved" : "Verification rejected",
+        body: status === "approved"
+          ? "Your identity documents have been approved. You now have full access."
+          : "Your identity documents were rejected. Please re-upload valid documents.",
+        link: "/kyc-upload",
+        type: "kyc",
+        channels: ["in_app", "email"],
+      });
+      await logAudit({ action: status === "approved" ? "kyc.approve" : "kyc.reject", entityType: "profile", entityId: userId });
       toast.success(`User ${status === "approved" ? "approved" : "rejected"}`);
       setSelectedUser(null);
       fetchSubmissions();

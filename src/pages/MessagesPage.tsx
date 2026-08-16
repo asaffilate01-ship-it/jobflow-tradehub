@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { notify } from "@/lib/notify";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -145,7 +146,17 @@ const MessagesPage = () => {
       recipient_id: selected.otherId,
       body,
     });
-    if (error) toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    await notify({
+      recipientId: selected.otherId,
+      title: "New message",
+      body: body.length > 120 ? `${body.slice(0, 117)}...` : body,
+      link: "/messages",
+      type: "message",
+    });
   };
 
   if (loading) {

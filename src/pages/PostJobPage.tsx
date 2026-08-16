@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { logAudit } from "@/lib/audit";
+import { notify, notifyRole } from "@/lib/notify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -70,7 +72,7 @@ const PostJobPage = () => {
   const handleSubmit = async () => {
     if (!user) return;
     setSubmitting(true);
-    const { error } = await supabase.from("jobs").insert({
+    const { data: inserted, error } = await supabase.from("jobs").insert({
       customer_profile_id: user.id,
       requested_trade: form.trade as TradeType,
       title: form.title,
@@ -81,15 +83,33 @@ const PostJobPage = () => {
       budget_min: form.budget_min ? Number(form.budget_min) : null,
       budget_max: form.budget_max ? Number(form.budget_max) : null,
       target_start_date: form.target_start_date || null,
-    });
+    }).select("id").single();
 
     if (error) {
       toast.error("Failed to post job: " + error.message);
       setSubmitting(false);
       return;
     }
+
+    // Alert matching trades + confirm to the customer
+    await notifyRole({
+      audienceRole: "trade",
+      title: "New job posted",
+      body: `${form.title} — ${form.city} ${form.postcode}`,
+      link: inserted?.id ? `/jobs/${inserted.id}` : "/jobs",
+      type: "job_posted",
+    });
+    await notify({
+      recipientId: user.id,
+      title: "Job posted",
+      body: `"${form.title}" is live. You'll be notified as quotes come in.`,
+      link: inserted?.id ? `/jobs/${inserted.id}` : "/my-projects",
+      type: "job",
+    });
+    await logAudit({ action: "job.create", entityType: "job", entityId: inserted?.id, metadata: { trade: form.trade, city: form.city } });
+
     toast.success("Job posted! Traders will start quoting soon.");
-    navigate("/jobs");
+    navigate("/my-projects");
   };
 
   const steps = [

@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { logAudit } from "@/lib/audit";
+import { notify } from "@/lib/notify";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,6 +10,19 @@ import { Truck, MapPin, User, Clock, Package, CheckCircle, AlertTriangle, Radio 
 import type { Database } from "@/integrations/supabase/types";
 
 type DeliveryStatus = Database["public"]["Enums"]["delivery_status"];
+
+/** Notify the trade/customer who owns the material order behind a delivery. */
+const notifyDeliveryOwner = async (deliveryId: string, title: string, body: string) => {
+  const { data } = await supabase
+    .from("deliveries")
+    .select("material_order_id, material_orders(created_by)")
+    .eq("id", deliveryId)
+    .maybeSingle();
+  const ownerId = (data as any)?.material_orders?.created_by;
+  if (ownerId) {
+    await notify({ recipientId: ownerId, title, body, link: "/deliveries", type: "delivery", channels: ["in_app", "email"] });
+  }
+};
 
 type DeliveryRow = {
   id: string;
@@ -135,6 +150,8 @@ const DeliveriesPage = () => {
       toast.error(error.message);
     } else {
       toast.success("Delivery accepted!");
+      await notifyDeliveryOwner(deliveryId, "Driver assigned", "A driver has accepted your delivery and is on the way.");
+      await logAudit({ action: "delivery.accept", entityType: "delivery", entityId: deliveryId });
       fetchDeliveries();
     }
   };
@@ -149,6 +166,14 @@ const DeliveriesPage = () => {
       toast.error(error.message);
     } else {
       toast.success(`Status updated to ${statusConfig[newStatus]?.label ?? newStatus}`);
+      await notifyDeliveryOwner(
+        deliveryId,
+        newStatus === "delivered" ? "Delivery completed" : "Delivery update",
+        newStatus === "delivered"
+          ? "Your materials have been delivered."
+          : `Your delivery status is now: ${statusConfig[newStatus]?.label ?? newStatus}.`
+      );
+      await logAudit({ action: newStatus === "delivered" ? "delivery.complete" : "delivery.update", entityType: "delivery", entityId: deliveryId, metadata: { status: newStatus } });
       fetchDeliveries();
     }
   };
