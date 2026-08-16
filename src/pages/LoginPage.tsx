@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -80,15 +80,6 @@ const portalConfig = {
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_MS = 5 * 60 * 1000;
 
-const TEST_ACCOUNTS = [
-  { label: "Trader", email: "trader@traderos.dev", password: "trader123!", portal: "trader" as Portal },
-  { label: "Customer", email: "customer@traderos.dev", password: "customer123!", portal: "customer" as Portal },
-  { label: "Driver", email: "driver@traderos.dev", password: "driver123!", portal: "driver" as Portal },
-  { label: "Admin", email: "admin@traderos.dev", password: "admin123!", portal: "admin" as Portal },
-  { label: "Agent", email: "agent@traderos.dev", password: "agent123!", portal: "agent" as Portal },
-  { label: "Staff", email: "staff@traderos.dev", password: "staff123!", portal: "staff" as Portal },
-];
-
 const LoginPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -101,27 +92,6 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [attempts, setAttempts] = useState(0);
   const [lockedUntil, setLockedUntil] = useState<number | null>(null);
-  const [devMode, setDevMode] = useState(false);
-
-  // 5-click-in-3-seconds dev mode
-  const clickTimesRef = useRef<number[]>([]);
-  const handleLogoClick = () => {
-    const now = Date.now();
-    clickTimesRef.current.push(now);
-    // Keep only clicks within last 3 seconds
-    clickTimesRef.current = clickTimesRef.current.filter(t => now - t < 3000);
-    if (clickTimesRef.current.length >= 5) {
-      setDevMode(prev => !prev);
-      clickTimesRef.current = [];
-      toast.success(devMode ? "Dev mode disabled" : "🔧 Dev mode enabled");
-    }
-  };
-
-  const handleQuickLogin = async (account: typeof TEST_ACCOUNTS[0]) => {
-    setEmail(account.email);
-    setPassword(account.password);
-    setPortal(account.portal);
-  };
 
   const isLocked = lockedUntil !== null && Date.now() < lockedUntil;
 
@@ -215,33 +185,9 @@ const LoginPage = () => {
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <div className="w-full max-w-lg space-y-8">
           <div className="flex flex-col items-center gap-3">
-            <button onClick={handleLogoClick} className="focus:outline-none select-none">
-              <img src={traderosLogo} alt="TraderOS" className="h-12" />
-            </button>
+            <img src={traderosLogo} alt="TraderOS" className="h-12" />
             <p className="text-sm text-muted-foreground">Choose your login portal</p>
           </div>
-
-          {devMode && (
-            <div className="glass-card p-4 border-2 border-primary/30 space-y-2">
-              <div className="flex items-center gap-2 text-xs font-semibold text-primary">
-                <span className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse" />
-                DEV MODE — Quick Login
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                {TEST_ACCOUNTS.map((account) => (
-                  <button
-                    key={account.label}
-                    onClick={() => handleQuickLogin(account)}
-                    className="text-left p-3 rounded-lg bg-secondary/50 hover:bg-primary/10 border border-border hover:border-primary/30 transition-all text-xs space-y-1"
-                  >
-                    <div className="font-semibold text-foreground">{account.label}</div>
-                    <div className="text-muted-foreground truncate">{account.email}</div>
-                    <div className="text-muted-foreground font-mono">{account.password}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
 
           <div className="grid gap-3">
             {(["customer", "trader", "driver", "agent", "staff", "admin"] as const).map((key) => {
