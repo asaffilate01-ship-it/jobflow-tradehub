@@ -32,7 +32,20 @@ serve(async (req) => {
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
 
+    const TIER_BY_PRODUCT: Record<string, string> = {
+      prod_UG3HuFk33raDJ1: "basic",
+      prod_UG3HsoKjk5DGhn: "premium",
+    };
+
+    const persist = async (row: Record<string, unknown>) => {
+      await supabaseClient.from("subscribers").upsert(
+        { user_id: user.id, email: user.email, ...row },
+        { onConflict: "email" },
+      );
+    };
+
     if (customers.data.length === 0) {
+      await persist({ tier: "free", subscribed: false, product_id: null, subscription_end: null });
       return new Response(JSON.stringify({ subscribed: false }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -45,21 +58,39 @@ serve(async (req) => {
     });
 
     if (subscriptions.data.length === 0) {
+      await persist({
+        tier: "free",
+        subscribed: false,
+        product_id: null,
+        subscription_end: null,
+        stripe_customer_id: customers.data[0].id,
+      });
       return new Response(JSON.stringify({ subscribed: false }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     const sub = subscriptions.data[0];
-    const productId = sub.items.data[0].price.product;
+    const productId = String(sub.items.data[0].price.product);
+    const subscriptionEnd = new Date((sub as any).current_period_end * 1000).toISOString();
+
+    await persist({
+      tier: TIER_BY_PRODUCT[productId] ?? "free",
+      subscribed: true,
+      product_id: productId,
+      subscription_end: subscriptionEnd,
+      stripe_customer_id: customers.data[0].id,
+      stripe_subscription_id: sub.id,
+    });
 
     return new Response(JSON.stringify({
       subscribed: true,
       product_id: productId,
-      subscription_end: new Date(sub.current_period_end * 1000).toISOString(),
+      subscription_end: subscriptionEnd,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
+
   } catch (error) {
     return new Response(JSON.stringify({ error: (error as Error).message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
