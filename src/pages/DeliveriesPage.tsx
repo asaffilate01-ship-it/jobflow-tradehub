@@ -15,10 +15,10 @@ type DeliveryStatus = Database["public"]["Enums"]["delivery_status"];
 const notifyDeliveryOwner = async (deliveryId: string, title: string, body: string) => {
   const { data } = await supabase
     .from("deliveries")
-    .select("material_order_id, material_orders(ordered_by_profile_id)")
+    .select("material_order_id, material_orders(created_by)")
     .eq("id", deliveryId)
     .maybeSingle();
-  const ownerId = (data as any)?.material_orders?.ordered_by_profile_id;
+  const ownerId = (data as any)?.material_orders?.created_by;
   if (ownerId) {
     await notify({ recipientId: ownerId, title, body, link: "/deliveries", type: "delivery", channels: ["in_app", "email"] });
   }
