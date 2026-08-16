@@ -11,6 +11,8 @@ import TraderLayout from "./components/TraderLayout";
 import DriverLayout from "./components/DriverLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import KycGate from "./components/KycGate";
+import TierGate from "./components/TierGate";
+
 import LandingPage from "./pages/LandingPage";
 import JobsPage from "./pages/JobsPage";
 import JobDetailPage from "./pages/JobDetailPage";
