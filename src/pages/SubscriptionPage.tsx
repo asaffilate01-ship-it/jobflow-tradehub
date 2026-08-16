@@ -1,39 +1,24 @@
-import { useState, useEffect, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Check, Crown, Zap, Star, Loader2, ExternalLink } from "lucide-react";
-import { SUBSCRIPTION_TIERS, getTierByProductId, type SubscriptionTier } from "@/lib/subscriptions";
+import { Check, Crown, Zap, Star, Loader2, ExternalLink, RefreshCw } from "lucide-react";
+import { SUBSCRIPTION_TIERS, type SubscriptionTier } from "@/lib/subscriptions";
+import { useSubscription } from "@/hooks/use-subscription";
 
 const SubscriptionPage = () => {
   const { user } = useAuth();
-  const [currentTier, setCurrentTier] = useState<SubscriptionTier>("free");
-  const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { tier: currentTier, subscriptionEnd, loading, refresh } = useSubscription();
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
 
-  const checkSubscription = useCallback(async () => {
-    if (!user) return;
-    try {
-      const { data, error } = await supabase.functions.invoke("check-subscription");
-      if (error) throw error;
-      if (data?.subscribed) {
-        setCurrentTier(getTierByProductId(data.product_id));
-        setSubscriptionEnd(data.subscription_end);
-      } else {
-        setCurrentTier("free");
-        setSubscriptionEnd(null);
-      }
-    } catch {
-      // Silent fail — default to free
-    } finally {
-      setLoading(false);
-    }
-  }, [user]);
+  // Re-verify against Stripe once on mount so a fresh checkout is picked up.
+  useEffect(() => {
+    if (user) refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
-  useEffect(() => { checkSubscription(); }, [checkSubscription]);
 
   const handleCheckout = async (priceId: string) => {
     if (!user) {
