@@ -24,6 +24,11 @@ const AppNav = () => {
     document.documentElement.classList.toggle("dark", dark);
   }, [dark]);
 
+  // Close the mobile menu whenever the route changes
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
+
   const navItems = [
     { to: "/", label: "Home", icon: Home, show: true },
     { to: "/marketplace", label: "Find Trades", icon: Search, show: true },
@@ -117,12 +122,18 @@ const AppNav = () => {
         <div className="flex md:hidden items-center gap-2">
           <button
             onClick={() => setDark(!dark)}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground"
-            aria-label="Toggle theme"
+            className="tap-target flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground transition-colors"
+            aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
           >
             {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
-          <button className="p-2 text-muted-foreground" onClick={() => setMobileOpen(!mobileOpen)}>
+          <button
+            className="tap-target flex items-center justify-center rounded-lg p-2 text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-nav"
+          >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
@@ -132,6 +143,7 @@ const AppNav = () => {
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
+            id="mobile-nav"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
@@ -202,7 +214,7 @@ const AppNav = () => {
                   <Link
                     to="/signup"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-semibold text-primary"
+                    className="flex items-center justify-center gap-2 rounded-lg bg-primary px-3 py-3 text-sm font-semibold text-primary-foreground shadow-sm"
                   >
                     <Users className="h-4 w-4" />
                     Join free

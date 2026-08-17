@@ -147,13 +147,81 @@
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-feature-settings: 'cv11', 'ss01';
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Consistent keyboard focus across every interactive element */
+  :where(a, button, input, textarea, select, [role="button"], [tabindex]):focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background rounded-[inherit];
+  }
+
+  ::selection {
+    background: hsl(var(--accent) / 0.25);
+  }
+
+  /* Headings tighten up for a more editorial feel */
+  h1, h2, h3, h4 {
+    @apply tracking-tight;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Subtle branded scrollbar (desktop) */
+  @media (min-width: 768px) {
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
+    }
+    *::-webkit-scrollbar { width: 10px; height: 10px; }
+    *::-webkit-scrollbar-track { background: transparent; }
+    *::-webkit-scrollbar-thumb {
+      background: hsl(var(--muted-foreground) / 0.25);
+      border: 3px solid transparent;
+      background-clip: content-box;
+      border-radius: 9999px;
+    }
+    *::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground) / 0.45); background-clip: content-box; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
 @layer utilities {
+  /* Auth / standalone screens: branded background + safe areas */
+  .auth-shell {
+    @apply min-h-screen flex items-center justify-center px-4 py-10;
+    background: var(--gradient-hero);
+    padding-top: max(2.5rem, env(safe-area-inset-top));
+    padding-bottom: max(2.5rem, env(safe-area-inset-bottom));
+  }
+
+  /* PWA / native safe-area helpers */
+  .safe-top { padding-top: env(safe-area-inset-top); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+  /* Comfortable touch targets on mobile */
+  @media (max-width: 767px) {
+    .tap-target { min-height: 44px; min-width: 44px; }
+  }
+
   .text-gradient {
     @apply bg-clip-text text-transparent;
     background-image: var(--gradient-accent);
