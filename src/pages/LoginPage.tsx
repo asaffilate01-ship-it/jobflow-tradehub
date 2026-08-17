@@ -3,7 +3,7 @@ import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Wrench, Shield, TruckIcon, Lock, AlertTriangle, Eye, EyeOff, Home, UserCheck, Users } from "lucide-react";
+import { Wrench, Shield, TruckIcon, Lock, AlertTriangle, Eye, EyeOff, Home, UserCheck, Users, ChevronRight, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
 import craftvaroLogo from "@/assets/craftvaro-logo.png";
@@ -242,10 +242,17 @@ const LoginPage = () => {
   const Icon = config.icon;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="glass-card p-8 w-full max-w-md space-y-6">
-        <div className="flex flex-col items-center gap-3">
-          <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${config.iconBg}`}>
+    <div className="auth-shell">
+      <div className="glass-card-elevated p-8 w-full max-w-md space-y-6 page-enter">
+        <button
+          onClick={() => { setPortal(null); setAttempts(0); setLockedUntil(null); }}
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          All portals
+        </button>
+        <div className="flex flex-col items-center gap-3 text-center">
+          <div className={`icon-container icon-container-lg ${config.iconBg}`}>
             <Icon className={`h-6 w-6 ${config.iconText}`} />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">{config.title}</h1>
@@ -315,12 +322,6 @@ const LoginPage = () => {
         </div>
 
         <div className="space-y-2 text-center">
-          <button
-            onClick={() => { setPortal(null); setAttempts(0); setLockedUntil(null); }}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            ← Back to portal selection
-          </button>
           <div className="flex items-center justify-center gap-3">
             <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
               <Home className="h-3.5 w-3.5" />
