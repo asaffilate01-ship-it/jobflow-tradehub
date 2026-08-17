@@ -145,7 +145,7 @@ const AppNav = () => {
                       {label}
                     </DropdownMenuItem>
                   ))}
-                  <DropdownMenuItem onClick={() => navigate("/profile")} className="gap-2">
+                  <DropdownMenuItem onClick={() => navigate("/profile-setup")} className="gap-2">
                     <UserIcon className="h-4 w-4 text-muted-foreground" />
                     Profile & settings
                   </DropdownMenuItem>
@@ -271,7 +271,7 @@ const AppNav = () => {
                 <>
                   <p className="px-1 pb-2 pt-5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Account</p>
                   <div className="space-y-1">
-                    <Link to="/profile" className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-foreground/80 hover:bg-secondary/50">
+                    <Link to="/profile-setup" className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-foreground/80 hover:bg-secondary/50">
                       <UserIcon className="h-4 w-4" />
                       Profile & settings
                     </Link>
