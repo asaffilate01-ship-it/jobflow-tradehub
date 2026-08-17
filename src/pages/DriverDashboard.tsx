@@ -10,6 +10,7 @@ import {
   Truck, MapPin, Clock, DollarSign, Package, CheckCircle,
   Navigation, AlertCircle, TrendingUp, Play, Square, Flag,
 } from "lucide-react";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 const statusColors: Record<string, string> = {
   unassigned: "bg-secondary text-secondary-foreground",
@@ -33,6 +34,7 @@ const nextStatusMap: Record<string, { next: string; label: string; icon: any }> 
 };
 
 const DriverDashboard = () => {
+  usePageMeta("Driver hub");
   const { user } = useAuth();
   const [myDeliveries, setMyDeliveries] = useState<any[]>([]);
   const [broadcastDeliveries, setBroadcastDeliveries] = useState<any[]>([]);

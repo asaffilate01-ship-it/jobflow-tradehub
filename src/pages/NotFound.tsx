@@ -2,9 +2,12 @@ import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Home, Search, ArrowLeft, HardHat } from "lucide-react";
+import { Home, Search, HardHat } from "lucide-react";
+import craftvaroLogo from "@/assets/craftvaro-logo.png";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 const NotFound = () => {
+  usePageMeta("Page not found", "The page you were looking for isn't here. Head back to Craftvaro.");
   const location = useLocation();
 
   useEffect(() => {
@@ -23,7 +26,10 @@ const NotFound = () => {
         transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
         className="text-center max-w-md space-y-6"
       >
-        <div className="flex justify-center">
+        <div className="flex flex-col items-center gap-5">
+          <Link to="/" className="inline-flex">
+            <img src={craftvaroLogo} alt="Craftvaro" className="h-9 dark:[filter:brightness(0)_invert(1)]" />
+          </Link>
           <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-primary/10 border border-primary/20">
             <HardHat className="h-10 w-10 text-primary" />
           </div>

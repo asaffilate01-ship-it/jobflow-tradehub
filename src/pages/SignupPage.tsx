@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { User, Wrench, TruckIcon, Phone, ArrowRight, Eye, EyeOff, Info, Home } from "lucide-react";
 import craftvaroLogo from "@/assets/craftvaro-logo.png";
 import { toast } from "sonner";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 type RoleOption = "customer" | "trade" | "driver";
 
@@ -18,6 +19,7 @@ const roleCards: { value: RoleOption; label: string; desc: string; icon: typeof 
 type Step = "details" | "verify-email" | "verify-phone";
 
 const SignupPage = () => {
+  usePageMeta("Create your free account", "Join Craftvaro free to post jobs, win work and manage deliveries. Find. Hire. Done.");
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

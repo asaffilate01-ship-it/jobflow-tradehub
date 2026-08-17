@@ -15,6 +15,7 @@ import {
   Truck, Trash2, SprayCan,
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 type TradeType = Database["public"]["Enums"]["trade_type"];
 
@@ -43,6 +44,7 @@ const stepVariants = {
 };
 
 const PostJobPage = () => {
+  usePageMeta("Post a job for free", "Describe your project and get quotes from vetted local tradespeople on Craftvaro.");
   const { user } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);

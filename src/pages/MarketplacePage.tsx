@@ -13,6 +13,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import { StaggerContainer, StaggerItem, ScaleOnHover } from "@/components/MotionWrapper";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 const tradeCategories = [
   { slug: "all", label: "All trades", icon: SlidersHorizontal },
@@ -47,6 +48,7 @@ type TraderCard = {
 };
 
 const MarketplacePage = () => {
+  usePageMeta("Find vetted tradespeople", "Browse verified builders, electricians, plumbers and more near you on Craftvaro.");
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const [traders, setTraders] = useState<TraderCard[]>([]);

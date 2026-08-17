@@ -4,9 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Lock, CheckCircle } from "lucide-react";
+import { Link } from "react-router-dom";
+import craftvaroLogo from "@/assets/craftvaro-logo.png";
 import { toast } from "sonner";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 const ResetPasswordPage = () => {
+  usePageMeta("Reset your password", "Set a new password for your Craftvaro account.");
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -32,8 +36,8 @@ const ResetPasswordPage = () => {
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters.");
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters.");
       return;
     }
 
@@ -56,10 +60,12 @@ const ResetPasswordPage = () => {
 
   if (!isRecovery) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <div className="glass-card p-8 w-full max-w-md text-center space-y-4">
-          <Lock className="h-10 w-10 text-muted-foreground mx-auto" />
-          <h1 className="text-xl font-bold text-foreground">Invalid Reset Link</h1>
+      <div className="auth-shell">
+        <div className="glass-card-elevated p-8 w-full max-w-md text-center space-y-4 page-enter">
+          <Link to="/" className="inline-flex">
+            <img src={craftvaroLogo} alt="Craftvaro" className="h-10 mx-auto dark:[filter:brightness(0)_invert(1)]" />
+          </Link>
+          <h1 className="text-xl font-bold text-foreground">Invalid reset link</h1>
           <p className="text-sm text-muted-foreground">
             This link is invalid or has expired. Please request a new password reset.
           </p>
@@ -72,12 +78,12 @@ const ResetPasswordPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="glass-card p-8 w-full max-w-md space-y-6">
-        <div className="flex flex-col items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-            <Lock className="h-6 w-6 text-primary" />
-          </div>
+    <div className="auth-shell">
+      <div className="glass-card-elevated p-8 w-full max-w-md space-y-6 page-enter">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <Link to="/" className="inline-flex">
+            <img src={craftvaroLogo} alt="Craftvaro" className="h-10 dark:[filter:brightness(0)_invert(1)]" />
+          </Link>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Set new password</h1>
           <p className="text-sm text-muted-foreground">Enter your new password below</p>
         </div>
@@ -90,7 +96,7 @@ const ResetPasswordPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              minLength={6}
+              minLength={8}
               required
               autoComplete="new-password"
             />
@@ -102,7 +108,7 @@ const ResetPasswordPage = () => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="••••••••"
-              minLength={6}
+              minLength={8}
               required
               autoComplete="new-password"
             />

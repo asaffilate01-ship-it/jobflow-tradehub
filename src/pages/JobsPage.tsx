@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 type Job = Database["public"]["Tables"]["jobs"]["Row"];
 
@@ -26,6 +27,7 @@ const trades: Database["public"]["Enums"]["trade_type"][] = [
 ];
 
 const JobsPage = () => {
+  usePageMeta("Live job board", "Browse live construction and trade jobs posted by customers on Craftvaro.");
   const { user, roles } = useAuth();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);

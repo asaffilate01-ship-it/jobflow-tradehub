@@ -9,6 +9,7 @@ import {
   Activity, AlertTriangle, ScrollText, CreditCard, Clock,
   ChevronRight, TrendingUp,
 } from "lucide-react";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 interface PlatformStats {
   totalUsers: number;
@@ -30,6 +31,7 @@ type AuditEntry = {
 };
 
 const AdminDashboardPage = () => {
+  usePageMeta("Admin console");
   const [stats, setStats] = useState<PlatformStats>({
     totalUsers: 0, totalJobs: 0, activeJobs: 0, totalDeliveries: 0,
     pendingKyc: 0, totalAgents: 0, totalCommissions: 0, activeSubscribers: 0,
