@@ -5,7 +5,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Truck, User, Wrench, TruckIcon, ArrowRight, MapPin } from "lucide-react";
+import { User, Wrench, TruckIcon, ArrowRight, MapPin } from "lucide-react";
+import { Link } from "react-router-dom";
+import craftvaroLogo from "@/assets/craftvaro-logo.png";
 import type { Database } from "@/integrations/supabase/types";
 
 type TradeType = Database["public"]["Enums"]["trade_type"];
@@ -104,12 +106,12 @@ const ProfileSetupPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="glass-card p-8 w-full max-w-lg space-y-6">
+    <div className="auth-shell">
+      <div className="glass-card-elevated p-8 w-full max-w-lg space-y-6 page-enter">
         <div className="text-center space-y-2">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary mx-auto">
-            <Truck className="h-6 w-6 text-primary-foreground" />
-          </div>
+          <Link to="/" className="inline-flex">
+            <img src={craftvaroLogo} alt="Craftvaro" className="h-10 mx-auto dark:[filter:brightness(0)_invert(1)]" />
+          </Link>
           <h1 className="text-2xl font-bold text-foreground">
             Complete your profile
           </h1>
