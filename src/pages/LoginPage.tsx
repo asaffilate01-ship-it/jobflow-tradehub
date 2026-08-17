@@ -3,7 +3,7 @@ import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Wrench, Shield, TruckIcon, Lock, AlertTriangle, Eye, EyeOff, Home, UserCheck, Users } from "lucide-react";
+import { Wrench, Shield, TruckIcon, Lock, AlertTriangle, Eye, EyeOff, Home, UserCheck, Users, ChevronRight, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
 import craftvaroLogo from "@/assets/craftvaro-logo.png";
@@ -182,14 +182,19 @@ const LoginPage = () => {
   // Portal selection screen
   if (!portal) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <div className="w-full max-w-lg space-y-8">
-          <div className="flex flex-col items-center gap-3">
-            <img src={craftvaroLogo} alt="Craftvaro" className="h-12" />
-            <p className="text-sm text-muted-foreground">Choose your login portal</p>
+      <div className="auth-shell">
+        <div className="w-full max-w-2xl space-y-8 page-enter">
+          <div className="flex flex-col items-center gap-3 text-center">
+            <Link to="/" className="inline-flex">
+              <img src={craftvaroLogo} alt="Craftvaro" className="h-11 dark:[filter:brightness(0)_invert(1)]" />
+            </Link>
+            <div className="space-y-1">
+              <h1 className="text-2xl font-bold tracking-tight text-foreground">Welcome back</h1>
+              <p className="text-sm text-muted-foreground">Choose the portal that matches your account</p>
+            </div>
           </div>
 
-          <div className="grid gap-3">
+          <div className="grid gap-3 sm:grid-cols-2">
             {(["customer", "trader", "driver", "agent", "staff", "admin"] as const).map((key) => {
               const config = portalConfig[key];
               const Icon = config.icon;
@@ -197,30 +202,33 @@ const LoginPage = () => {
                 <button
                   key={key}
                   onClick={() => setPortal(key)}
-                  className="glass-card p-5 flex items-center gap-4 hover:border-primary/40 hover:bg-primary/5 transition-all text-left group"
+                  className="glass-card p-5 flex items-center gap-4 hover:border-primary/40 hover:-translate-y-0.5 transition-all text-left group"
                 >
-                  <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${config.iconBg}`}>
+                  <div className={`icon-container icon-container-lg shrink-0 ${config.iconBg} group-hover:scale-105`}>
                     <Icon className={`h-6 w-6 ${config.iconText}`} />
                   </div>
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <div className="font-semibold text-foreground group-hover:text-primary transition-colors">
-                      {config.title}
+                      {config.title.replace(" Login", "")}
                     </div>
-                    <div className="text-sm text-muted-foreground">{config.subtitle}</div>
+                    <div className="text-sm text-muted-foreground leading-snug">{config.subtitle}</div>
                   </div>
+                  <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
                 </button>
               );
             })}
           </div>
 
-          <div className="flex items-center justify-center gap-3">
-            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+          <div className="space-y-3 text-center">
+            <p className="text-sm text-muted-foreground">
+              New to Craftvaro?{" "}
+              <Link to="/signup" className="text-primary hover:underline font-semibold">
+                Create a free account
+              </Link>
+            </p>
+            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1.5">
               <Home className="h-3.5 w-3.5" />
-              Home
-            </Link>
-            <span className="text-muted-foreground/40">·</span>
-            <Link to="/signup" className="text-sm text-primary hover:underline font-medium">
-              Sign up
+              Back to home
             </Link>
           </div>
         </div>
@@ -228,15 +236,23 @@ const LoginPage = () => {
     );
   }
 
+
   // Login form for selected portal
   const config = portalConfig[portal];
   const Icon = config.icon;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="glass-card p-8 w-full max-w-md space-y-6">
-        <div className="flex flex-col items-center gap-3">
-          <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${config.iconBg}`}>
+    <div className="auth-shell">
+      <div className="glass-card-elevated p-8 w-full max-w-md space-y-6 page-enter">
+        <button
+          onClick={() => { setPortal(null); setAttempts(0); setLockedUntil(null); }}
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          All portals
+        </button>
+        <div className="flex flex-col items-center gap-3 text-center">
+          <div className={`icon-container icon-container-lg ${config.iconBg}`}>
             <Icon className={`h-6 w-6 ${config.iconText}`} />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">{config.title}</h1>
@@ -306,12 +322,6 @@ const LoginPage = () => {
         </div>
 
         <div className="space-y-2 text-center">
-          <button
-            onClick={() => { setPortal(null); setAttempts(0); setLockedUntil(null); }}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            ← Back to portal selection
-          </button>
           <div className="flex items-center justify-center gap-3">
             <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
               <Home className="h-3.5 w-3.5" />
