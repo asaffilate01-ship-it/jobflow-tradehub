@@ -35,8 +35,8 @@ const AgentReferralLinkPage = () => {
   const handleShare = async () => {
     if (navigator.share) {
       await navigator.share({
-        title: "Join TraderOS",
-        text: "Sign up for TraderOS — the operating system for trades.",
+        title: "Join Craftvaro",
+        text: "Sign up for Craftvaro — the operating system for trades.",
         url: referralLink,
       });
     } else {

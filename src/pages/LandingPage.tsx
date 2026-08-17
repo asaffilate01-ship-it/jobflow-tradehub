@@ -443,7 +443,7 @@ const LandingPage = () => {
               <Award className="h-3 w-3" />
               Why us
             </Badge>
-            <h2 className="text-3xl font-bold">Why TraderOS?</h2>
+            <h2 className="text-3xl font-bold">Why Craftvaro?</h2>
             <p className="text-muted-foreground max-w-md mx-auto">More than a directory — a complete project management platform</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -598,7 +598,7 @@ const LandingPage = () => {
         >
           <h2 className="text-3xl sm:text-4xl font-bold">Ready to get started?</h2>
           <p className="text-muted-foreground leading-relaxed text-lg">
-            Whether you need work done or you're a tradesperson looking for jobs — TraderOS has you covered.
+            Whether you need work done or you're a tradesperson looking for jobs — Craftvaro has you covered.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Button asChild size="lg" className="font-semibold gap-2 h-13 px-8 shadow-lg text-base">

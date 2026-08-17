@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Wrench, Shield, TruckIcon, Lock, AlertTriangle, Eye, EyeOff, Home, UserCheck, Users } from "lucide-react";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
-import traderosLogo from "@/assets/traderos-logo.png";
+import craftvaroLogo from "@/assets/craftvaro-logo.png";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
 type Portal = "trader" | "driver" | "admin" | "customer" | "agent" | "staff" | null;
@@ -185,7 +185,7 @@ const LoginPage = () => {
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <div className="w-full max-w-lg space-y-8">
           <div className="flex flex-col items-center gap-3">
-            <img src={traderosLogo} alt="TraderOS" className="h-12" />
+            <img src={craftvaroLogo} alt="Craftvaro" className="h-12" />
             <p className="text-sm text-muted-foreground">Choose your login portal</p>
           </div>
 

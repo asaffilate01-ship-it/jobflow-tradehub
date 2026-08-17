@@ -1,5 +1,5 @@
-// TraderOS Service Worker — web push + offline app shell
-const CACHE = "traderos-v2";
+// Craftvaro Service Worker — web push + offline app shell
+const CACHE = "craftvaro-v2";
 const SHELL = ["/", "/manifest.json", "/icons/icon-192.png", "/icons/icon-512.png", "/favicon.png"];
 
 self.addEventListener("install", (event) => {
@@ -61,17 +61,17 @@ self.addEventListener("push", (event) => {
   try {
     payload = event.data.json();
   } catch {
-    payload = { title: "TraderOS", body: event.data.text() };
+    payload = { title: "Craftvaro", body: event.data.text() };
   }
 
-  const { title = "TraderOS", body = "", icon, link, tag } = payload;
+  const { title = "Craftvaro", body = "", icon, link, tag } = payload;
 
   event.waitUntil(
     self.registration.showNotification(title, {
       body,
       icon: icon || "/icons/icon-192.png",
       badge: "/icons/icon-192.png",
-      tag: tag || "traderos-notification",
+      tag: tag || "craftvaro-notification",
       data: { url: link || "/" },
       vibrate: [200, 100, 200],
       actions: link ? [{ action: "open", title: "View" }] : [],

@@ -6,7 +6,7 @@ import {
   Building2, Truck, CreditCard, MessageCircle, LogOut,
   Radio, Shield, Calendar, CalendarDays, Zap, Calculator,
 } from "lucide-react";
-import traderosLogo from "@/assets/traderos-logo.png";
+import craftvaroLogo from "@/assets/craftvaro-logo.png";
 import NotificationBell from "@/components/NotificationBell";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
@@ -72,7 +72,7 @@ function TraderSidebar() {
       <SidebarContent className="pt-4">
         {/* Logo */}
         <div className={`px-4 mb-6 flex items-center ${collapsed ? "justify-center" : ""}`}>
-          <img src={traderosLogo} alt="TraderOS" className={`${collapsed ? "h-8" : "h-9"} [filter:brightness(0)_invert(1)]`} />
+          <img src={craftvaroLogo} alt="Craftvaro" className={`${collapsed ? "h-8" : "h-9"} [filter:brightness(0)_invert(1)]`} />
         </div>
 
         {navGroups.map((group) => (
@@ -158,7 +158,7 @@ const TraderLayout = () => {
             <div className="flex items-center gap-3">
               <SidebarTrigger className="hidden md:flex" />
               <div className="md:hidden">
-                <img src={traderosLogo} alt="TraderOS" className="h-7" />
+                <img src={craftvaroLogo} alt="Craftvaro" className="h-7" />
               </div>
             </div>
             <NotificationBell />
