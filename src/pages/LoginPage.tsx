@@ -7,6 +7,7 @@ import { Wrench, Shield, TruckIcon, Lock, AlertTriangle, Eye, EyeOff, Home, User
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
 import craftvaroLogo from "@/assets/craftvaro-logo.png";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
 type Portal = "trader" | "driver" | "admin" | "customer" | "agent" | "staff" | null;
@@ -81,6 +82,7 @@ const MAX_ATTEMPTS = 5;
 const LOCKOUT_MS = 5 * 60 * 1000;
 
 const LoginPage = () => {
+  usePageMeta("Sign in", "Sign in to Craftvaro — access your customer, trade, driver or admin portal.");
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const portalParam = searchParams.get("portal") as Portal;

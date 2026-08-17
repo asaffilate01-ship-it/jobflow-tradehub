@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import {
+import { usePageMeta } from "@/hooks/use-page-meta";
   Users, Briefcase, Truck, UserCheck, DollarSign, Shield,
   Activity, AlertTriangle, ScrollText, CreditCard, Clock,
   ChevronRight, TrendingUp,
@@ -30,6 +31,7 @@ type AuditEntry = {
 };
 
 const AdminDashboardPage = () => {
+  usePageMeta("Admin console");
   const [stats, setStats] = useState<PlatformStats>({
     totalUsers: 0, totalJobs: 0, activeJobs: 0, totalDeliveries: 0,
     pendingKyc: 0, totalAgents: 0, totalCommissions: 0, activeSubscribers: 0,

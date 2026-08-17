@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/MotionWrapper";
 import { toast } from "sonner";
 import {
+import { usePageMeta } from "@/hooks/use-page-meta";
   Truck, MapPin, Clock, DollarSign, Package, CheckCircle,
   Navigation, AlertCircle, TrendingUp, Play, Square, Flag,
 } from "lucide-react";
@@ -33,6 +34,7 @@ const nextStatusMap: Record<string, { next: string; label: string; icon: any }> 
 };
 
 const DriverDashboard = () => {
+  usePageMeta("Driver hub");
   const { user } = useAuth();
   const [myDeliveries, setMyDeliveries] = useState<any[]>([]);
   const [broadcastDeliveries, setBroadcastDeliveries] = useState<any[]>([]);

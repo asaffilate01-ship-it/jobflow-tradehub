@@ -11,6 +11,7 @@ import {
   Users, FileText, ChevronRight, Star, Shield,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 const statusColor: Record<string, string> = {
   posted: "bg-info/15 text-info border-info/20",
@@ -27,6 +28,7 @@ const weatherEmoji: Record<string, string> = {
 };
 
 const CustomerPortalPage = () => {
+  usePageMeta("My dashboard");
   const { user } = useAuth();
   const [jobs, setJobs] = useState<any[]>([]);
   const [selectedJob, setSelectedJob] = useState<any>(null);

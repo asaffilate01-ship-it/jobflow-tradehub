@@ -4,8 +4,10 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Home, Search, HardHat } from "lucide-react";
 import craftvaroLogo from "@/assets/craftvaro-logo.png";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 const NotFound = () => {
+  usePageMeta("Page not found", "The page you were looking for isn't here. Head back to Craftvaro.");
   const location = useLocation();
 
   useEffect(() => {

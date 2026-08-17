@@ -7,8 +7,10 @@ import { Lock, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import craftvaroLogo from "@/assets/craftvaro-logo.png";
 import { toast } from "sonner";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 const ResetPasswordPage = () => {
+  usePageMeta("Reset your password", "Set a new password for your Craftvaro account.");
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

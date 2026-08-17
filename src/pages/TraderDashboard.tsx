@@ -12,8 +12,10 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 const TraderDashboard = () => {
+  usePageMeta("Trader portal");
   const { user } = useAuth();
   const [stats, setStats] = useState({ activeJobs: 0, pendingQuotes: 0, totalOrders: 0, revenue: 0, completedJobs: 0, evidenceCount: 0 });
   const [recentJobs, setRecentJobs] = useState<any[]>([]);

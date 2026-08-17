@@ -9,6 +9,7 @@ import { User, Wrench, TruckIcon, ArrowRight, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import craftvaroLogo from "@/assets/craftvaro-logo.png";
 import type { Database } from "@/integrations/supabase/types";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 type TradeType = Database["public"]["Enums"]["trade_type"];
 type VehicleType = Database["public"]["Enums"]["vehicle_type"];
@@ -21,6 +22,7 @@ const trades: TradeType[] = [
 const vehicles: VehicleType[] = ["car", "small_van", "medium_van", "large_van", "luton", "flatbed"];
 
 const ProfileSetupPage = () => {
+  usePageMeta("Complete your profile", "Finish setting up your Craftvaro profile to get started.");
   const { user, roles } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);

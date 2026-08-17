@@ -7,8 +7,10 @@ import { toast } from "sonner";
 import { Check, Crown, Zap, Star, Loader2, ExternalLink, RefreshCw } from "lucide-react";
 import { SUBSCRIPTION_TIERS, type SubscriptionTier } from "@/lib/subscriptions";
 import { useSubscription } from "@/hooks/use-subscription";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 const SubscriptionPage = () => {
+  usePageMeta("Plans & pricing", "Compare Craftvaro Free, Basic and Premium plans for trade businesses.");
   const { user } = useAuth();
   const { tier: currentTier, subscriptionEnd, loading, refresh } = useSubscription();
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
