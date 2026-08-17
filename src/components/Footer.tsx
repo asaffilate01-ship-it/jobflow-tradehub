@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import traderosLogo from "@/assets/traderos-logo.png";
+import craftvaroLogo from "@/assets/craftvaro-logo.png";
 
 const footerLinks = {
   Platform: [
@@ -15,7 +15,7 @@ const footerLinks = {
     { label: "Compliance Certs", to: "/compliance" },
   ],
   Company: [
-    { label: "About TraderOS", to: "/" },
+    { label: "About Craftvaro", to: "/" },
     { label: "Blog", to: "/" },
     { label: "Privacy Policy", to: "/" },
     { label: "Terms of Service", to: "/" },
@@ -77,7 +77,7 @@ const Footer = () => (
         {/* Brand */}
         <div className="col-span-2 md:col-span-1 space-y-4">
           <Link to="/" className="flex items-center gap-2">
-            <img src={traderosLogo} alt="TraderOS" className="h-9 dark:[filter:brightness(0)_invert(1)]" />
+            <img src={craftvaroLogo} alt="Craftvaro" className="h-9 dark:[filter:brightness(0)_invert(1)]" />
           </Link>
           <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
             The UK's complete platform for finding trusted tradespeople and managing construction projects.
@@ -118,7 +118,7 @@ const Footer = () => (
 
       <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
         <p className="text-xs text-muted-foreground">
-          © {new Date().getFullYear()} TraderOS. All rights reserved.
+          © {new Date().getFullYear()} Craftvaro. All rights reserved.
         </p>
         <p className="text-xs text-muted-foreground">
           Built in the UK 🇬🇧

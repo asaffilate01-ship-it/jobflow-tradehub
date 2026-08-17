@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
-import traderosLogo from "@/assets/traderos-logo.png";
+import craftvaroLogo from "@/assets/craftvaro-logo.png";
 
 const AppNav = () => {
   const location = useLocation();
@@ -37,7 +37,7 @@ const AppNav = () => {
     <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2 group">
-          <img src={traderosLogo} alt="TraderOS" className="h-9 group-hover:opacity-90 transition-opacity dark:[filter:brightness(0)_invert(1)]" />
+          <img src={craftvaroLogo} alt="Craftvaro" className="h-9 group-hover:opacity-90 transition-opacity dark:[filter:brightness(0)_invert(1)]" />
         </Link>
 
         {/* Desktop nav */}

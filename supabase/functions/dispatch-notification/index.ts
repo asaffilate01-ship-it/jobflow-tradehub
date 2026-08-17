@@ -161,8 +161,8 @@ async function sendEmail(
     const { error } = await supabase.rpc("send_email_message", {
       p_to: profile.email,
       p_subject: subject,
-      p_html: `<p>Hi ${profile.full_name || "there"},</p><p>${body}</p><p>— TraderOS</p>`,
-      p_from_name: "TraderOS",
+      p_html: `<p>Hi ${profile.full_name || "there"},</p><p>${body}</p><p>— Craftvaro</p>`,
+      p_from_name: "Craftvaro",
     });
     if (error) throw error;
     return { success: true };

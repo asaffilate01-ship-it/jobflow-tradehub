@@ -216,14 +216,15 @@ const LandingPage = () => {
             </motion.div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.08] text-white">
-              Get the right trade,{" "}
-              <span className="text-primary">first time</span>
+              Find. Hire.{" "}
+              <span className="text-accent">Done.</span>
             </h1>
 
             <p className="text-lg sm:text-xl text-white/80 max-w-xl leading-relaxed">
-              Get quotes from verified, reviewed tradespeople in your area.
-              Compare prices, check credentials, and hire with confidence.
+              Craftvaro connects you with verified, reviewed tradespeople in your area.
+              Compare quotes, check credentials, and hire with confidence.
             </p>
+
 
             {/* Search bar */}
             <div className="max-w-xl">
@@ -251,17 +252,17 @@ const LandingPage = () => {
                 <Button
                   onClick={handleSearch}
                   size="lg"
-                  className="h-14 px-8 rounded-xl font-semibold text-base shrink-0 shadow-lg"
+                  className="h-14 px-8 rounded-xl font-semibold text-base shrink-0 shadow-lg bg-accent text-accent-foreground hover:bg-accent/90"
                 >
                   Search
                 </Button>
               </div>
               <p className="text-xs text-white/50 mt-3">
-                Popular: <Link to="/marketplace?category=plumber" className="text-primary hover:underline">Plumber</Link>
-                {" · "}<Link to="/marketplace?category=electrician" className="text-primary hover:underline">Electrician</Link>
-                {" · "}<Link to="/marketplace?category=builder" className="text-primary hover:underline">Builder</Link>
-                {" · "}<Link to="/marketplace?category=roofer" className="text-primary hover:underline">Roofer</Link>
-                {" · "}<Link to="/marketplace?category=gas_engineer" className="text-primary hover:underline">Gas Engineer</Link>
+                Popular: <Link to="/marketplace?category=plumber" className="text-accent hover:underline">Plumber</Link>
+                {" · "}<Link to="/marketplace?category=electrician" className="text-accent hover:underline">Electrician</Link>
+                {" · "}<Link to="/marketplace?category=builder" className="text-accent hover:underline">Builder</Link>
+                {" · "}<Link to="/marketplace?category=roofer" className="text-accent hover:underline">Roofer</Link>
+                {" · "}<Link to="/marketplace?category=gas_engineer" className="text-accent hover:underline">Gas Engineer</Link>
               </p>
             </div>
 
@@ -443,7 +444,7 @@ const LandingPage = () => {
               <Award className="h-3 w-3" />
               Why us
             </Badge>
-            <h2 className="text-3xl font-bold">Why TraderOS?</h2>
+            <h2 className="text-3xl font-bold">Why Craftvaro?</h2>
             <p className="text-muted-foreground max-w-md mx-auto">More than a directory — a complete project management platform</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -598,7 +599,7 @@ const LandingPage = () => {
         >
           <h2 className="text-3xl sm:text-4xl font-bold">Ready to get started?</h2>
           <p className="text-muted-foreground leading-relaxed text-lg">
-            Whether you need work done or you're a tradesperson looking for jobs — TraderOS has you covered.
+            Whether you need work done or you're a tradesperson looking for jobs — Craftvaro has you covered.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Button asChild size="lg" className="font-semibold gap-2 h-13 px-8 shadow-lg text-base">
