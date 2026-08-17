@@ -216,14 +216,15 @@ const LandingPage = () => {
             </motion.div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.08] text-white">
-              Get the right trade,{" "}
-              <span className="text-primary">first time</span>
+              Find. Hire.{" "}
+              <span className="text-accent">Done.</span>
             </h1>
 
             <p className="text-lg sm:text-xl text-white/80 max-w-xl leading-relaxed">
-              Get quotes from verified, reviewed tradespeople in your area.
-              Compare prices, check credentials, and hire with confidence.
+              Craftvaro connects you with verified, reviewed tradespeople in your area.
+              Compare quotes, check credentials, and hire with confidence.
             </p>
+
 
             {/* Search bar */}
             <div className="max-w-xl">
