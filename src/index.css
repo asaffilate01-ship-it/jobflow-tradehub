@@ -159,6 +159,11 @@
     background-image: var(--gradient-accent);
   }
 
+  .text-gradient-brand {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-brand);
+  }
+
   .text-gradient-premium {
     @apply bg-clip-text text-transparent;
     background-image: var(--gradient-premium);
@@ -273,7 +278,7 @@
 
   .admin-nav-link:hover,
   .admin-nav-link[aria-current="page"] {
-    color: hsl(var(--primary));
+    color: hsl(var(--sidebar-primary));
   }
 
   .admin-sidebar-action {
