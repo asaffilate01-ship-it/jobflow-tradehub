@@ -252,17 +252,17 @@ const LandingPage = () => {
                 <Button
                   onClick={handleSearch}
                   size="lg"
-                  className="h-14 px-8 rounded-xl font-semibold text-base shrink-0 shadow-lg"
+                  className="h-14 px-8 rounded-xl font-semibold text-base shrink-0 shadow-lg bg-accent text-accent-foreground hover:bg-accent/90"
                 >
                   Search
                 </Button>
               </div>
               <p className="text-xs text-white/50 mt-3">
-                Popular: <Link to="/marketplace?category=plumber" className="text-primary hover:underline">Plumber</Link>
-                {" · "}<Link to="/marketplace?category=electrician" className="text-primary hover:underline">Electrician</Link>
-                {" · "}<Link to="/marketplace?category=builder" className="text-primary hover:underline">Builder</Link>
-                {" · "}<Link to="/marketplace?category=roofer" className="text-primary hover:underline">Roofer</Link>
-                {" · "}<Link to="/marketplace?category=gas_engineer" className="text-primary hover:underline">Gas Engineer</Link>
+                Popular: <Link to="/marketplace?category=plumber" className="text-accent hover:underline">Plumber</Link>
+                {" · "}<Link to="/marketplace?category=electrician" className="text-accent hover:underline">Electrician</Link>
+                {" · "}<Link to="/marketplace?category=builder" className="text-accent hover:underline">Builder</Link>
+                {" · "}<Link to="/marketplace?category=roofer" className="text-accent hover:underline">Roofer</Link>
+                {" · "}<Link to="/marketplace?category=gas_engineer" className="text-accent hover:underline">Gas Engineer</Link>
               </p>
             </div>
 
