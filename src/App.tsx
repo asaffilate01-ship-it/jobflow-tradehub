@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
+
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import SmartOrderPage from "./pages/SmartOrderPage";
 import { Toaster } from "@/components/ui/toaster";
@@ -13,7 +14,10 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import KycGate from "./components/KycGate";
 import TierGate from "./components/TierGate";
 
+import PromoGate, { UnlockScreen } from "./components/PromoGate";
+import PromoHomePage from "./pages/PromoHomePage";
 import LandingPage from "./pages/LandingPage";
+
 import JobsPage from "./pages/JobsPage";
 import JobDetailPage from "./pages/JobDetailPage";
 import SubmitQuotePage from "./pages/SubmitQuotePage";
