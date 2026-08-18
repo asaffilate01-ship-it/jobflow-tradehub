@@ -362,7 +362,7 @@ const PromoHomePage = () => {
         <div className="container flex flex-col items-center gap-4 text-center md:flex-row md:justify-between md:text-left">
           <img src={logo} alt="Craftvaro" className="h-8 w-auto" width={160} height={32} />
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Craftvaro. Find. Hire. Done. · hello@craftvaro.co.uk
+            © {new Date().getFullYear()} Craftvaro. Craftvaro is a trading name of iTechLounge Ltd. All rights reserved. · hello@craftvaro.co.uk
           </p>
         </div>
       </footer>
