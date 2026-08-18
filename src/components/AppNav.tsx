@@ -49,7 +49,7 @@ const AppNav = () => {
   }, []);
 
   const navItems = [
-    { to: "/", label: "Home", icon: Home, show: true },
+    { to: "/home", label: "Home", icon: Home, show: true },
     { to: "/marketplace", label: "Find Trades", icon: Search, show: true },
     { to: "/jobs", label: "Jobs", icon: Briefcase, show: true },
     { to: "/my-projects", label: "My Projects", icon: FolderOpen, show: isCustomer },
@@ -69,7 +69,7 @@ const AppNav = () => {
   return (
     <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className="container flex h-16 items-center gap-4">
-        <Link to="/" className="flex shrink-0 items-center gap-2 group" aria-label="Craftvaro home">
+        <Link to="/home" className="flex shrink-0 items-center gap-2 group" aria-label="Craftvaro home">
           <img
             src={craftvaroLogo}
             alt="Craftvaro"
