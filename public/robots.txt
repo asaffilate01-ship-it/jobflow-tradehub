@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://craftvaro.co.uk/sitemap.xml
+Sitemap: https://craftvaro.com/sitemap.xml

@@ -1,5 +1,8 @@
 import { Link } from "react-router-dom";
 import craftvaroLogo from "@/assets/craftvaro-logo.png";
+import craftvaroLogoDe from "@/assets/craftvaro-logo-de.png";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useLanguage, legalByLang } from "@/contexts/LanguageContext";
 
 const footerLinks = {
   Platform: [
@@ -70,18 +73,49 @@ const socialLinks = [
   },
 ];
 
-const Footer = () => (
+const deLabels: Record<string, string> = {
+  Platform: "Plattform",
+  "For Trades": "Für Betriebe",
+  Company: "Unternehmen",
+  "Find a Tradesperson": "Handwerker finden",
+  "Post a Job": "Auftrag einstellen",
+  "Browse Jobs": "Aufträge ansehen",
+  Pricing: "Preise",
+  "Join as a Trader": "Als Betrieb registrieren",
+  Dashboard: "Dashboard",
+  "Materials & Delivery": "Material & Lieferung",
+  "Compliance Certs": "Nachweise & Zertifikate",
+  "About Craftvaro": "Über Craftvaro",
+  Blog: "Blog",
+  "Privacy Policy": "Datenschutz",
+  "Terms of Service": "AGB",
+};
+
+const Footer = () => {
+  const { lang } = useLanguage();
+  const legal = legalByLang[lang];
+  const tr = (s: string) => (lang === "de" ? deLabels[s] ?? s : s);
+
+  return (
   <footer className="border-t border-border bg-card/50 mt-16">
     <div className="container py-12">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
         {/* Brand */}
         <div className="col-span-2 md:col-span-1 space-y-4">
           <Link to="/home" className="flex items-center gap-2">
-            <img src={craftvaroLogo} alt="Craftvaro" className="h-9 dark:[filter:brightness(0)_invert(1)]" />
+            <img
+              src={lang === "de" ? craftvaroLogoDe : craftvaroLogo}
+              alt="Craftvaro"
+              className="h-9 dark:[filter:brightness(0)_invert(1)]"
+            />
           </Link>
           <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-            The UK's complete platform for finding trusted tradespeople and managing construction projects.
+            {lang === "de"
+              ? "Die komplette Plattform, um geprüfte Handwerksbetriebe zu finden und Bauprojekte zu steuern."
+              : "The complete platform for finding trusted tradespeople and managing construction projects."}
           </p>
+
+          <LanguageSwitcher className="w-fit" />
 
           {/* Social icons */}
           <div className="flex items-center gap-2 pt-1">
@@ -102,12 +136,12 @@ const Footer = () => (
 
         {Object.entries(footerLinks).map(([heading, links]) => (
           <div key={heading}>
-            <h4 className="text-sm font-semibold text-foreground mb-4">{heading}</h4>
+            <h4 className="text-sm font-semibold text-foreground mb-4">{tr(heading)}</h4>
             <ul className="space-y-2.5">
               {links.map(({ label, to }) => (
                 <li key={label}>
                   <Link to={to} className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                    {label}
+                    {tr(label)}
                   </Link>
                 </li>
               ))}
@@ -118,14 +152,16 @@ const Footer = () => (
 
       <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
         <p className="text-xs text-muted-foreground">
-          © {new Date().getFullYear()} Craftvaro. Craftvaro is a trading name of iTechLounge Ltd. All rights reserved.
+          © {new Date().getFullYear()} Craftvaro. {legal.entity}.{" "}
+          {lang === "de" ? "Alle Rechte vorbehalten." : "All rights reserved."} · {legal.email}
         </p>
         <p className="text-xs text-muted-foreground">
-          Built in the UK 🇬🇧
+          {lang === "de" ? "Made in Europe 🇪🇺" : "Built in the UK 🇬🇧"}
         </p>
       </div>
     </div>
   </footer>
-);
+  );
+};
 
 export default Footer;
