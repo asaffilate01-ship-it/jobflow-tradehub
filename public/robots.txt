@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://traderos.313test.co.uk/sitemap.xml
+Sitemap: https://craftvaro.co.uk/sitemap.xml
