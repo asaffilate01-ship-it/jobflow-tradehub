@@ -13,11 +13,15 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import NotificationBell from "@/components/NotificationBell";
 import craftvaroLogo from "@/assets/craftvaro-logo.png";
+import craftvaroLogoDe from "@/assets/craftvaro-logo-de.png";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const AppNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, roles, signOut } = useAuth();
+  const { lang } = useLanguage();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dark, setDark] = useState(() => document.documentElement.classList.contains("dark"));
 
@@ -71,7 +75,7 @@ const AppNav = () => {
       <div className="container flex h-16 items-center gap-4">
         <Link to="/home" className="flex shrink-0 items-center gap-2 group" aria-label="Craftvaro home">
           <img
-            src={craftvaroLogo}
+            src={lang === "de" ? craftvaroLogoDe : craftvaroLogo}
             alt="Craftvaro"
             className="h-9 transition-opacity group-hover:opacity-90 dark:[filter:brightness(0)_invert(1)]"
           />
@@ -105,6 +109,7 @@ const AppNav = () => {
         </div>
 
         <div className="ml-auto hidden md:flex items-center gap-2">
+          <LanguageSwitcher />
           <Button
             variant="ghost"
             size="sm"

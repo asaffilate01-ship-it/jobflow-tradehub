@@ -85,7 +85,7 @@ export const UnlockScreen = ({ onUnlocked }: { onUnlocked?: () => void }) => {
               <ArrowLeft className="h-3.5 w-3.5" /> Back to site
             </Link>
             <a
-              href="mailto:hello@craftvaro.co.uk?subject=Craftvaro%20access%20request"
+              href="mailto:hello@craftvaro.com?subject=Craftvaro%20access%20request"
               className="text-accent hover:underline"
             >
               Request access
