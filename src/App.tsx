@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
+
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import SmartOrderPage from "./pages/SmartOrderPage";
 import { Toaster } from "@/components/ui/toaster";
@@ -13,7 +14,10 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import KycGate from "./components/KycGate";
 import TierGate from "./components/TierGate";
 
+import PromoGate, { UnlockScreen } from "./components/PromoGate";
+import PromoHomePage from "./pages/PromoHomePage";
 import LandingPage from "./pages/LandingPage";
+
 import JobsPage from "./pages/JobsPage";
 import JobDetailPage from "./pages/JobDetailPage";
 import SubmitQuotePage from "./pages/SubmitQuotePage";
@@ -70,7 +74,14 @@ const App = () => (
         <ScrollToTop />
         <AuthProvider>
           <Routes>
+            {/* Promo homepage — public, default */}
+            <Route path="/" element={<PromoHomePage />} />
+            <Route path="/unlock" element={<UnlockScreen />} />
+
+            {/* Everything below requires the promo access password */}
+            <Route element={<PromoGate><Outlet /></PromoGate>}>
             {/* Public pages */}
+
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
@@ -122,7 +133,7 @@ const App = () => (
 
             {/* Public / Customer layout (top nav) */}
             <Route element={<AppLayout />}>
-              <Route path="/" element={<LandingPage />} />
+              <Route path="/home" element={<LandingPage />} />
               <Route path="/marketplace" element={<MarketplacePage />} />
               <Route path="/trader/:id" element={<TraderProfilePage />} />
               <Route path="/jobs" element={<JobsPage />} />
@@ -184,7 +195,9 @@ const App = () => (
             </Route>
 
             <Route path="*" element={<NotFound />} />
+            </Route>
           </Routes>
+
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
