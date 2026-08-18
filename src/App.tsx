@@ -74,7 +74,14 @@ const App = () => (
         <ScrollToTop />
         <AuthProvider>
           <Routes>
+            {/* Promo homepage — public, default */}
+            <Route path="/" element={<PromoHomePage />} />
+            <Route path="/unlock" element={<UnlockScreen />} />
+
+            {/* Everything below requires the promo access password */}
+            <Route element={<PromoGate><Outlet /></PromoGate>}>
             {/* Public pages */}
+
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
@@ -126,7 +133,7 @@ const App = () => (
 
             {/* Public / Customer layout (top nav) */}
             <Route element={<AppLayout />}>
-              <Route path="/" element={<LandingPage />} />
+              <Route path="/home" element={<LandingPage />} />
               <Route path="/marketplace" element={<MarketplacePage />} />
               <Route path="/trader/:id" element={<TraderProfilePage />} />
               <Route path="/jobs" element={<JobsPage />} />
