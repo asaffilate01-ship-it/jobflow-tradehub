@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Briefcase, Home, Menu, X, LogIn, LogOut, Search, FolderOpen, Sun, Moon,
-  Plus, LayoutDashboard, Truck, Shield, User as UserIcon, ChevronRight, Sparkles,
+  Plus, LayoutDashboard, Truck, Shield, User as UserIcon, ChevronRight, Sparkles, Siren,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -55,6 +55,7 @@ const AppNav = () => {
   const navItems = [
     { to: "/home", label: "Home", icon: Home, show: true },
     { to: "/marketplace", label: "Find Trades", icon: Search, show: true },
+    { to: "/repair-assist", label: "Repair Assist", icon: Siren, show: Boolean(user) && (isCustomer || isAdmin) },
     { to: "/jobs", label: "Jobs", icon: Briefcase, show: true },
     { to: "/my-projects", label: "My Projects", icon: FolderOpen, show: isCustomer },
   ].filter((item) => item.show);

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import RepairIntelligencePanel from "@/components/RepairIntelligencePanel";
 import {
   ArrowLeft, Briefcase, FileText, CheckCircle, Clock, DollarSign,
   Camera, AlertTriangle, Shield, Plus, Trash2, Edit2, Upload,
@@ -86,6 +87,25 @@ const JobDetailPage = () => {
 
   // --- Quote acceptance ---
   const handleAcceptQuote = async (quoteId: string, tradeCompanyId: string) => {
+    if (job?.job_kind === "repair") {
+      const { error } = await (supabase as any).rpc("accept_repair_offer", { p_quote_id: quoteId });
+      if (error) { toast.error(error.message); return; }
+      const ownerId = await getCompanyOwner(tradeCompanyId);
+      if (ownerId) {
+        await notify({
+          recipientId: ownerId,
+          title: "Your repair offer was accepted",
+          body: `You have been awarded the repair${job?.title ? ` "${job.title}"` : ""}. The full address is now available.`,
+          link: `/jobs/${id}`,
+          type: "quote_accepted",
+          channels: ["in_app", "email"],
+        });
+      }
+      await logAudit({ action: "repair_offer.accept", entityType: "job", entityId: id, metadata: { quote_id: quoteId, trade_company_id: tradeCompanyId } });
+      toast.success("Offer accepted. The provider can now see the full address.");
+      window.location.reload();
+      return;
+    }
     const { error: quoteErr } = await supabase.from("quotes").update({ status: "accepted" }).eq("id", quoteId);
     if (quoteErr) { toast.error(quoteErr.message); return; }
     // Reject others
@@ -285,6 +305,8 @@ const JobDetailPage = () => {
         )}
       </div>
 
+      <RepairIntelligencePanel job={job} />
+
       {/* Tabs */}
       <div className="flex gap-1 overflow-x-auto pb-1">
         {tabs.map(({ key, label, icon: Icon, count }) => (
@@ -402,10 +424,27 @@ const JobDetailPage = () => {
                   </div>
                 )}
                 {q.notes && <p className="text-xs text-muted-foreground">{q.notes}</p>}
+                {job.job_kind === "repair" && (
+                  <div className="grid gap-3 border-t border-border pt-3 text-xs sm:grid-cols-3">
+                    <div><span className="text-muted-foreground">Offer:</span> <span className="font-medium capitalize">{(q.offer_type ?? "fixed").replace("_", " ")}</span></div>
+                    <div><span className="text-muted-foreground">Arrival:</span> <span className="font-medium">{q.eta_minutes ? `${q.eta_minutes} minutes` : "Not stated"}</span></div>
+                    <div><span className="text-muted-foreground">Duration:</span> <span className="font-medium">{q.duration_minutes ? `${q.duration_minutes} minutes` : "Not stated"}</span></div>
+                    {q.warranty_days !== null && <div><span className="text-muted-foreground">Warranty:</span> <span className="font-medium">{q.warranty_days} days</span></div>}
+                    {q.assumptions?.length > 0 && <div className="sm:col-span-3"><span className="text-muted-foreground">Assumptions:</span> {q.assumptions.join("; ")}</div>}
+                    {q.exclusions?.length > 0 && <div className="sm:col-span-3"><span className="text-muted-foreground">Exclusions:</span> {q.exclusions.join("; ")}</div>}
+                  </div>
+                )}
                 {isCustomer && q.status === "submitted" && (
                   <div className="flex gap-2 pt-2">
                     <Button size="sm" className="font-semibold" onClick={() => handleAcceptQuote(q.id, q.trade_company_id)}>Accept quote</Button>
                     <Button size="sm" variant="outline" onClick={async () => {
+                      if (job.job_kind === "repair") {
+                        const { error } = await (supabase as any).rpc("decline_repair_offer", { p_quote_id: q.id });
+                        if (error) { toast.error(error.message); return; }
+                        toast.success("Offer declined");
+                        window.location.reload();
+                        return;
+                      }
                       await supabase.from("quotes").update({ status: "rejected" }).eq("id", q.id);
                       const rejOwner = await getCompanyOwner(q.trade_company_id);
                       if (rejOwner) {

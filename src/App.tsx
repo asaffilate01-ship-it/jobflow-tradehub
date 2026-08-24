@@ -39,6 +39,8 @@ import EvidenceCameraPage from "./pages/EvidenceCameraPage";
 import EvidenceGalleryPage from "./pages/EvidenceGalleryPage";
 import ComplianceCertsPage from "./pages/ComplianceCertsPage";
 import PostJobPage from "./pages/PostJobPage";
+import RepairAssistPage from "./pages/RepairAssistPage";
+import RepairOpportunitiesPage from "./pages/RepairOpportunitiesPage";
 import DriverDashboard from "./pages/DriverDashboard";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import BroadcastsPage from "./pages/BroadcastsPage";
@@ -111,6 +113,7 @@ const App = () => (
             }>
               <Route path="/dashboard" element={<TraderDashboard />} />
               <Route path="/jobs" element={<JobsPage />} />
+              <Route path="/repair-opportunities" element={<RepairOpportunitiesPage />} />
               <Route path="/jobs/:id" element={<JobDetailPage />} />
               <Route path="/jobs/:jobId/quote" element={<TierGate required="basic" feature="Quoting"><SubmitQuotePage /></TierGate>} />
               <Route path="/trade-accounts" element={<TierGate required="premium" feature="Trade accounts"><TradeAccountsPage /></TierGate>} />
@@ -142,6 +145,11 @@ const App = () => (
               <Route path="/post-job" element={
                 <ProtectedRoute>
                   <PostJobPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/repair-assist" element={
+                <ProtectedRoute allowedRoles={["customer", "admin"]}>
+                  <RepairAssistPage />
                 </ProtectedRoute>
               } />
               <Route path="/jobs/:id" element={<JobDetailPage />} />

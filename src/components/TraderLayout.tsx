@@ -4,7 +4,7 @@ import { NavLink } from "@/components/NavLink";
 import {
   LayoutDashboard, Briefcase, Package, Camera, FileCheck,
   Building2, Truck, CreditCard, MessageCircle, LogOut,
-  Radio, Shield, Calendar, CalendarDays, Zap, Calculator,
+  Radio, Shield, Calendar, CalendarDays, Zap, Calculator, Siren,
 } from "lucide-react";
 import craftvaroLogo from "@/assets/craftvaro-logo.png";
 import NotificationBell from "@/components/NotificationBell";
@@ -21,6 +21,7 @@ const navGroups = [
     items: [
       { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
       { to: "/jobs", label: "Jobs", icon: Briefcase },
+      { to: "/repair-opportunities", label: "Repairs", icon: Siren },
       { to: "/schedule", label: "Schedule", icon: Calendar },
       { to: "/messages", label: "Messages", icon: MessageCircle },
     ],
@@ -57,7 +58,7 @@ const navGroups = [
 const mobileNavItems = [
   { to: "/dashboard", label: "Home", icon: LayoutDashboard },
   { to: "/jobs", label: "Jobs", icon: Briefcase },
-  { to: "/schedule", label: "Schedule", icon: Calendar },
+  { to: "/repair-opportunities", label: "Repairs", icon: Siren },
   { to: "/site-evidence", label: "Evidence", icon: Camera },
   { to: "/messages", label: "Chat", icon: MessageCircle },
 ];
