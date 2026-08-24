@@ -145,6 +145,57 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_agent_daily_usage: {
+        Row: {
+          agent: string
+          request_count: number
+          updated_at: string
+          usage_date: string
+          user_id: string
+        }
+        Insert: {
+          agent: string
+          request_count?: number
+          updated_at?: string
+          usage_date?: string
+          user_id: string
+        }
+        Update: {
+          agent?: string
+          request_count?: number
+          updated_at?: string
+          usage_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_trade_search_events: {
+        Row: {
+          created_at: string
+          id: string
+          parsed_filters: Json
+          query_fingerprint: string
+          result_count: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          parsed_filters?: Json
+          query_fingerprint: string
+          result_count?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          parsed_filters?: Json
+          query_fingerprint?: string
+          result_count?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -3138,6 +3189,15 @@ export type Database = {
     }
     Functions: {
       accept_repair_offer: { Args: { p_quote_id: string }; Returns: string }
+      consume_ai_agent_quota: {
+        Args: { p_agent?: string; p_user_id: string }
+        Returns: {
+          allowed: boolean
+          daily_limit: number
+          remaining: number
+          used: number
+        }[]
+      }
       current_tier: { Args: never; Returns: string }
       decline_repair_invite: { Args: { p_invite_id: string }; Returns: string }
       decline_repair_offer: { Args: { p_quote_id: string }; Returns: string }
