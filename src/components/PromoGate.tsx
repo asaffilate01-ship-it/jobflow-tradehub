@@ -8,7 +8,7 @@ import logo from "@/assets/craftvaro-logo.png";
 
 const STORAGE_KEY = "craftvaro_preview_access";
 /** Promo-phase soft gate only — not a security boundary (real data is protected by auth + RLS). */
-const ACCESS_PASSWORD = "craftvaro2026";
+const ACCESS_PASSWORD = "LondonCalling85!";
 
 export const hasPreviewAccess = () =>
   typeof window !== "undefined" && localStorage.getItem(STORAGE_KEY) === "granted";
@@ -23,7 +23,7 @@ export const UnlockScreen = ({ onUnlocked }: { onUnlocked?: () => void }) => {
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (value.trim().toLowerCase() === ACCESS_PASSWORD) {
+    if (value.trim() === ACCESS_PASSWORD) {
       grantPreviewAccess();
       setError("");
       if (onUnlocked) onUnlocked();
