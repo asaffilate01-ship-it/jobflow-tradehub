@@ -23,7 +23,7 @@ export const UnlockScreen = ({ onUnlocked }: { onUnlocked?: () => void }) => {
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (value.trim().toLowerCase() === ACCESS_PASSWORD) {
+    if (value.trim() === ACCESS_PASSWORD) {
       grantPreviewAccess();
       setError("");
       if (onUnlocked) onUnlocked();
