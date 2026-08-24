@@ -66,7 +66,7 @@ const MarketplacePage = () => {
         .select("id, full_name, company_name, trade_specialism, rating, services_description, service_radius_miles, years_experience, trade_bodies, verified, cover_image_url");
 
       if (category !== "all") {
-        query = query.eq("trade_specialism", category as any);
+        query = query.eq("trade_specialism", category as Database["public"]["Enums"]["trade_type"]);
       }
 
       const { data } = await query;
