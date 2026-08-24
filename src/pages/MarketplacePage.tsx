@@ -14,6 +14,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import { StaggerContainer, StaggerItem, ScaleOnHover } from "@/components/MotionWrapper";
 import { usePageMeta } from "@/hooks/use-page-meta";
+import AITradeSearch from "@/components/AITradeSearch";
+import type { Database } from "@/integrations/supabase/types";
 
 const tradeCategories = [
   { slug: "all", label: "All trades", icon: SlidersHorizontal },
