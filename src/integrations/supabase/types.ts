@@ -786,6 +786,53 @@ export type Database = {
         }
         Relationships: []
       }
+      dokuvera_case_links: {
+        Row: {
+          created_at: string
+          dokuvera_case_id: string | null
+          evidence_pack_url: string | null
+          id: string
+          job_id: string
+          last_error: string | null
+          last_synced_at: string | null
+          metadata: Json
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          dokuvera_case_id?: string | null
+          evidence_pack_url?: string | null
+          id?: string
+          job_id: string
+          last_error?: string | null
+          last_synced_at?: string | null
+          metadata?: Json
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          dokuvera_case_id?: string | null
+          evidence_pack_url?: string | null
+          id?: string
+          job_id?: string
+          last_error?: string | null
+          last_synced_at?: string | null
+          metadata?: Json
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dokuvera_case_links_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: true
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       driver_profiles: {
         Row: {
           available: boolean
@@ -1229,11 +1276,19 @@ export type Database = {
           created_at: string
           customer_profile_id: string
           description: string | null
+          exact_address_released: boolean
           id: string
+          job_kind: string
           postcode: string
+          postcode_sector: string | null
+          property_reference: string | null
+          repair_priority: string | null
           requested_trade: Database["public"]["Enums"]["trade_type"]
+          source_product: string
+          source_reference: string | null
           status: Database["public"]["Enums"]["job_status"]
           target_start_date: string | null
+          tenancy_reference: string | null
           title: string
           trade_company_id: string | null
           updated_at: string
@@ -1246,11 +1301,19 @@ export type Database = {
           created_at?: string
           customer_profile_id: string
           description?: string | null
+          exact_address_released?: boolean
           id?: string
+          job_kind?: string
           postcode: string
+          postcode_sector?: string | null
+          property_reference?: string | null
+          repair_priority?: string | null
           requested_trade: Database["public"]["Enums"]["trade_type"]
+          source_product?: string
+          source_reference?: string | null
           status?: Database["public"]["Enums"]["job_status"]
           target_start_date?: string | null
+          tenancy_reference?: string | null
           title: string
           trade_company_id?: string | null
           updated_at?: string
@@ -1263,11 +1326,19 @@ export type Database = {
           created_at?: string
           customer_profile_id?: string
           description?: string | null
+          exact_address_released?: boolean
           id?: string
+          job_kind?: string
           postcode?: string
+          postcode_sector?: string | null
+          property_reference?: string | null
+          repair_priority?: string | null
           requested_trade?: Database["public"]["Enums"]["trade_type"]
+          source_product?: string
+          source_reference?: string | null
           status?: Database["public"]["Enums"]["job_status"]
           target_start_date?: string | null
+          tenancy_reference?: string | null
           title?: string
           trade_company_id?: string | null
           updated_at?: string
@@ -2098,43 +2169,61 @@ export type Database = {
       }
       quotes: {
         Row: {
+          assumptions: Json
           created_at: string
           delivery_estimate: number
+          duration_minutes: number | null
+          eta_minutes: number | null
+          exclusions: Json
           id: string
           job_id: string
           labour_amount: number
           materials_estimate: number
           notes: string | null
+          offer_type: string
           status: Database["public"]["Enums"]["quote_status"]
           total_amount: number | null
           trade_company_id: string
           updated_at: string
+          warranty_days: number | null
         }
         Insert: {
+          assumptions?: Json
           created_at?: string
           delivery_estimate?: number
+          duration_minutes?: number | null
+          eta_minutes?: number | null
+          exclusions?: Json
           id?: string
           job_id: string
           labour_amount?: number
           materials_estimate?: number
           notes?: string | null
+          offer_type?: string
           status?: Database["public"]["Enums"]["quote_status"]
           total_amount?: number | null
           trade_company_id: string
           updated_at?: string
+          warranty_days?: number | null
         }
         Update: {
+          assumptions?: Json
           created_at?: string
           delivery_estimate?: number
+          duration_minutes?: number | null
+          eta_minutes?: number | null
+          exclusions?: Json
           id?: string
           job_id?: string
           labour_amount?: number
           materials_estimate?: number
           notes?: string | null
+          offer_type?: string
           status?: Database["public"]["Enums"]["quote_status"]
           total_amount?: number | null
           trade_company_id?: string
           updated_at?: string
+          warranty_days?: number | null
         }
         Relationships: [
           {
@@ -2152,6 +2241,282 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      repair_diagnoses: {
+        Row: {
+          confidence: number
+          created_at: string
+          emergency_contacts: Json
+          emergency_stop: boolean
+          estimated_cost: Json
+          follow_up_questions: Json
+          hazards: Json
+          id: string
+          job_id: string
+          likely_remedies: Json
+          model_metadata: Json
+          probable_causes: Json
+          prohibited_actions: Json
+          risk_level: string
+          safety_actions: Json
+          status: string
+          suggested_trade: Database["public"]["Enums"]["trade_type"]
+          updated_at: string
+        }
+        Insert: {
+          confidence?: number
+          created_at?: string
+          emergency_contacts?: Json
+          emergency_stop?: boolean
+          estimated_cost?: Json
+          follow_up_questions?: Json
+          hazards?: Json
+          id?: string
+          job_id: string
+          likely_remedies?: Json
+          model_metadata?: Json
+          probable_causes?: Json
+          prohibited_actions?: Json
+          risk_level?: string
+          safety_actions?: Json
+          status?: string
+          suggested_trade: Database["public"]["Enums"]["trade_type"]
+          updated_at?: string
+        }
+        Update: {
+          confidence?: number
+          created_at?: string
+          emergency_contacts?: Json
+          emergency_stop?: boolean
+          estimated_cost?: Json
+          follow_up_questions?: Json
+          hazards?: Json
+          id?: string
+          job_id?: string
+          likely_remedies?: Json
+          model_metadata?: Json
+          probable_causes?: Json
+          prohibited_actions?: Json
+          risk_level?: string
+          safety_actions?: Json
+          status?: string
+          suggested_trade?: Database["public"]["Enums"]["trade_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repair_diagnoses_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: true
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      repair_dispatch_invites: {
+        Row: {
+          created_at: string
+          dispatch_round_id: string
+          id: string
+          job_id: string
+          ranking_score: number
+          responded_at: string | null
+          scoped_payload: Json
+          status: string
+          trade_company_id: string
+        }
+        Insert: {
+          created_at?: string
+          dispatch_round_id: string
+          id?: string
+          job_id: string
+          ranking_score?: number
+          responded_at?: string | null
+          scoped_payload?: Json
+          status?: string
+          trade_company_id: string
+        }
+        Update: {
+          created_at?: string
+          dispatch_round_id?: string
+          id?: string
+          job_id?: string
+          ranking_score?: number
+          responded_at?: string | null
+          scoped_payload?: Json
+          status?: string
+          trade_company_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repair_dispatch_invites_dispatch_round_id_fkey"
+            columns: ["dispatch_round_id"]
+            isOneToOne: false
+            referencedRelation: "repair_dispatch_rounds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "repair_dispatch_invites_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "repair_dispatch_invites_trade_company_id_fkey"
+            columns: ["trade_company_id"]
+            isOneToOne: false
+            referencedRelation: "trade_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      repair_dispatch_rounds: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          job_id: string
+          max_providers: number
+          mode: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          job_id: string
+          max_providers?: number
+          mode?: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          job_id?: string
+          max_providers?: number
+          mode?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repair_dispatch_rounds_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      repair_intake_media: {
+        Row: {
+          captured_at: string | null
+          checksum: string | null
+          created_at: string
+          dokuvera_evidence_id: string | null
+          id: string
+          job_id: string
+          media_type: string
+          redacted_storage_path: string | null
+          redaction_status: string
+          storage_path: string
+          uploaded_by: string
+        }
+        Insert: {
+          captured_at?: string | null
+          checksum?: string | null
+          created_at?: string
+          dokuvera_evidence_id?: string | null
+          id?: string
+          job_id: string
+          media_type: string
+          redacted_storage_path?: string | null
+          redaction_status?: string
+          storage_path: string
+          uploaded_by: string
+        }
+        Update: {
+          captured_at?: string | null
+          checksum?: string | null
+          created_at?: string
+          dokuvera_evidence_id?: string | null
+          id?: string
+          job_id?: string
+          media_type?: string
+          redacted_storage_path?: string | null
+          redaction_status?: string
+          storage_path?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repair_intake_media_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "repair_intake_media_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "repair_intake_media_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "trader_profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      repair_integration_outbox: {
+        Row: {
+          aggregate_id: string
+          aggregate_type: string
+          attempts: number
+          created_at: string
+          delivered_at: string | null
+          destination: string
+          event_type: string
+          id: string
+          idempotency_key: string
+          last_error: string | null
+          payload: Json
+          status: string
+        }
+        Insert: {
+          aggregate_id: string
+          aggregate_type: string
+          attempts?: number
+          created_at?: string
+          delivered_at?: string | null
+          destination: string
+          event_type: string
+          id?: string
+          idempotency_key: string
+          last_error?: string | null
+          payload?: Json
+          status?: string
+        }
+        Update: {
+          aggregate_id?: string
+          aggregate_type?: string
+          attempts?: number
+          created_at?: string
+          delivered_at?: string | null
+          destination?: string
+          event_type?: string
+          id?: string
+          idempotency_key?: string
+          last_error?: string | null
+          payload?: Json
+          status?: string
+        }
+        Relationships: []
       }
       reviews: {
         Row: {
@@ -2616,6 +2981,68 @@ export type Database = {
           },
         ]
       }
+      trade_repair_profiles: {
+        Row: {
+          available: boolean
+          capability_verified: boolean
+          created_at: string
+          credential_expires_at: string | null
+          credential_number: string | null
+          credential_type: string | null
+          credential_verified: boolean
+          emergency_work: boolean
+          id: string
+          insurance_expires_at: string | null
+          insurance_verified: boolean
+          service_postcode_prefixes: string[]
+          trade: Database["public"]["Enums"]["trade_type"]
+          trade_company_id: string
+          updated_at: string
+        }
+        Insert: {
+          available?: boolean
+          capability_verified?: boolean
+          created_at?: string
+          credential_expires_at?: string | null
+          credential_number?: string | null
+          credential_type?: string | null
+          credential_verified?: boolean
+          emergency_work?: boolean
+          id?: string
+          insurance_expires_at?: string | null
+          insurance_verified?: boolean
+          service_postcode_prefixes?: string[]
+          trade: Database["public"]["Enums"]["trade_type"]
+          trade_company_id: string
+          updated_at?: string
+        }
+        Update: {
+          available?: boolean
+          capability_verified?: boolean
+          created_at?: string
+          credential_expires_at?: string | null
+          credential_number?: string | null
+          credential_type?: string | null
+          credential_verified?: boolean
+          emergency_work?: boolean
+          id?: string
+          insurance_expires_at?: string | null
+          insurance_verified?: boolean
+          service_postcode_prefixes?: string[]
+          trade?: Database["public"]["Enums"]["trade_type"]
+          trade_company_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_repair_profiles_trade_company_id_fkey"
+            columns: ["trade_company_id"]
+            isOneToOne: false
+            referencedRelation: "trade_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
@@ -2710,13 +3137,43 @@ export type Database = {
       }
     }
     Functions: {
+      accept_repair_offer: { Args: { p_quote_id: string }; Returns: string }
       current_tier: { Args: never; Returns: string }
+      decline_repair_invite: { Args: { p_invite_id: string }; Returns: string }
+      decline_repair_offer: { Args: { p_quote_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      match_repair_providers: {
+        Args: {
+          p_limit?: number
+          p_postcode_sector: string
+          p_rapid?: boolean
+          p_trade: Database["public"]["Enums"]["trade_type"]
+        }
+        Returns: {
+          ranking_score: number
+          trade_company_id: string
+        }[]
+      }
+      submit_repair_offer: {
+        Args: {
+          p_assumptions: Json
+          p_duration_minutes: number
+          p_eta_minutes: number
+          p_exclusions: Json
+          p_invite_id: string
+          p_labour: number
+          p_materials: number
+          p_notes: string
+          p_offer_type: string
+          p_warranty_days: number
+        }
+        Returns: string
       }
       verify_order_status: { Args: { order_id: string }; Returns: Json }
     }
