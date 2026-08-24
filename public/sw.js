@@ -1,5 +1,5 @@
 // Craftvaro Service Worker — web push + offline app shell
-const CACHE = "craftvaro-v2";
+const CACHE = "craftvaro-v3";
 const SHELL = ["/", "/manifest.json", "/icons/icon-192.png", "/icons/icon-512.png", "/favicon.png"];
 
 self.addEventListener("install", (event) => {
