@@ -14,6 +14,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import { StaggerContainer, StaggerItem, ScaleOnHover } from "@/components/MotionWrapper";
 import { usePageMeta } from "@/hooks/use-page-meta";
+import AITradeSearch from "@/components/AITradeSearch";
+import type { Database } from "@/integrations/supabase/types";
 
 const tradeCategories = [
   { slug: "all", label: "All trades", icon: SlidersHorizontal },
@@ -64,7 +66,7 @@ const MarketplacePage = () => {
         .select("id, full_name, company_name, trade_specialism, rating, services_description, service_radius_miles, years_experience, trade_bodies, verified, cover_image_url");
 
       if (category !== "all") {
-        query = query.eq("trade_specialism", category as any);
+        query = query.eq("trade_specialism", category as Database["public"]["Enums"]["trade_type"]);
       }
 
       const { data } = await query;
@@ -134,6 +136,8 @@ const MarketplacePage = () => {
           ))}
         </div>
       </div>
+
+      <AITradeSearch />
 
       {/* Search bar */}
       <div className="flex flex-col sm:flex-row gap-3">
