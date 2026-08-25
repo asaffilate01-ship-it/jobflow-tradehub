@@ -64,12 +64,23 @@ Deno.serve(async (req) => {
     }
     await admin.from("dokuvera_case_links").upsert({ job_id, status: "syncing", last_error: null }, { onConflict: "job_id" });
     const raw = JSON.stringify(payload);
-    const signature = await hmacHex(signingSecret, raw);
-    const response = await fetch(`${apiUrl.replace(/\/$/, "")}/v1/cases/upsert`, {
+    const timestamp = Math.floor(Date.now() / 1000).toString();
+    const signature = await hmacHex(signingSecret, `${timestamp}.${raw}`);
+    const base = apiUrl.replace(/\/$/, "");
+    const endpoint = /craftvaro-evidence-intake$/.test(base) ? base : `${base}/v1/cases/upsert`;
+    const response = await fetch(endpoint, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiToken}`, "X-Dokuvera-Signature": `sha256=${signature}`, "Idempotency-Key": `craftvaro:${job_id}` },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiToken}`,
+        "X-Craftvaro-Timestamp": timestamp,
+        "X-Craftvaro-Signature": `sha256=${signature}`,
+        "X-Dokuvera-Signature": `sha256=${signature}`,
+        "Idempotency-Key": `craftvaro:${job_id}`,
+      },
       body: raw,
     });
+
     const result = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(result?.error || `Dokuvera returned ${response.status}`);
     await admin.from("dokuvera_case_links").upsert({
