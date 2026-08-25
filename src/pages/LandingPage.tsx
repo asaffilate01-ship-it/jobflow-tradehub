@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- public views are introduced by the release migration */
 import { Link } from "react-router-dom";
 import {
   ArrowRight, Users, Shield, Star,
-  Search, CheckCircle, Clock, MapPin, ThumbsUp, Award,
-  Phone, FileText, Truck, Package, Building2, Zap, Calendar,
+  Search, CheckCircle, MapPin, ThumbsUp, Award,
+  Phone, FileText, Truck, Package, Building2, Zap,
   PhoneCall, ChevronRight, Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,11 +13,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { FadeIn, StaggerContainer, StaggerItem, ScaleOnHover } from "@/components/MotionWrapper";
+import { supabase } from "@/integrations/supabase/client";
 
 import heroBanner from "@/assets/hero-banner.jpg";
-import blogKitchen from "@/assets/blog-kitchen-refit.jpg";
-import blogTech from "@/assets/blog-trade-tech.jpg";
-import blogDelivery from "@/assets/blog-delivery.jpg";
 
 import plumberIcon from "@/assets/icons/plumber-3d.png";
 import electricianIcon from "@/assets/icons/electrician-3d.png";
@@ -50,41 +49,14 @@ const tradeCategories = [
   { label: "Cleaner", slug: "cleaner", img: cleanerIcon },
 ];
 
-const stats = [
-  { value: 500, suffix: "+", label: "Verified Trades", icon: Shield },
-  { value: 2400, suffix: "+", label: "Jobs Completed", icon: CheckCircle },
-  { value: 2, prefix: "< ", suffix: "hr", label: "Avg. Response", icon: Clock },
-  { value: 4.8, suffix: "★", label: "Avg. Rating", icon: Star, decimals: 1 },
-];
+type Stat = { value: number; suffix?: string; prefix?: string; label: string; icon: typeof Shield; decimals?: number; hideZero?: boolean };
+type HomeReview = { id: string; rating: number; comment: string | null; created_at: string };
 
-const reviews = [
-  {
-    name: "Sarah M.",
-    location: "Manchester",
-    trade: "Plumber",
-    rating: 5,
-    text: "Found a fantastic plumber within hours. Work was completed same day — brilliant service and fair pricing.",
-    date: "March 2026",
-    avatar: "S",
-  },
-  {
-    name: "David T.",
-    location: "Birmingham",
-    trade: "Electrician",
-    rating: 5,
-    text: "The quote process was seamless. Three quotes in one day, all from verified electricians. Couldn't be easier.",
-    date: "March 2026",
-    avatar: "D",
-  },
-  {
-    name: "Emma R.",
-    location: "Bristol",
-    trade: "Builder",
-    rating: 5,
-    text: "Tracked the whole project through the app — milestones, payments, photos. Felt completely in control.",
-    date: "February 2026",
-    avatar: "E",
-  },
+const emptyStats: Stat[] = [
+  { value: 0, label: "Verified Members", icon: Shield },
+  { value: 0, label: "Completed Jobs", icon: CheckCircle },
+  { value: 0, label: "Directory Profiles", icon: Users },
+  { value: 0, suffix: "★", label: "Verified-job Rating", icon: Star, decimals: 1, hideZero: true },
 ];
 
 const howItWorks = [
@@ -94,44 +66,17 @@ const howItWorks = [
 ];
 
 const whyBetter = [
-  { icon: Shield, title: "Verified & Insured", desc: "Every trader is ID-checked, insured, and their qualifications verified before they appear." },
+  { icon: Shield, title: "Verified & Insured", desc: "Paid marketplace members are identity, insurance and capability checked before they receive leads." },
   { icon: Star, title: "Genuine Reviews", desc: "All reviews are from real, completed jobs — no fake ratings or paid placements." },
   { icon: Phone, title: "In-App Messaging", desc: "Chat directly with your trader. No chasing phone calls or lost emails." },
   { icon: Award, title: "Compliance Built In", desc: "Gas Safe, EICR, Part P certificates generated and stored automatically." },
   { icon: Truck, title: "Material Delivery", desc: "Traders order materials at trade prices with same-day delivery to site." },
-  { icon: ThumbsUp, title: "Payment Protection", desc: "Milestone-based payments — you only pay when work is completed to your satisfaction." },
+  { icon: ThumbsUp, title: "Milestone Clarity", desc: "Agreed milestones, evidence and payment records stay attached to the job for both parties." },
 ];
 
 const trustLogos = [
   "Gas Safe Register", "NICEIC", "NAPIT", "FMB", "Trustmark",
-  "Checkatrade", "Trading Standards", "CIPHE",
-];
-
-const blogPosts = [
-  {
-    title: "How to Plan a Kitchen Refit: The Complete 2026 Guide",
-    excerpt: "From layout choices to budgeting for materials, here's everything you need to know before starting your kitchen renovation.",
-    image: blogKitchen,
-    date: "28 Mar 2026",
-    category: "Homeowner Guides",
-    readTime: "7 min read",
-  },
-  {
-    title: "Why Digital Job Management Is Changing the Trades",
-    excerpt: "GPS-stamped evidence, milestone payments, and real-time updates — how technology is building trust between trades and customers.",
-    image: blogTech,
-    date: "21 Mar 2026",
-    category: "Trade Insights",
-    readTime: "5 min read",
-  },
-  {
-    title: "Same-Day Material Delivery: How It Works",
-    excerpt: "Order from 30+ UK merchants at trade prices and get materials delivered to site within hours. Here's the full breakdown.",
-    image: blogDelivery,
-    date: "14 Mar 2026",
-    category: "Platform Updates",
-    readTime: "4 min read",
-  },
+  "Trading Standards", "CIPHE", "Handwerksrolle",
 ];
 
 /* Animated counter hook */
@@ -157,7 +102,7 @@ function useCountUp(end: number, duration = 2000, decimals = 0) {
   return { count, ref };
 }
 
-function AnimatedStat({ value, suffix, prefix, label, icon: Icon, decimals = 0 }: typeof stats[0]) {
+function AnimatedStat({ value, suffix, prefix, label, icon: Icon, decimals = 0, hideZero = false }: Stat) {
   const { count, ref } = useCountUp(value, 2000, decimals);
   return (
     <div ref={ref} className="flex items-center gap-3.5">
@@ -166,7 +111,7 @@ function AnimatedStat({ value, suffix, prefix, label, icon: Icon, decimals = 0 }
       </div>
       <div>
         <div className="text-2xl font-extrabold text-foreground tabular-nums">
-          {prefix}{decimals > 0 ? count.toFixed(decimals) : count.toLocaleString()}{suffix}
+          {hideZero && value === 0 ? "—" : <>{prefix}{decimals > 0 ? count.toFixed(decimals) : count.toLocaleString()}{suffix}</>}
         </div>
         <div className="text-xs text-muted-foreground font-medium">{label}</div>
       </div>
@@ -178,6 +123,28 @@ const LandingPage = () => {
   const { user } = useAuth();
   const [searchTrade, setSearchTrade] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
+  const [platformStats, setPlatformStats] = useState<Stat[]>(emptyStats);
+  const [homeReviews, setHomeReviews] = useState<HomeReview[]>([]);
+
+  useEffect(() => {
+    const loadMarketplaceProof = async () => {
+      const db = supabase as any;
+      const [statsResult, reviewsResult] = await Promise.all([
+        db.from("marketplace_stats_public").select("verified_members,directory_profiles,completed_jobs,average_rating").maybeSingle(),
+        db.from("reviews_public").select("id,rating,comment,created_at").not("comment", "is", null).order("created_at", { ascending: false }).limit(3),
+      ]);
+      if (statsResult.data) {
+        setPlatformStats([
+          { value: Number(statsResult.data.verified_members ?? 0), label: "Verified Members", icon: Shield },
+          { value: Number(statsResult.data.completed_jobs ?? 0), label: "Completed Jobs", icon: CheckCircle },
+          { value: Number(statsResult.data.directory_profiles ?? 0), label: "Directory Profiles", icon: Users },
+          { value: Number(statsResult.data.average_rating ?? 0), suffix: "★", label: "Verified-job Rating", icon: Star, decimals: 1, hideZero: true },
+        ]);
+      }
+      setHomeReviews((reviewsResult.data ?? []) as HomeReview[]);
+    };
+    void loadMarketplaceProof();
+  }, []);
 
   const handleSearch = () => {
     const params = new URLSearchParams();
@@ -212,7 +179,7 @@ const LandingPage = () => {
               className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur-md px-4 py-1.5 text-sm font-medium text-white"
             >
               <Sparkles className="h-3.5 w-3.5" />
-              Trusted by thousands across the UK
+              AI-assisted matching for verified trade members
             </motion.div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.08] text-white">
@@ -221,8 +188,8 @@ const LandingPage = () => {
             </h1>
 
             <p className="text-lg sm:text-xl text-white/80 max-w-xl leading-relaxed">
-              Craftvaro connects you with verified, reviewed tradespeople in your area.
-              Compare quotes, check credentials, and hire with confidence.
+              Craftvaro connects you with subscribed, verified tradespeople in your area.
+              Compare quotes, check credentials, and see why every AI match was selected.
             </p>
 
 
@@ -289,7 +256,7 @@ const LandingPage = () => {
       <section className="py-5 border-b border-border bg-card/80 overflow-hidden">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center gap-6">
-            <span className="text-xs text-muted-foreground font-medium whitespace-nowrap shrink-0">Trusted by members of</span>
+            <span className="text-xs text-muted-foreground font-medium whitespace-nowrap shrink-0">Credentials we can verify</span>
             <div className="overflow-hidden relative flex-1">
               <div className="flex gap-8 items-center trust-bar-scroll" style={{ width: "max-content" }}>
                 {[...trustLogos, ...trustLogos].map((name, i) => (
@@ -306,7 +273,7 @@ const LandingPage = () => {
       {/* Stats bar */}
       <section className="py-12 border-b border-border bg-card/50">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto px-4">
-          {stats.map((stat) => (
+          {platformStats.map((stat) => (
             <AnimatedStat key={stat.label} {...stat} />
           ))}
         </div>
@@ -321,7 +288,7 @@ const LandingPage = () => {
               Browse trades
             </Badge>
             <h2 className="text-3xl font-bold">Find the right specialist</h2>
-            <p className="text-muted-foreground max-w-md mx-auto">Choose from 11 trade categories — every tradesperson is verified and reviewed</p>
+            <p className="text-muted-foreground max-w-xl mx-auto">Choose from 14 trade categories. Paid members are verified and clearly separated from unclaimed directory profiles.</p>
           </div>
           <StaggerContainer className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
             {tradeCategories.map(({ label, slug, img }) => (
@@ -405,10 +372,10 @@ const LandingPage = () => {
             <h2 className="text-3xl font-bold">What customers say</h2>
             <p className="text-muted-foreground">From verified, completed jobs — no fake ratings</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-5">
-            {reviews.map((review, i) => (
+          {homeReviews.length > 0 ? <div className="grid md:grid-cols-3 gap-5">
+            {homeReviews.map((review, i) => (
               <motion.div
-                key={i}
+                key={review.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -420,19 +387,25 @@ const LandingPage = () => {
                     <Star key={j} className="h-4 w-4 text-primary fill-primary" />
                   ))}
                 </div>
-                <p className="text-sm text-foreground leading-relaxed">"{review.text}"</p>
+                <p className="text-sm text-foreground leading-relaxed">"{review.comment}"</p>
                 <div className="flex items-center gap-3 pt-3 border-t border-border">
                   <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-sm">
-                    {review.avatar}
+                    <CheckCircle className="h-4 w-4" />
                   </div>
                   <div>
-                    <div className="text-sm font-semibold text-foreground">{review.name}</div>
-                    <div className="text-xs text-muted-foreground">{review.location} · {review.trade} · {review.date}</div>
+                    <div className="text-sm font-semibold text-foreground">Verified customer</div>
+                    <div className="text-xs text-muted-foreground">Completed Craftvaro job · {new Date(review.created_at).toLocaleDateString("en-GB", { month: "short", year: "numeric" })}</div>
                   </div>
                 </div>
               </motion.div>
             ))}
-          </div>
+          </div> : (
+            <div className="glass-card mx-auto max-w-xl p-8 text-center">
+              <CheckCircle className="mx-auto h-8 w-8 text-muted-foreground/40" />
+              <p className="mt-3 font-medium">No verified-job reviews published yet</p>
+              <p className="mt-1 text-sm text-muted-foreground">Reviews appear here only after a customer completes a job with the awarded trader.</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -463,69 +436,6 @@ const LandingPage = () => {
                 <h3 className="font-bold text-foreground">{title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
               </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Blog / Articles */}
-      <section className="py-20 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-end justify-between mb-12">
-            <div className="space-y-3">
-              <Badge variant="outline" className="text-xs font-medium gap-1.5 py-1 px-3">
-                <FileText className="h-3 w-3" />
-                Resources
-              </Badge>
-              <h2 className="text-3xl font-bold">From the blog</h2>
-              <p className="text-muted-foreground">Guides, tips, and platform updates</p>
-            </div>
-            <Button variant="ghost" size="sm" className="gap-1.5 text-primary hidden sm:flex">
-              View all articles
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Button>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {blogPosts.map((post, i) => (
-              <motion.article
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="glass-card overflow-hidden group cursor-pointer hover:border-primary/30 hover:shadow-lg transition-all"
-              >
-                <div className="aspect-[16/10] overflow-hidden">
-                  <img
-                    src={post.image}
-                    alt={post.title}
-                    loading="lazy"
-                    width={800}
-                    height={512}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="p-5 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-[10px] font-medium py-0">{post.category}</Badge>
-                    <span className="text-[10px] text-muted-foreground flex items-center gap-1">
-                      <Clock className="h-2.5 w-2.5" />
-                      {post.readTime}
-                    </span>
-                  </div>
-                  <h3 className="font-semibold text-foreground leading-snug group-hover:text-primary transition-colors line-clamp-2">
-                    {post.title}
-                  </h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
-                    {post.excerpt}
-                  </p>
-                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground pt-2 border-t border-border">
-                    <Calendar className="h-3 w-3" />
-                    {post.date}
-                  </div>
-                </div>
-              </motion.article>
             ))}
           </div>
         </div>
@@ -563,7 +473,7 @@ const LandingPage = () => {
               <div className="flex gap-3 pt-3">
                 <Button asChild size="lg" className="font-semibold gap-2 shadow-lg">
                   <Link to="/signup">
-                    Join now — it's free
+                    Create trader account
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
@@ -571,7 +481,7 @@ const LandingPage = () => {
             </div>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { icon: Users, label: "Win Jobs", value: "Unlimited leads" },
+                { icon: Users, label: "Win Jobs", value: "Qualified leads" },
                 { icon: Package, label: "Materials", value: "Trade prices" },
                 { icon: Truck, label: "Delivery", value: "Same day" },
                 { icon: Building2, label: "CRM & CIS", value: "Full suite" },
@@ -604,7 +514,7 @@ const LandingPage = () => {
           <div className="flex flex-wrap justify-center gap-3">
             <Button asChild size="lg" className="font-semibold gap-2 h-13 px-8 shadow-lg text-base">
               <Link to={user ? "/post-job" : "/signup"}>
-                {user ? "Post a job" : "Get started free"}
+                {user ? "Post a job" : "Create account"}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>

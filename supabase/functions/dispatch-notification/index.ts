@@ -192,7 +192,7 @@ async function matchedPaidTraderIds(supabase: AdminClient, senderId: string, job
 
   const { data: repairProfiles } = await supabase
     .from("trade_repair_profiles")
-    .select("trade_company_id,service_postcode_prefixes,insurance_expires_at")
+    .select("trade_company_id,service_postcode_prefixes,insurance_expires_at,credential_type,credential_verified,credential_expires_at")
     .eq("trade", job.requested_trade)
     .eq("available", true)
     .eq("capability_verified", true)
@@ -201,9 +201,25 @@ async function matchedPaidTraderIds(supabase: AdminClient, senderId: string, job
   const today = new Date().toISOString().slice(0, 10);
   const postcode = normaliseArea(job.postcode ?? "");
   const companyIds = (repairProfiles ?? [])
-    .filter((profile: { service_postcode_prefixes: string[] | null; insurance_expires_at: string | null }) =>
-      (!profile.insurance_expires_at || profile.insurance_expires_at >= today) &&
-      (profile.service_postcode_prefixes ?? []).some((prefix) => postcode.startsWith(normaliseArea(prefix))))
+    .filter((profile: {
+      service_postcode_prefixes: string[] | null;
+      insurance_expires_at: string | null;
+      credential_type: string | null;
+      credential_verified: boolean;
+      credential_expires_at: string | null;
+    }) => {
+      if (profile.insurance_expires_at && profile.insurance_expires_at < today) return false;
+      if (!(profile.service_postcode_prefixes ?? []).some((prefix) => postcode.startsWith(normaliseArea(prefix)))) return false;
+      if (job.requested_trade === "gas_engineer") {
+        return profile.credential_verified
+          && (!profile.credential_expires_at || profile.credential_expires_at >= today)
+          && /gas\s*safe/i.test(profile.credential_type ?? "");
+      }
+      if (job.requested_trade === "electrician") {
+        return profile.credential_verified && (!profile.credential_expires_at || profile.credential_expires_at >= today);
+      }
+      return true;
+    })
     .map((profile: { trade_company_id: string }) => profile.trade_company_id);
   if (!companyIds.length) return [];
 
@@ -211,7 +227,11 @@ async function matchedPaidTraderIds(supabase: AdminClient, senderId: string, job
     .from("trade_companies")
     .select("owner_profile_id")
     .in("id", companyIds);
-  return paidSubscriberIds(supabase, (companies ?? []).map((company: { owner_profile_id: string }) => company.owner_profile_id));
+  const ownerIds = (companies ?? []).map((company: { owner_profile_id: string }) => company.owner_profile_id);
+  const { data: verifiedProfiles } = ownerIds.length
+    ? await supabase.from("profiles").select("id").in("id", ownerIds).eq("is_active", true).eq("verified", true)
+    : { data: [] };
+  return paidSubscriberIds(supabase, (verifiedProfiles ?? []).map((profile: { id: string }) => profile.id));
 }
 
 async function canNotifyRecipient(supabase: AdminClient, senderId: string, recipientId: string): Promise<boolean> {

@@ -78,7 +78,7 @@ where trade_company_id = '<verified-company-uuid>'
   and trade = 'plumber';
 ```
 
-For `gas_engineer` or `electrician`, also set `credential_type`, `credential_number`, `credential_verified` and `credential_expires_at` from the verifier serviceâ€”not from browser input.
+For `gas_engineer` or `electrician`, also set `credential_type`, `credential_number`, `credential_verified` and `credential_expires_at` from the verifier service—not from browser input.
 
 ## Dokuvera outbound adapter
 

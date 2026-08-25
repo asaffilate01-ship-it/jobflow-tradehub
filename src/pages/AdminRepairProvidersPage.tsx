@@ -98,7 +98,7 @@ const AdminRepairProvidersPage = () => {
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <h2 className="font-semibold">{provider.company_name}</h2>
-              <p className="text-xs text-muted-foreground">{provider.owner_name} Â· {provider.trade.replace(/_/g, " ")}</p>
+              <p className="text-xs text-muted-foreground">{provider.owner_name} · {provider.trade.replace(/_/g, " ")}</p>
               <p className="mt-1 text-xs text-muted-foreground">Coverage: {provider.service_postcode_prefixes.join(", ") || "Not configured"}</p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -133,7 +133,7 @@ const AdminRepairProvidersPage = () => {
           </div>
 
           <div className="flex justify-end">
-            <Button onClick={() => void save(provider)} disabled={saving === provider.id} className="gap-2"><Wrench className="h-4 w-4" />{saving === provider.id ? "Savingâ€¦" : "Save verification"}</Button>
+            <Button onClick={() => void save(provider)} disabled={saving === provider.id} className="gap-2"><Wrench className="h-4 w-4" />{saving === provider.id ? "Saving…" : "Save verification"}</Button>
           </div>
         </div>
       ))}

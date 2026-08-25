@@ -2092,6 +2092,7 @@ export type Database = {
           is_active: boolean
           kyc_documents: Json | null
           kyc_status: string
+          languages: string[]
           marketplace_visible: boolean
           marketplace_visible_until: string | null
           phone: string | null
@@ -2116,6 +2117,7 @@ export type Database = {
           is_active?: boolean
           kyc_documents?: Json | null
           kyc_status?: string
+          languages?: string[]
           marketplace_visible?: boolean
           marketplace_visible_until?: string | null
           phone?: string | null
@@ -2140,6 +2142,7 @@ export type Database = {
           is_active?: boolean
           kyc_documents?: Json | null
           kyc_status?: string
+          languages?: string[]
           marketplace_visible?: boolean
           marketplace_visible_until?: string | null
           phone?: string | null
@@ -2640,6 +2643,7 @@ export type Database = {
           reviewer_id: string
           trader_profile_id: string
           updated_at: string
+          verified_job: boolean
         }
         Insert: {
           comment?: string | null
@@ -2650,6 +2654,7 @@ export type Database = {
           reviewer_id: string
           trader_profile_id: string
           updated_at?: string
+          verified_job?: boolean
         }
         Update: {
           comment?: string | null
@@ -2660,6 +2665,7 @@ export type Database = {
           reviewer_id?: string
           trader_profile_id?: string
           updated_at?: string
+          verified_job?: boolean
         }
         Relationships: [
           {
@@ -3155,6 +3161,229 @@ export type Database = {
           },
         ]
       }
+      trader_directory_contacts: {
+        Row: {
+          business_email: string | null
+          business_phone: string | null
+          directory_profile_id: string
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          business_email?: string | null
+          business_phone?: string | null
+          directory_profile_id: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          business_email?: string | null
+          business_phone?: string | null
+          directory_profile_id?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trader_directory_contacts_directory_profile_id_fkey"
+            columns: ["directory_profile_id"]
+            isOneToOne: true
+            referencedRelation: "marketplace_directory_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trader_directory_contacts_directory_profile_id_fkey"
+            columns: ["directory_profile_id"]
+            isOneToOne: true
+            referencedRelation: "trader_directory_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trader_directory_profiles: {
+        Row: {
+          business_name: string
+          city: string
+          claim_status: string
+          claimed_profile_id: string | null
+          country_code: string
+          factual_summary: string | null
+          id: string
+          imported_at: string
+          is_active: boolean
+          languages: string[]
+          postcode_district: string
+          region: string | null
+          registration_authority: string | null
+          registration_reference: string | null
+          service_radius_miles: number | null
+          services: string[]
+          source_checked_at: string
+          source_name: string
+          source_record_id: string
+          source_url: string
+          trade: Database["public"]["Enums"]["trade_type"]
+          updated_at: string
+          verification_status: string
+        }
+        Insert: {
+          business_name: string
+          city: string
+          claim_status?: string
+          claimed_profile_id?: string | null
+          country_code?: string
+          factual_summary?: string | null
+          id?: string
+          imported_at?: string
+          is_active?: boolean
+          languages?: string[]
+          postcode_district: string
+          region?: string | null
+          registration_authority?: string | null
+          registration_reference?: string | null
+          service_radius_miles?: number | null
+          services?: string[]
+          source_checked_at?: string
+          source_name: string
+          source_record_id: string
+          source_url: string
+          trade: Database["public"]["Enums"]["trade_type"]
+          updated_at?: string
+          verification_status?: string
+        }
+        Update: {
+          business_name?: string
+          city?: string
+          claim_status?: string
+          claimed_profile_id?: string | null
+          country_code?: string
+          factual_summary?: string | null
+          id?: string
+          imported_at?: string
+          is_active?: boolean
+          languages?: string[]
+          postcode_district?: string
+          region?: string | null
+          registration_authority?: string | null
+          registration_reference?: string | null
+          service_radius_miles?: number | null
+          services?: string[]
+          source_checked_at?: string
+          source_name?: string
+          source_record_id?: string
+          source_url?: string
+          trade?: Database["public"]["Enums"]["trade_type"]
+          updated_at?: string
+          verification_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trader_directory_profiles_claimed_profile_id_fkey"
+            columns: ["claimed_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trader_directory_profiles_claimed_profile_id_fkey"
+            columns: ["claimed_profile_id"]
+            isOneToOne: false
+            referencedRelation: "trader_profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trader_profile_claims: {
+        Row: {
+          admin_notes: string | null
+          claimant_profile_id: string
+          created_at: string
+          directory_profile_id: string
+          id: string
+          message: string | null
+          registration_number: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          role_at_business: string
+          status: string
+          updated_at: string
+          verification_method: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          claimant_profile_id: string
+          created_at?: string
+          directory_profile_id: string
+          id?: string
+          message?: string | null
+          registration_number?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          role_at_business: string
+          status?: string
+          updated_at?: string
+          verification_method: string
+        }
+        Update: {
+          admin_notes?: string | null
+          claimant_profile_id?: string
+          created_at?: string
+          directory_profile_id?: string
+          id?: string
+          message?: string | null
+          registration_number?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          role_at_business?: string
+          status?: string
+          updated_at?: string
+          verification_method?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trader_profile_claims_claimant_profile_id_fkey"
+            columns: ["claimant_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trader_profile_claims_claimant_profile_id_fkey"
+            columns: ["claimant_profile_id"]
+            isOneToOne: false
+            referencedRelation: "trader_profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trader_profile_claims_directory_profile_id_fkey"
+            columns: ["directory_profile_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_directory_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trader_profile_claims_directory_profile_id_fkey"
+            columns: ["directory_profile_id"]
+            isOneToOne: false
+            referencedRelation: "trader_directory_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trader_profile_claims_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trader_profile_claims_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "trader_profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
@@ -3199,6 +3428,138 @@ export type Database = {
       }
     }
     Views: {
+      marketplace_directory_public: {
+        Row: {
+          business_name: string | null
+          city: string | null
+          claim_status: string | null
+          country_code: string | null
+          factual_summary: string | null
+          id: string | null
+          imported_at: string | null
+          languages: string[] | null
+          postcode_district: string | null
+          region: string | null
+          registration_authority: string | null
+          service_radius_miles: number | null
+          services: string[] | null
+          source_checked_at: string | null
+          source_name: string | null
+          trade: Database["public"]["Enums"]["trade_type"] | null
+          verification_status: string | null
+        }
+        Insert: {
+          business_name?: string | null
+          city?: string | null
+          claim_status?: string | null
+          country_code?: string | null
+          factual_summary?: string | null
+          id?: string | null
+          imported_at?: string | null
+          languages?: string[] | null
+          postcode_district?: string | null
+          region?: string | null
+          registration_authority?: string | null
+          service_radius_miles?: number | null
+          services?: string[] | null
+          source_checked_at?: string | null
+          source_name?: string | null
+          trade?: Database["public"]["Enums"]["trade_type"] | null
+          verification_status?: string | null
+        }
+        Update: {
+          business_name?: string | null
+          city?: string | null
+          claim_status?: string | null
+          country_code?: string | null
+          factual_summary?: string | null
+          id?: string | null
+          imported_at?: string | null
+          languages?: string[] | null
+          postcode_district?: string | null
+          region?: string | null
+          registration_authority?: string | null
+          service_radius_miles?: number | null
+          services?: string[] | null
+          source_checked_at?: string | null
+          source_name?: string | null
+          trade?: Database["public"]["Enums"]["trade_type"] | null
+          verification_status?: string | null
+        }
+        Relationships: []
+      }
+      marketplace_listings_public: {
+        Row: {
+          accepting_work: boolean | null
+          city: string | null
+          claim_status: string | null
+          company_name: string | null
+          completed_jobs: number | null
+          country_code: string | null
+          cover_image_url: string | null
+          credential: string | null
+          display_name: string | null
+          emergency_work: boolean | null
+          insurance_verified: boolean | null
+          languages: string[] | null
+          listing_id: string | null
+          listing_kind: string | null
+          member_rank: number | null
+          postcode_district: string | null
+          profile_id: string | null
+          rating: number | null
+          recommended_score: number | null
+          response_minutes: number | null
+          review_count: number | null
+          service_radius_miles: number | null
+          services_description: string | null
+          source_checked_at: string | null
+          source_name: string | null
+          subscription_verified: boolean | null
+          trade_bodies: string[] | null
+          trade_specialism: Database["public"]["Enums"]["trade_type"] | null
+          verified: boolean | null
+          years_experience: number | null
+        }
+        Relationships: []
+      }
+      marketplace_stats_public: {
+        Row: {
+          average_rating: number | null
+          average_response_minutes: number | null
+          completed_jobs: number | null
+          directory_profiles: number | null
+          verified_members: number | null
+        }
+        Relationships: []
+      }
+      reviews_public: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          id: string | null
+          rating: number | null
+          trader_profile_id: string | null
+          verified_job: boolean | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string | null
+          rating?: number | null
+          trader_profile_id?: string | null
+          verified_job?: boolean | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string | null
+          rating?: number | null
+          trader_profile_id?: string | null
+          verified_job?: boolean | null
+        }
+        Relationships: []
+      }
       trader_profiles_public: {
         Row: {
           company_name: string | null
@@ -3206,6 +3567,7 @@ export type Database = {
           created_at: string | null
           full_name: string | null
           id: string | null
+          languages: string[] | null
           rating: number | null
           service_radius_miles: number | null
           services_description: string | null
@@ -3221,6 +3583,7 @@ export type Database = {
           created_at?: string | null
           full_name?: string | null
           id?: string | null
+          languages?: string[] | null
           rating?: number | null
           service_radius_miles?: number | null
           services_description?: string | null
@@ -3236,6 +3599,7 @@ export type Database = {
           created_at?: string | null
           full_name?: string | null
           id?: string | null
+          languages?: string[] | null
           rating?: number | null
           service_radius_miles?: number | null
           services_description?: string | null
@@ -3250,6 +3614,10 @@ export type Database = {
     }
     Functions: {
       accept_repair_offer: { Args: { p_quote_id: string }; Returns: string }
+      approve_trader_profile_claim: {
+        Args: { p_claim_id: string }
+        Returns: string
+      }
       consume_ai_agent_quota: {
         Args: { p_agent?: string; p_user_id: string }
         Returns: {
@@ -3290,6 +3658,10 @@ export type Database = {
           ranking_score: number
           trade_company_id: string
         }[]
+      }
+      reject_trader_profile_claim: {
+        Args: { p_claim_id: string; p_reason?: string }
+        Returns: undefined
       }
       submit_repair_offer: {
         Args: {

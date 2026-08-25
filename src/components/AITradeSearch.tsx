@@ -16,6 +16,7 @@ type Match = {
   full_name: string;
   trade: string;
   rating: number;
+  review_count: number;
   services_description: string | null;
   years_experience: number | null;
   trade_bodies: string[];
@@ -27,6 +28,8 @@ type Match = {
   subscription_verified: boolean;
   credential: string | null;
   coverage: string;
+  match_score: number;
+  match_reasons: string[];
 };
 
 type SearchResult = {
@@ -143,6 +146,7 @@ const AITradeSearch = () => {
             <Badge variant="outline">
               {result.matches.length} verified match{result.matches.length === 1 ? "" : "es"}
             </Badge>
+            <Badge variant="secondary">{result.ai_mode === "hybrid" ? "AI + verified rules" : "Verified rules fallback"}</Badge>
           </div>
 
           {result.matches.length ? (
@@ -159,13 +163,18 @@ const AITradeSearch = () => {
                   )}
                   <div className="space-y-3 p-5">
                     <div>
-                      <h3 className="font-semibold">{match.company_name || match.full_name}</h3>
+                      <div className="flex items-start justify-between gap-3">
+                        <h3 className="font-semibold">{match.company_name || match.full_name}</h3>
+                        <Badge className="shrink-0">{match.match_score}% match</Badge>
+                      </div>
                       <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                         <span className="capitalize">{match.trade.replace(/_/g, " ")}</span>
-                        <span className="inline-flex items-center gap-1">
-                          <Star className="h-3.5 w-3.5 text-accent" />
-                          {match.rating.toFixed(1)}
-                        </span>
+                        {match.review_count > 0 ? (
+                          <span className="inline-flex items-center gap-1">
+                            <Star className="h-3.5 w-3.5 text-accent" />
+                            {match.rating.toFixed(1)} ({match.review_count})
+                          </span>
+                        ) : <span>New member</span>}
                         <span className="inline-flex items-center gap-1">
                           <MapPin className="h-3.5 w-3.5" /> {match.coverage}
                         </span>
@@ -202,6 +211,17 @@ const AITradeSearch = () => {
                         {match.services_description}
                       </p>
                     )}
+
+                    <div className="rounded-xl bg-secondary/40 p-3">
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Why this matched</p>
+                      <ul className="mt-1.5 space-y-1">
+                        {match.match_reasons.slice(0, 4).map((reason) => (
+                          <li key={reason} className="flex gap-1.5 text-xs text-muted-foreground">
+                            <CheckCircle2 className="mt-0.5 h-3 w-3 shrink-0 text-success" />{reason}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
 
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-muted-foreground">

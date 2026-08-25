@@ -7,10 +7,14 @@ Only verified traders with an active non-free Craftvaro subscription are visible
 ## Required deployment order
 
 1. Review the target project's migration history. `20260824215000_repair_hub_dokuvera.sql` is intentionally a no-op marker because the canonical Lovable migration is `20260824221602_75248a38-3b14-48fc-90b8-6c87fdaf6b58.sql`.
-2. Apply migrations through `20260825090000_repair_marketplace_hardening.sql`.
+2. Apply migrations through `20260825113000_marketplace_directory_claims.sql`.
 3. Deploy every function under `supabase/functions`; deploy `stripe-webhook`, `dokuvera-webhook` and `integration-outbox-worker` without Supabase JWT verification because each uses its own signature/cron authentication.
 4. Configure secrets and test each integration in a non-production environment.
 5. Run `npm run typecheck`, `npm run lint`, `npm test` and `npm run build` before release.
+
+The manual **Deploy Supabase production** GitHub Action performs a database dry run, applies pending migrations, and deploys all Edge Functions. Create a protected GitHub `production` environment and add encrypted `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, and `SUPABASE_PROJECT_ID` secrets before running it. Keep the workflow manually approved until a separate staging project is available.
+
+The Supabase workflow does not publish the Vite frontend. After the backend action succeeds, publish the same commit through Lovable so the live UI and database contract cannot drift.
 
 ## Required server secrets
 
