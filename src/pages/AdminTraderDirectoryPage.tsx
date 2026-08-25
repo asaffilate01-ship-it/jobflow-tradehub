@@ -67,7 +67,9 @@ export default function AdminTraderDirectoryPage() {
     const { data: claimantRows } = claimantIds.length
       ? await db.from("profiles").select("id,full_name,email").in("id", claimantIds)
       : { data: [] };
-    const claimantMap = new Map((claimantRows ?? []).map((profile: any) => [profile.id, profile]));
+    const claimantMap = new Map<string, { full_name: string; email: string | null }>(
+      (claimantRows ?? []).map((profile: any) => [profile.id, profile]),
+    );
     setProfiles((profileResult.data ?? []) as DirectoryProfile[]);
     setClaims(claimRows.map((claim) => ({ ...claim, claimant: claimantMap.get(claim.claimant_profile_id) })));
     setLoading(false);
