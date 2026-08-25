@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Lock, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -98,7 +98,14 @@ export const UnlockScreen = ({ onUnlocked }: { onUnlocked?: () => void }) => {
 };
 
 const PromoGate = ({ children }: { children: ReactNode }) => {
+  const { pathname } = useLocation();
   const [unlocked, setUnlocked] = useState(hasPreviewAccess);
+  const publicMarketplacePath = [
+    "/home", "/marketplace", "/trader/", "/claim-trader/", "/post-job",
+    "/repair-assist", "/my-projects", "/login", "/signup", "/reset-password",
+    "/profile-setup", "/verify-order/",
+  ].some((path) => pathname === path || (path.endsWith("/") && pathname.startsWith(path)));
+  if (publicMarketplacePath) return <>{children}</>;
   if (!unlocked) return <UnlockScreen onUnlocked={() => setUnlocked(true)} />;
   return <>{children}</>;
 };

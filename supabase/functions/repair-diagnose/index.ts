@@ -128,7 +128,7 @@ Deno.serve(async (req) => {
         const { data: companies } = await admin.from("trade_companies").select("id,owner_profile_id").in("id", rows.map((row: any) => row.trade_company_id));
         if (companies?.length) await admin.from("notifications").insert(companies.map((company: any) => ({
           recipient_id: company.owner_profile_id, title: mode === "rapid" ? "Urgent repair opportunity" : "New repair opportunity",
-          body: `${job.title} â€” ${sector}`, link: "/repair-opportunities", type: "repair_invite",
+          body: `${job.title} — ${sector}`, link: "/repair-opportunities", type: "repair_invite",
         })));
       } else {
         await admin.from("repair_dispatch_rounds").update({ status: "unmatched" }).eq("id", round.id);

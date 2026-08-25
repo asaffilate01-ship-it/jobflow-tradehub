@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
-  Star, Shield, MapPin, Clock, Award, Phone, Mail, Globe, 
+  Star, Shield, MapPin, Clock, Award, Mail, Globe,
   ArrowLeft, Lock, CheckCircle, Briefcase
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -25,16 +25,23 @@ type TraderProfile = {
   created_at: string;
 };
 
+type VerifiedReview = {
+  id: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+};
+
 const TraderProfilePage = () => {
   const { id } = useParams<{ id: string }>();
   const { user, roles } = useAuth();
   const [trader, setTrader] = useState<TraderProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<VerifiedReview[]>([]);
   const [portfolioImages, setPortfolioImages] = useState<string[]>([]);
   const [completedJobCount, setCompletedJobCount] = useState(0);
 
-  const isSubscribed = roles.includes("customer") || roles.includes("admin");
+  const canContact = Boolean(user) && (roles.includes("customer") || roles.includes("trade") || roles.includes("admin"));
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -45,15 +52,15 @@ const TraderProfilePage = () => {
           .select("id, full_name, company_name, trade_specialism, rating, services_description, service_radius_miles, years_experience, trade_bodies, verified, cover_image_url, website_url, created_at")
           .eq("id", id)
           .single(),
-        supabase
-          .from("reviews")
-          .select("*")
+        (supabase as any)
+          .from("reviews_public")
+          .select("id, rating, comment, created_at")
           .eq("trader_profile_id", id)
           .order("created_at", { ascending: false })
           .limit(10),
       ]);
       setTrader(profile as TraderProfile | null);
-      setReviews(reviewData ?? []);
+      setReviews((reviewData ?? []) as VerifiedReview[]);
 
       // Fetch portfolio: evidence from completed jobs by this trader
       const { data: companies } = await supabase.from("trade_companies").select("id").eq("owner_profile_id", id);
@@ -96,6 +103,9 @@ const TraderProfilePage = () => {
   }
 
   const memberSince = new Date(trader.created_at).toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+  const verifiedRating = reviews.length
+    ? reviews.reduce((total, review) => total + Number(review.rating), 0) / reviews.length
+    : null;
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
@@ -138,10 +148,12 @@ const TraderProfilePage = () => {
                 {trader.trade_specialism.replace("_", " ")}
               </span>
             )}
-            <span className="flex items-center gap-1">
-              <Star className="h-4 w-4 text-primary fill-primary" />
-              {trader.rating?.toFixed(1) ?? "5.0"} rating
-            </span>
+            {verifiedRating !== null ? (
+              <span className="flex items-center gap-1">
+                <Star className="h-4 w-4 text-primary fill-primary" />
+                {verifiedRating.toFixed(1)} from {reviews.length} verified job{reviews.length === 1 ? "" : "s"}
+              </span>
+            ) : <span>New member · no verified reviews yet</span>}
             {trader.years_experience && (
               <span className="flex items-center gap-1">
                 <Clock className="h-4 w-4" />
@@ -205,12 +217,9 @@ const TraderProfilePage = () => {
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-3 gap-2">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="aspect-square rounded-lg bg-secondary/50 flex items-center justify-center">
-                    <CheckCircle className="h-6 w-6 text-muted-foreground/30" />
-                  </div>
-                ))}
+              <div className="rounded-xl border border-dashed border-border p-8 text-center">
+                <CheckCircle className="mx-auto h-7 w-7 text-muted-foreground/40" />
+                <p className="mt-2 text-sm text-muted-foreground">No completed-job photos have been added yet.</p>
               </div>
             )}
           </div>
@@ -220,7 +229,7 @@ const TraderProfilePage = () => {
             <h2 className="text-lg font-semibold">Customer Reviews</h2>
             {reviews.length > 0 ? (
               <div className="space-y-3">
-                {reviews.map((r: any) => (
+                {reviews.map((r) => (
                   <div key={r.id} className="p-3 rounded-lg bg-secondary/40 space-y-1.5">
                     <div className="flex items-center gap-1">
                       {Array.from({ length: 5 }).map((_, i) => (
@@ -233,7 +242,7 @@ const TraderProfilePage = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">No reviews yet.</p>
+              <p className="text-sm text-muted-foreground">No verified completed-job reviews yet.</p>
             )}
           </div>
         </div>
@@ -242,7 +251,7 @@ const TraderProfilePage = () => {
         <div className="space-y-6">
           <div className="glass-card p-6 space-y-4 glow">
             <h2 className="text-lg font-semibold">Contact this trader</h2>
-            {isSubscribed || (user && roles.includes("trade")) ? (
+            {canContact ? (
               <div className="space-y-3">
                 {trader.website_url && (
                   <a href={trader.website_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors">
@@ -250,9 +259,8 @@ const TraderProfilePage = () => {
                     Website
                   </a>
                 )}
-                <Button className="w-full font-semibold gap-2">
-                  <Mail className="h-4 w-4" />
-                  Send a message
+                <Button asChild className="w-full font-semibold gap-2">
+                  <Link to={`/post-job?preferred_trader=${trader.id}`}><Mail className="h-4 w-4" />Request a quote</Link>
                 </Button>
               </div>
             ) : (
@@ -262,8 +270,8 @@ const TraderProfilePage = () => {
                   Contact details are for registered users
                 </div>
                 <Button asChild className="w-full font-semibold">
-                  <Link to={user ? "/jobs" : "/signup"}>
-                    {user ? "Subscribe to contact" : "Sign up to contact"}
+                  <Link to={user ? "/post-job" : "/signup"}>
+                    {user ? "Post a job" : "Sign up to contact"}
                   </Link>
                 </Button>
               </div>
@@ -277,8 +285,8 @@ const TraderProfilePage = () => {
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Rating</span>
                 <span className="flex items-center gap-1 font-medium text-foreground">
-                  <Star className="h-3.5 w-3.5 text-primary fill-primary" />
-                  {trader.rating?.toFixed(1) ?? "5.0"}
+                  {verifiedRating !== null && <Star className="h-3.5 w-3.5 text-primary fill-primary" />}
+                  {verifiedRating !== null ? verifiedRating.toFixed(1) : "New member"}
                 </span>
               </div>
               <div className="flex justify-between">

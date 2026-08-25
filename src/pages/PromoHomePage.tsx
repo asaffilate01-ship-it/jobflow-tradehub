@@ -79,7 +79,7 @@ const PromoHomePage = () => {
               </Link>
             </Button>
             <Button asChild size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90">
-              <a href="#access">{t.cta.demo}</a>
+              <Link to="/marketplace">{lang === "de" ? "Handwerker finden" : "Find a trader"}</Link>
             </Button>
             <button
               onClick={() => setMenuOpen((v) => !v)}
@@ -136,9 +136,9 @@ const PromoHomePage = () => {
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
-                <a href="#access">
-                  {t.cta.demo} <ArrowRight className="ml-2 h-4 w-4" />
-                </a>
+                <Link to="/marketplace">
+                  {lang === "de" ? "Handwerker finden" : "Find a trader"} <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="border-primary-foreground/30 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20">
                 <a href="#platform">{t.cta.inside}</a>

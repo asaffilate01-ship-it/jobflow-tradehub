@@ -67,8 +67,9 @@ Deno.serve(async (req) => {
       ai_mode: aiFilters ? "hybrid" : "rules_fallback",
       notices: [
         "Available means the provider has marked themselves as accepting work; confirm the actual appointment time.",
-        "For gas work, check the engineer's Gas Safe ID and permitted work categories before work starts.",
-      ],
+        filters.gas_safe ? "For gas work, check the engineer's Gas Safe ID and permitted work categories before work starts." : null,
+        "Match scores rank verified eligibility signals; they are not a guarantee of price, quality or arrival time.",
+      ].filter(Boolean),
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Trade search failed";
@@ -158,7 +159,17 @@ async function findMatches(admin: any, filters: Filters) {
   const paidOwnerIds = new Set((subscribers ?? [])
     .filter((subscriber: any) => subscriber.user_id && (!subscriber.subscription_end || new Date(subscriber.subscription_end).getTime() > now))
     .map((subscriber: any) => subscriber.user_id));
-  const { data: profiles } = await admin.from("profiles").select("id,full_name,company_name,trade_specialism,rating,is_active,services_description,service_radius_miles,years_experience,trade_bodies,verified,cover_image_url").in("id", ownerIds).eq("is_active", true);
+  const { data: profiles } = await admin.from("profiles").select("id,full_name,company_name,trade_specialism,is_active,services_description,service_radius_miles,years_experience,trade_bodies,verified,cover_image_url").in("id", ownerIds).eq("is_active", true).eq("verified", true);
+  const { data: reviewRows } = ownerIds.length
+    ? await admin.from("reviews_public").select("trader_profile_id,rating").in("trader_profile_id", ownerIds)
+    : { data: [] };
+  const reviewStats = new Map<string, { count: number; total: number }>();
+  for (const review of reviewRows ?? []) {
+    const current = reviewStats.get(review.trader_profile_id) ?? { count: 0, total: 0 };
+    current.count += 1;
+    current.total += Number(review.rating);
+    reviewStats.set(review.trader_profile_id, current);
+  }
   const companyMap = new Map((companies ?? []).map((company: any) => [company.id, company]));
   const profileMap = new Map((profiles ?? []).map((profile: any) => [profile.id, profile]));
 
@@ -166,16 +177,32 @@ async function findMatches(admin: any, filters: Filters) {
     const company: any = companyMap.get(repair.trade_company_id);
     const profile: any = company ? profileMap.get(company.owner_profile_id) : null;
     if (!company || !profile || !paidOwnerIds.has(company.owner_profile_id)) return null;
-    if (filters.minimum_rating !== null && Number(profile.rating ?? 0) < filters.minimum_rating) return null;
+    const reviews = reviewStats.get(profile.id) ?? { count: 0, total: 0 };
+    const rating = reviews.count ? reviews.total / reviews.count : 0;
+    if (filters.minimum_rating !== null && rating < filters.minimum_rating) return null;
     const prefixes = repair.service_postcode_prefixes ?? [];
     const specificity = filters.postcode ? Math.max(0, ...prefixes.map((prefix: string) => normaliseArea(prefix).length)) : 0;
-    const score = Number(profile.rating ?? 0) * 10 + specificity * 2 + (repair.emergency_work ? 2 : 0);
+    const postcodePoints = filters.postcode ? Math.min(specificity * 3, 15) : 5;
+    const score = Math.min(100, Math.round(
+      25 + 15 + 15 + (repair.available ? 10 : 0) + postcodePoints
+      + rating * 4 + (repair.credential_verified ? 10 : 0) + (filters.emergency && repair.emergency_work ? 5 : 0)
+    ));
+    const matchReasons = [
+      `Verified ${repair.trade.replaceAll("_", " ")} capability`,
+      "Active paid Craftvaro member",
+      "Insurance checked and in date",
+      filters.postcode ? `Covers ${filters.postcode_sector ?? filters.postcode}` : "Service coverage matched",
+      repair.available ? "Marked as accepting work" : null,
+      repair.credential_verified && repair.credential_type ? `${repair.credential_type} credential checked` : null,
+      reviews.count ? `${rating.toFixed(1)} from ${reviews.count} verified job review${reviews.count === 1 ? "" : "s"}` : "New member with no verified reviews yet",
+    ].filter(Boolean);
     return {
       profile_id: profile.id,
       company_name: company.trading_name || company.legal_name || profile.company_name,
       full_name: profile.full_name,
       trade: repair.trade,
-      rating: Number(profile.rating ?? 0),
+      rating,
+      review_count: reviews.count,
       services_description: profile.services_description,
       years_experience: profile.years_experience,
       trade_bodies: profile.trade_bodies ?? [],
@@ -187,9 +214,10 @@ async function findMatches(admin: any, filters: Filters) {
       subscription_verified: true,
       credential: repair.credential_verified ? repair.credential_type : null,
       coverage: filters.postcode_sector ?? "Service area matched",
-      score,
+      match_score: score,
+      match_reasons: matchReasons,
     };
-  }).filter(Boolean).sort((a: any, b: any) => b.score - a.score).slice(0, 12).map(({ score: _score, ...match }: any) => match);
+  }).filter(Boolean).sort((a: any, b: any) => b.match_score - a.match_score).slice(0, 12);
 }
 
 function coversPostcode(prefixes: string[], postcode: string | null) {

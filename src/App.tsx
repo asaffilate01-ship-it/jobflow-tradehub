@@ -67,6 +67,8 @@ const AdminAnalyticsPage = lazy(() => import("./pages/AdminAnalyticsPage"));
 const AdminAgentsPage = lazy(() => import("./pages/AdminAgentsPage"));
 const AdminAuditLogPage = lazy(() => import("./pages/AdminAuditLogPage"));
 const AdminRepairProvidersPage = lazy(() => import("./pages/AdminRepairProvidersPage"));
+const AdminTraderDirectoryPage = lazy(() => import("./pages/AdminTraderDirectoryPage"));
+const ClaimTraderProfilePage = lazy(() => import("./pages/ClaimTraderProfilePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -150,6 +152,11 @@ const App = () => (
               <Route path="/home" element={<LandingPage />} />
               <Route path="/marketplace" element={<MarketplacePage />} />
               <Route path="/trader/:id" element={<TraderProfilePage />} />
+              <Route path="/claim-trader/:id" element={
+                <ProtectedRoute>
+                  <ClaimTraderProfilePage />
+                </ProtectedRoute>
+              } />
               <Route path="/post-job" element={
                 <ProtectedRoute>
                   <PostJobPage />
@@ -177,6 +184,7 @@ const App = () => (
               <Route path="/admin/users" element={<AdminUsersPage />} />
               <Route path="/admin/kyc-review" element={<AdminKycPage />} />
               <Route path="/admin/repair-providers" element={<AdminRepairProvidersPage />} />
+              <Route path="/admin/trader-directory" element={<AdminTraderDirectoryPage />} />
               <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
               <Route path="/admin/agents" element={<AdminAgentsPage />} />
               <Route path="/admin/commissions" element={<AgentCommissionsPage />} />

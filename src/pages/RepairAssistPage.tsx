@@ -118,8 +118,8 @@ export default function RepairAssistPage() {
 
         {diagnosis.emergency_stop && (
           <div className="glass-card p-6 space-y-5">
-            <div><h2 className="font-semibold text-lg">Do this now</h2><ul className="mt-2 space-y-2 text-sm">{diagnosis.safety_actions.map((item) => <li key={item}>â€¢ {item}</li>)}</ul></div>
-            <div><h2 className="font-semibold text-lg text-destructive">Do not</h2><ul className="mt-2 space-y-2 text-sm">{diagnosis.prohibited_actions.map((item) => <li key={item}>â€¢ {item}</li>)}</ul></div>
+            <div><h2 className="font-semibold text-lg">Do this now</h2><ul className="mt-2 space-y-2 text-sm">{diagnosis.safety_actions.map((item) => <li key={item}>• {item}</li>)}</ul></div>
+            <div><h2 className="font-semibold text-lg text-destructive">Do not</h2><ul className="mt-2 space-y-2 text-sm">{diagnosis.prohibited_actions.map((item) => <li key={item}>• {item}</li>)}</ul></div>
             <div className="grid gap-3 sm:grid-cols-2">{diagnosis.emergency_contacts.map((contact) => <a key={contact.label} href={`tel:${contact.number.replace(/\s/g, "")}`} className="rounded-xl border border-destructive/20 p-4 hover:bg-destructive/5"><div className="font-semibold">{contact.label}</div><div className="text-xl font-bold text-destructive">{contact.number}</div><div className="text-xs text-muted-foreground">{contact.when}</div></a>)}</div>
           </div>
         )}
@@ -127,19 +127,19 @@ export default function RepairAssistPage() {
         <div className="grid gap-5 md:grid-cols-2">
           <div className="glass-card p-6 space-y-4">
             <div className="flex items-center gap-2"><Sparkles className="h-5 w-5 text-primary" /><h2 className="font-semibold text-lg">Possible causes</h2></div>
-            <ul className="space-y-2 text-sm text-muted-foreground">{diagnosis.probable_causes.map((cause) => <li key={cause}>â€¢ {cause}</li>)}</ul>
+            <ul className="space-y-2 text-sm text-muted-foreground">{diagnosis.probable_causes.map((cause) => <li key={cause}>• {cause}</li>)}</ul>
             <div className="text-sm"><span className="text-muted-foreground">Suggested trade:</span> <strong className="capitalize">{diagnosis.suggested_trade.replace("_", " ")}</strong></div>
           </div>
           <div className="glass-card p-6 space-y-4">
             <div className="flex items-center gap-2"><Wrench className="h-5 w-5 text-primary" /><h2 className="font-semibold text-lg">Indicative repair cost</h2></div>
-            <div className="text-3xl font-bold">Â£{diagnosis.estimated_cost.minimum}â€“Â£{diagnosis.estimated_cost.maximum}</div>
-            <p className="text-sm text-muted-foreground">Typical around Â£{diagnosis.estimated_cost.typical}. {diagnosis.estimated_cost.notice}</p>
+            <div className="text-3xl font-bold">£{diagnosis.estimated_cost.minimum}–£{diagnosis.estimated_cost.maximum}</div>
+            <p className="text-sm text-muted-foreground">Typical around £{diagnosis.estimated_cost.typical}. {diagnosis.estimated_cost.notice}</p>
           </div>
         </div>
 
         <div className="glass-card p-6 space-y-3">
           <div className="flex items-center gap-2"><Wrench className="h-5 w-5 text-primary" /><h2 className="font-semibold text-lg">How it may be repaired</h2></div>
-          <ul className="space-y-2 text-sm text-muted-foreground">{diagnosis.likely_remedies.map((remedy) => <li key={remedy}>â€¢ {remedy}</li>)}</ul>
+          <ul className="space-y-2 text-sm text-muted-foreground">{diagnosis.likely_remedies.map((remedy) => <li key={remedy}>• {remedy}</li>)}</ul>
           <p className="text-xs text-muted-foreground">The attending professional must inspect the property and choose the safe, compliant repair method.</p>
         </div>
 
@@ -180,7 +180,7 @@ export default function RepairAssistPage() {
           <div className="grid gap-3 sm:grid-cols-2"><Input value={form.city} onChange={(event) => set("city", event.target.value)} placeholder="Town or city" /><Input value={form.postcode} onChange={(event) => set("postcode", event.target.value)} placeholder="Postcode" /></div>
           <p className="text-xs text-muted-foreground">Tradespeople receive only the postcode sector initially. The full address is released only after you accept an offer.</p>
         </div>
-        <Button onClick={submit} disabled={submitting} size="lg" className="w-full gap-2 font-semibold">{submitting ? <><Loader2 className="h-4 w-4 animate-spin" />Assessing safelyâ€¦</> : <><Sparkles className="h-4 w-4" />Analyse and find help</>}</Button>
+        <Button onClick={submit} disabled={submitting} size="lg" className="w-full gap-2 font-semibold">{submitting ? <><Loader2 className="h-4 w-4 animate-spin" />Assessing safely…</> : <><Sparkles className="h-4 w-4" />Analyse and find help</>}</Button>
       </div>
     </div>
   );
