@@ -2608,17 +2608,24 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "repair_private_locations_job_id_fkey"
-            columns: ["job_id"]
-            isOneToOne: true
-            referencedRelation: "jobs"
+            foreignKeyName: "repair_private_locations_customer_profile_id_fkey"
+            columns: ["customer_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "repair_private_locations_customer_profile_id_fkey"
             columns: ["customer_profile_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "trader_profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "repair_private_locations_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: true
+            referencedRelation: "jobs"
             referencedColumns: ["id"]
           },
         ]
@@ -3252,7 +3259,6 @@ export type Database = {
           used: number
         }[]
       }
-      current_tier: { Args: never; Returns: string }
       create_repair_job: {
         Args: {
           p_address_line1: string
@@ -3263,6 +3269,7 @@ export type Database = {
         }
         Returns: string
       }
+      current_tier: { Args: never; Returns: string }
       decline_repair_invite: { Args: { p_invite_id: string }; Returns: string }
       decline_repair_offer: { Args: { p_quote_id: string }; Returns: string }
       has_role: {
