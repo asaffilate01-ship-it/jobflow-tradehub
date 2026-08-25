@@ -62,7 +62,7 @@ export default function AdminTraderDirectoryPage() {
     if (profileResult.error) toast.error(profileResult.error.message);
     if (claimResult.error) toast.error(claimResult.error.message);
 
-    const claimRows = (claimResult.data ?? []) as Claim[];
+    const claimRows = (claimResult.data ?? []) as unknown as Claim[];
     const claimantIds = [...new Set(claimRows.map((claim) => claim.claimant_profile_id))];
     const { data: claimantRows } = claimantIds.length
       ? await db.from("profiles").select("id,full_name,email").in("id", claimantIds)
