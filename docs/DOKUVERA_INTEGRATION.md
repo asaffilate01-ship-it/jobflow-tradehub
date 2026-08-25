@@ -219,3 +219,39 @@ Schedule a POST to `/functions/v1/integration-outbox-worker` every minute with t
 - Gas and electrical matching requires verified, unexpired credentials in addition to insurance.
 - Monitor `repair_integration_outbox` retries and `dokuvera_case_links.last_error`.
 - Treat `999` and `0800 111 999` guidance as emergency signposting, not as a booked service.
+
+## Receiving side: what to build in the Dokuvera project
+
+Craftvaro is ready; the Dokuvera project currently has no inbound evidence API. Build there:
+
+### 1. `craftvaro-evidence-intake` (public, `verify_jwt = false`)
+
+- Route: `POST /functions/v1/craftvaro-evidence-intake`, treated by Craftvaro as `{DOKUVERA_API_URL}/v1/cases/upsert` (set `DOKUVERA_API_URL` to `https://<dokuvera-functions-host>/functions/v1/craftvaro-evidence-intake` and have the function ignore any trailing path, or expose a `/v1/cases/upsert` rewrite).
+- Auth: require `Authorization: Bearer <CRAFTVARO_API_TOKEN>` and verify
+  `X-Dokuvera-Signature: sha256=<hex>` as HMAC-SHA256 of the **raw** body using
+  `CRAFTVARO_SIGNING_SECRET`. Compare in constant time. Reject with 401 on mismatch.
+- Idempotency: dedupe on the `Idempotency-Key` header (`craftvaro:<job_uuid>`).
+- Body: the payload documented above (`external_system`, `external_case_id`, `property`,
+  `repair`, `source`, `diagnosis`, `media[]` with short-lived `signed_url`, `offers[]`,
+  `certificates[]`). Download each `signed_url` immediately (10-minute expiry), scan it,
+  redact faces/plates/identifiers, store checksums.
+- Response: `{ "case_id": "...", "status": "synced", "evidence_pack_url": "...", "version": 1 }`.
+
+### 2. Callback to Craftvaro after processing
+
+`POST https://<craftvaro-functions-host>/functions/v1/dokuvera-webhook` with
+`X-Dokuvera-Signature: sha256=<HMAC-SHA256(raw body, CRAFTVARO_WEBHOOK_SECRET)>` and the
+`evidence.processed` body documented above. `redacted_storage_path` must be a derivative
+written into Craftvaro's private `repair-intake` bucket, so Dokuvera also needs Craftvaro
+storage write access (service credentials or a dedicated upload endpoint).
+
+### 3. Credential mapping
+
+| Craftvaro secret | Dokuvera secret | Who generates |
+| --- | --- | --- |
+| `DOKUVERA_API_URL` | n/a (its own function URL) | Dokuvera project |
+| `DOKUVERA_API_TOKEN` | `CRAFTVARO_API_TOKEN` | one random value, saved in both |
+| `DOKUVERA_SIGNING_SECRET` | `CRAFTVARO_SIGNING_SECRET` | one random value, saved in both |
+| `DOKUVERA_WEBHOOK_SECRET` | `CRAFTVARO_WEBHOOK_SECRET` | one random value, saved in both |
+
+Generate each with `openssl rand -hex 32` and store the identical string on both sides.
