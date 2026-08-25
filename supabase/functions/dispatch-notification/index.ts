@@ -164,6 +164,110 @@ Deno.serve(async (req) => {
   }
 });
 
+type AdminClient = ReturnType<typeof createClient>;
+
+async function paidSubscriberIds(supabase: AdminClient, userIds: string[]): Promise<string[]> {
+  if (!userIds.length) return [];
+  const { data } = await supabase
+    .from("subscribers")
+    .select("user_id,subscription_end")
+    .in("user_id", userIds)
+    .eq("subscribed", true)
+    .neq("tier", "free");
+  const now = Date.now();
+  return (data ?? [])
+    .filter((subscriber: { user_id: string | null; subscription_end: string | null }) =>
+      subscriber.user_id && (!subscriber.subscription_end || new Date(subscriber.subscription_end).getTime() > now))
+    .map((subscriber: { user_id: string }) => subscriber.user_id);
+}
+
+async function matchedPaidTraderIds(supabase: AdminClient, senderId: string, jobId: string): Promise<string[]> {
+  const { data: job } = await supabase
+    .from("jobs")
+    .select("customer_profile_id,requested_trade,postcode")
+    .eq("id", jobId)
+    .eq("customer_profile_id", senderId)
+    .maybeSingle();
+  if (!job) throw new Error("Job not found or not owned by caller");
+
+  const { data: repairProfiles } = await supabase
+    .from("trade_repair_profiles")
+    .select("trade_company_id,service_postcode_prefixes,insurance_expires_at")
+    .eq("trade", job.requested_trade)
+    .eq("available", true)
+    .eq("capability_verified", true)
+    .eq("insurance_verified", true)
+    .limit(250);
+  const today = new Date().toISOString().slice(0, 10);
+  const postcode = normaliseArea(job.postcode ?? "");
+  const companyIds = (repairProfiles ?? [])
+    .filter((profile: { service_postcode_prefixes: string[] | null; insurance_expires_at: string | null }) =>
+      (!profile.insurance_expires_at || profile.insurance_expires_at >= today) &&
+      (profile.service_postcode_prefixes ?? []).some((prefix) => postcode.startsWith(normaliseArea(prefix))))
+    .map((profile: { trade_company_id: string }) => profile.trade_company_id);
+  if (!companyIds.length) return [];
+
+  const { data: companies } = await supabase
+    .from("trade_companies")
+    .select("owner_profile_id")
+    .in("id", companyIds);
+  return paidSubscriberIds(supabase, (companies ?? []).map((company: { owner_profile_id: string }) => company.owner_profile_id));
+}
+
+async function canNotifyRecipient(supabase: AdminClient, senderId: string, recipientId: string): Promise<boolean> {
+  if (senderId === recipientId) return true;
+
+  const { data: conversation } = await supabase
+    .from("messages")
+    .select("id")
+    .or(`and(sender_id.eq.${senderId},recipient_id.eq.${recipientId}),and(sender_id.eq.${recipientId},recipient_id.eq.${senderId})`)
+    .limit(1)
+    .maybeSingle();
+  if (conversation) return true;
+
+  const [{ data: senderCompanies }, { data: recipientCompanies }] = await Promise.all([
+    supabase.from("trade_companies").select("id").eq("owner_profile_id", senderId),
+    supabase.from("trade_companies").select("id").eq("owner_profile_id", recipientId),
+  ]);
+
+  const senderCompanyIds = (senderCompanies ?? []).map((company: { id: string }) => company.id);
+  if (senderCompanyIds.length) {
+    const { data: quote } = await supabase
+      .from("quotes")
+      .select("id,jobs!inner(customer_profile_id)")
+      .in("trade_company_id", senderCompanyIds)
+      .eq("jobs.customer_profile_id", recipientId)
+      .limit(1)
+      .maybeSingle();
+    if (quote) return true;
+  }
+
+  const recipientCompanyIds = (recipientCompanies ?? []).map((company: { id: string }) => company.id);
+  if (recipientCompanyIds.length) {
+    const { data: quote } = await supabase
+      .from("quotes")
+      .select("id,jobs!inner(customer_profile_id)")
+      .in("trade_company_id", recipientCompanyIds)
+      .eq("jobs.customer_profile_id", senderId)
+      .limit(1)
+      .maybeSingle();
+    if (quote) return true;
+  }
+
+  const { data: delivery } = await supabase
+    .from("deliveries")
+    .select("id,material_orders!inner(created_by)")
+    .eq("driver_profile_id", senderId)
+    .eq("material_orders.created_by", recipientId)
+    .limit(1)
+    .maybeSingle();
+  return Boolean(delivery);
+}
+
+function normaliseArea(value: string): string {
+  return value.toUpperCase().replace(/\s+/g, "");
+}
+
 /* ────────── Email helpers ────────── */
 
 async function sendEmail(
@@ -183,22 +287,38 @@ async function sendEmail(
     return { success: false, error: "No email on profile" };
   }
 
-  // Try to queue via email infrastructure if available
+  const apiKey = Deno.env.get("RESEND_API_KEY");
+  const from = Deno.env.get("EMAIL_FROM");
+  if (!apiKey || !from) return { success: false, error: "RESEND_API_KEY and EMAIL_FROM not configured" };
+
   try {
-    const { error } = await supabase.rpc("send_email_message", {
-      p_to: profile.email,
-      p_subject: subject,
-      p_html: `<p>Hi ${profile.full_name || "there"},</p><p>${body}</p><p>— Craftvaro</p>`,
-      p_from_name: "Craftvaro",
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from,
+        to: [profile.email],
+        subject,
+        html: `<p>Hi ${escapeHtml(profile.full_name || "there")},</p><p>${escapeHtml(body).replace(/\n/g, "<br>")}</p><p>— Craftvaro</p>`,
+      }),
     });
-    if (error) throw error;
+    if (!response.ok) throw new Error(`Email provider returned ${response.status}`);
     return { success: true };
-  } catch {
-    // Email infra not set up yet — log and return gracefully
-    console.log(`[Email] Would send to ${profile.email}: ${subject}`);
-    return { success: false, error: "Email infrastructure not configured yet" };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : "Email send failed" };
   }
 }
+
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
+  })[character] ?? character);
+}
+
 
 async function sendBulkEmail(
   supabase: any,
