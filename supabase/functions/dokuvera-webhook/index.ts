@@ -6,9 +6,14 @@ Deno.serve(async (req) => {
   const admin = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "");
   try {
     const raw = await req.text();
-    const supplied = (req.headers.get("X-Dokuvera-Signature") ?? "").replace("sha256=", "");
+    const supplied = (req.headers.get("X-Dokuvera-Signature") ?? req.headers.get("X-Craftvaro-Signature") ?? "").replace("sha256=", "");
+    const timestamp = req.headers.get("X-Craftvaro-Timestamp") ?? req.headers.get("X-Dokuvera-Timestamp");
     const secret = Deno.env.get("DOKUVERA_WEBHOOK_SECRET");
-    if (!secret || !supplied || !(await verifyHmac(secret, raw, supplied))) throw new Error("Invalid webhook signature");
+    if (!secret || !supplied) throw new Error("Invalid webhook signature");
+    const signedOk = (await verifyHmac(secret, raw, supplied))
+      || (!!timestamp && (await verifyHmac(secret, `${timestamp}.${raw}`, supplied)));
+    if (!signedOk) throw new Error("Invalid webhook signature");
+
     const event = JSON.parse(raw);
     if (!event.event_id || !event.job_id || !event.event_type) throw new Error("event_id, job_id and event_type are required");
     const idempotencyKey = `dokuvera.webhook:${event.event_id}`;
