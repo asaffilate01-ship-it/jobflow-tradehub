@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Craftvaro</string>
+    <string name="title_activity_main">Craftvaro</string>
+    <string name="package_name">com.craftvaro.app</string>
+    <string name="custom_url_scheme">com.craftvaro.app</string>
+</resources>

@@ -1,14 +1,14 @@
 // Stripe subscription tier configuration
 export const SUBSCRIPTION_TIERS = {
   free: {
-    name: "Free",
+    name: "Registration",
     price: 0,
     product_id: null,
     price_id: null,
     features: [
-      "Browse marketplace",
-      "View basic job details (title, area, trade)",
-      "Post jobs (customers)",
+      "Create your trader account",
+      "Complete identity and credential verification",
+      "Upgrade to appear in searches and receive opportunities",
     ],
   },
   basic: {
@@ -17,7 +17,7 @@ export const SUBSCRIPTION_TIERS = {
     product_id: "prod_UG3HuFk33raDJ1",
     price_id: "price_1THXB3PFw8eRtNbtl1PvsPQy",
     features: [
-      "Everything in Free",
+      "Active Craftvaro marketplace membership",
       "Marketplace profile card",
       "Full job details & customer contact",
       "Submit quotes on jobs",

@@ -99,7 +99,7 @@ const MarketplacePage = () => {
             </Badge>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Find a Tradesperson</h1>
             <p className="text-sm text-muted-foreground max-w-lg">
-              Browse verified, rated tradespeople across the UK. Compare profiles, check reviews, and get quotes.
+              Browse verified, subscribing Craftvaro tradespeople across the UK. Compare profiles, check reviews, and get quotes.
             </p>
           </div>
           <div className="flex gap-2 shrink-0">

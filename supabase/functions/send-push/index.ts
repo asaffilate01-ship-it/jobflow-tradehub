@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import webpush from "npm:web-push@3.6.7";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -141,6 +142,14 @@ Deno.serve(async (req) => {
 
     if (!user_id || !title) {
       throw new Error("user_id and title are required");
+    }
+
+    const { data: isAdmin } = await supabase.rpc("has_role", {
+      _user_id: user.id,
+      _role: "admin",
+    });
+    if (user_id !== user.id && !isAdmin) {
+      throw new Error("Not authorised to send push notifications to this user");
     }
 
     // Get all push subscriptions for the target user

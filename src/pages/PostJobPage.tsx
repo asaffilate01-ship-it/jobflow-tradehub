@@ -96,6 +96,7 @@ const PostJobPage = () => {
     // Alert matching trades + confirm to the customer
     await notifyRole({
       audienceRole: "trade",
+      jobId: inserted?.id,
       title: "New job posted",
       body: `${form.title} — ${form.city} ${form.postcode}`,
       link: inserted?.id ? `/jobs/${inserted.id}` : "/jobs",

@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { NavLink } from "@/components/NavLink";
 import {
   LayoutDashboard, Users, Shield, BarChart3, UserCheck,
-  DollarSign, LogOut, Radio, ScrollText,
+  DollarSign, LogOut, Radio, ScrollText, Wrench,
 } from "lucide-react";
 import craftvaroLogo from "@/assets/craftvaro-logo.png";
 import NotificationBell from "@/components/NotificationBell";
@@ -21,6 +21,7 @@ const navGroups = [
       { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
       { to: "/admin/users", label: "Users", icon: Users },
       { to: "/admin/kyc-review", label: "KYC Review", icon: Shield },
+      { to: "/admin/repair-providers", label: "Repair Providers", icon: Wrench },
       { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
       { to: "/admin/audit-log", label: "Audit Log", icon: ScrollText },
     ],

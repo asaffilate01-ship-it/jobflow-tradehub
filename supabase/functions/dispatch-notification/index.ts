@@ -48,25 +48,49 @@ Deno.serve(async (req) => {
     if (!user) throw new Error("Not authenticated");
 
     const body = await req.json();
-    const channels: string[] = body.channels ?? ["in_app"];
+    const allowedChannels = new Set(["in_app", "email", "sms"]);
+    const channels: string[] = [...new Set(body.channels ?? ["in_app"])]
+      .filter((channel): channel is string => allowedChannels.has(channel));
+    const title = String(body.title ?? "").trim().slice(0, 120);
+    const notificationBody = body.body == null ? null : String(body.body).trim().slice(0, 2000);
+    if (!title) throw new Error("title is required");
+    if (!channels.length) throw new Error("At least one valid notification channel is required");
+
+    const { data: isAdmin } = await supabase.rpc("has_role", {
+      _user_id: user.id,
+      _role: "admin",
+    });
     const results: { channel: string; success: boolean; error?: string }[] = [];
 
     if (body.broadcast) {
-      // Broadcast to all users with a given role
-      const { data: roleUsers } = await supabase
-        .from("user_roles")
-        .select("user_id")
-        .eq("role", body.audience_role);
+      const audienceRole = String(body.audience_role ?? "");
+      let recipientIds: string[];
+      if (isAdmin) {
+        const { data: roleUsers } = await supabase
+          .from("user_roles")
+          .select("user_id")
+          .eq("role", audienceRole);
+        recipientIds = (roleUsers ?? []).map((roleUser: { user_id: string }) => roleUser.user_id);
+        if (audienceRole === "trade") {
+          recipientIds = await paidSubscriberIds(supabase, recipientIds);
+        }
+      } else {
+        if (audienceRole !== "trade" || body.type !== "job_posted" || !body.job_id) {
+          throw new Error("Administrator access required for broadcasts");
+        }
+        recipientIds = await matchedPaidTraderIds(supabase, user.id, String(body.job_id));
+      }
 
-      const recipientIds = (roleUsers ?? []).map((r: any) => r.user_id);
+      // Prevent accidental or malicious fan-out from becoming an unbounded bill.
+      recipientIds = [...new Set(recipientIds)].slice(0, isAdmin ? 1000 : 100);
 
       for (const channel of channels) {
         if (channel === "in_app") {
           // Insert notification for each recipient
           const notifications = recipientIds.map((rid: string) => ({
             recipient_id: rid,
-            title: body.title,
-            body: body.body ?? null,
+            title,
+            body: notificationBody,
             link: body.link ?? null,
             type: body.type ?? "broadcast",
           }));
@@ -85,10 +109,10 @@ Deno.serve(async (req) => {
           }
         } else if (channel === "email") {
           // Queue emails for each recipient
-          const sent = await sendBulkEmail(supabase, recipientIds, body.title, body.body ?? "");
+          const sent = await sendBulkEmail(supabase, recipientIds, title, notificationBody ?? "");
           results.push({ channel: "email", ...sent });
         } else if (channel === "sms") {
-          const sent = await sendBulkSms(supabase, recipientIds, body.title, body.body ?? "");
+          const sent = await sendBulkSms(supabase, recipientIds, title, notificationBody ?? "");
           results.push({ channel: "sms", ...sent });
         }
       }
@@ -96,6 +120,9 @@ Deno.serve(async (req) => {
       // Single recipient notification
       const recipientId = body.recipient_id;
       if (!recipientId) throw new Error("recipient_id is required");
+      if (!isAdmin && !(await canNotifyRecipient(supabase, user.id, recipientId))) {
+        throw new Error("Not authorised to notify this user");
+      }
 
       for (const channel of channels) {
         if (channel === "in_app") {
@@ -103,8 +130,8 @@ Deno.serve(async (req) => {
             .from("notifications")
             .insert({
               recipient_id: recipientId,
-              title: body.title,
-              body: body.body ?? null,
+              title,
+              body: notificationBody,
               link: body.link ?? null,
               type: body.type ?? "general",
             });
@@ -114,10 +141,10 @@ Deno.serve(async (req) => {
             error: insertErr?.message,
           });
         } else if (channel === "email") {
-          const sent = await sendEmail(supabase, recipientId, body.title, body.body ?? "");
+          const sent = await sendEmail(supabase, recipientId, title, notificationBody ?? "");
           results.push({ channel: "email", ...sent });
         } else if (channel === "sms") {
-          const sent = await sendSms(supabase, recipientId, body.title, body.body ?? "");
+          const sent = await sendSms(supabase, recipientId, title, notificationBody ?? "");
           results.push({ channel: "sms", ...sent });
         }
       }
@@ -186,7 +213,7 @@ async function sendBulkEmail(
     if (result.success) sent++;
     else failed++;
   }
-  return { success: true, error: `Sent: ${sent}, Failed: ${failed}` };
+  return { success: failed === 0, error: failed ? `Sent: ${sent}, Failed: ${failed}` : undefined };
 }
 
 /* ────────── SMS helpers ────────── */
@@ -258,5 +285,5 @@ async function sendBulkSms(
     if (result.success) sent++;
     else failed++;
   }
-  return { success: true, error: `Sent: ${sent}, Failed: ${failed}` };
+  return { success: failed === 0, error: failed ? `Sent: ${sent}, Failed: ${failed}` : undefined };
 }

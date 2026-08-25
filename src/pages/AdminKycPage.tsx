@@ -105,7 +105,7 @@ const AdminKycPage = () => {
     setUpdating(true);
     const { error } = await supabase
       .from("profiles")
-      .update({ kyc_status: status })
+      .update({ kyc_status: status, verified: status === "approved" })
       .eq("id", userId);
 
     if (error) {

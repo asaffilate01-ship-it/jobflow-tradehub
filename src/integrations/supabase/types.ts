@@ -2092,6 +2092,8 @@ export type Database = {
           is_active: boolean
           kyc_documents: Json | null
           kyc_status: string
+          marketplace_visible: boolean
+          marketplace_visible_until: string | null
           phone: string | null
           phone_verified: boolean
           rating: number | null
@@ -2114,6 +2116,8 @@ export type Database = {
           is_active?: boolean
           kyc_documents?: Json | null
           kyc_status?: string
+          marketplace_visible?: boolean
+          marketplace_visible_until?: string | null
           phone?: string | null
           phone_verified?: boolean
           rating?: number | null
@@ -2136,6 +2140,8 @@ export type Database = {
           is_active?: boolean
           kyc_documents?: Json | null
           kyc_status?: string
+          marketplace_visible?: boolean
+          marketplace_visible_until?: string | null
           phone?: string | null
           phone_verified?: boolean
           rating?: number | null
@@ -2536,6 +2542,7 @@ export type Database = {
           id: string
           idempotency_key: string
           last_error: string | null
+          next_attempt_at: string
           payload: Json
           status: string
         }
@@ -2550,6 +2557,7 @@ export type Database = {
           id?: string
           idempotency_key: string
           last_error?: string | null
+          next_attempt_at?: string
           payload?: Json
           status?: string
         }
@@ -2564,10 +2572,56 @@ export type Database = {
           id?: string
           idempotency_key?: string
           last_error?: string | null
+          next_attempt_at?: string
           payload?: Json
           status?: string
         }
         Relationships: []
+      }
+      repair_private_locations: {
+        Row: {
+          address_line1: string
+          city: string
+          created_at: string
+          customer_profile_id: string
+          job_id: string
+          postcode: string
+          updated_at: string
+        }
+        Insert: {
+          address_line1: string
+          city: string
+          created_at?: string
+          customer_profile_id: string
+          job_id: string
+          postcode: string
+          updated_at?: string
+        }
+        Update: {
+          address_line1?: string
+          city?: string
+          created_at?: string
+          customer_profile_id?: string
+          job_id?: string
+          postcode?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repair_private_locations_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: true
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "repair_private_locations_customer_profile_id_fkey"
+            columns: ["customer_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reviews: {
         Row: {
@@ -3199,6 +3253,16 @@ export type Database = {
         }[]
       }
       current_tier: { Args: never; Returns: string }
+      create_repair_job: {
+        Args: {
+          p_address_line1: string
+          p_city: string
+          p_description: string
+          p_postcode: string
+          p_title: string
+        }
+        Returns: string
+      }
       decline_repair_invite: { Args: { p_invite_id: string }; Returns: string }
       decline_repair_offer: { Args: { p_quote_id: string }; Returns: string }
       has_role: {

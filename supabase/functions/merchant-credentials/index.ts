@@ -6,12 +6,17 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Simple AES-GCM encryption using Web Crypto API
-async function getKey(): Promise<CryptoKey> {
-  const secret = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+const CURRENT_PREFIX = "v2:";
+
+// Credentials use a dedicated secret so rotating the Supabase service-role key
+// does not make merchant passwords unreadable.
+async function getKey(secretName: "MERCHANT_CREDENTIALS_ENCRYPTION_KEY" | "SUPABASE_SERVICE_ROLE_KEY"): Promise<CryptoKey> {
+  const secret = Deno.env.get(secretName);
+  if (!secret) throw new Error(`${secretName} not configured`);
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(secret));
   const keyMaterial = await crypto.subtle.importKey(
     "raw",
-    new TextEncoder().encode(secret.slice(0, 32).padEnd(32, "0")),
+    digest,
     "AES-GCM",
     false,
     ["encrypt", "decrypt"]
@@ -20,7 +25,7 @@ async function getKey(): Promise<CryptoKey> {
 }
 
 async function encrypt(text: string): Promise<string> {
-  const key = await getKey();
+  const key = await getKey("MERCHANT_CREDENTIALS_ENCRYPTION_KEY");
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const encoded = new TextEncoder().encode(text);
   const ciphertext = await crypto.subtle.encrypt(
@@ -31,20 +36,7 @@ async function encrypt(text: string): Promise<string> {
   const combined = new Uint8Array(iv.length + new Uint8Array(ciphertext).length);
   combined.set(iv);
   combined.set(new Uint8Array(ciphertext), iv.length);
-  return btoa(String.fromCharCode(...combined));
-}
-
-async function decrypt(base64: string): Promise<string> {
-  const key = await getKey();
-  const combined = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
-  const iv = combined.slice(0, 12);
-  const ciphertext = combined.slice(12);
-  const decrypted = await crypto.subtle.decrypt(
-    { name: "AES-GCM", iv },
-    key,
-    ciphertext
-  );
-  return new TextDecoder().decode(decrypted);
+  return `${CURRENT_PREFIX}${btoa(String.fromCharCode(...combined))}`;
 }
 
 Deno.serve(async (req) => {
@@ -58,7 +50,8 @@ Deno.serve(async (req) => {
   );
 
   try {
-    const authHeader = req.headers.get("Authorization")!;
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new Error("Missing authorization header");
     const token = authHeader.replace("Bearer ", "");
     const { data: { user } } = await supabase.auth.getUser(token);
     if (!user) throw new Error("Not authenticated");
@@ -120,11 +113,25 @@ Deno.serve(async (req) => {
       // Return whether credentials exist (never return the password)
       if (!trade_account_id) throw new Error("trade_account_id required");
 
-      const { data: account } = await supabase
+      const adminClient = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+      );
+      const { data: account } = await adminClient
         .from("trade_accounts")
-        .select("portal_url, portal_username, encrypted_credentials")
+        .select("portal_url, portal_username, encrypted_credentials, trade_company_id")
         .eq("id", trade_account_id)
         .single();
+
+      if (!account) throw new Error("Trade account not found");
+      const { data: company } = await adminClient
+        .from("trade_companies")
+        .select("owner_profile_id")
+        .eq("id", account.trade_company_id)
+        .single();
+      if (company?.owner_profile_id !== user.id) {
+        throw new Error("Not authorised to view this account");
+      }
 
       return new Response(
         JSON.stringify({

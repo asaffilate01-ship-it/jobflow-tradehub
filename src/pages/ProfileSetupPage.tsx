@@ -35,6 +35,9 @@ const ProfileSetupPage = () => {
   const [serviceRadius, setServiceRadius] = useState(25);
   const [yearsExp, setYearsExp] = useState(5);
   const [tradeBodies, setTradeBodies] = useState("");
+  const [serviceAreas, setServiceAreas] = useState("");
+  const [acceptingWork, setAcceptingWork] = useState(true);
+  const [emergencyWork, setEmergencyWork] = useState(false);
 
   // Driver fields
   const [vehicleType, setVehicleType] = useState<VehicleType>("small_van");
@@ -78,12 +81,44 @@ const ProfileSetupPage = () => {
 
     // Create trade company
     if (isTrade) {
-      const { error: compErr } = await supabase.from("trade_companies").insert({
-        legal_name: companyName || "My Company",
-        owner_profile_id: user.id,
-      });
-      if (compErr && !compErr.message.includes("duplicate")) {
-        toast.error(compErr.message);
+      const { data: existingCompany } = await supabase
+        .from("trade_companies")
+        .select("id")
+        .eq("owner_profile_id", user.id)
+        .limit(1)
+        .maybeSingle();
+      let companyId = existingCompany?.id;
+      if (companyId) {
+        const { error: companyUpdateError } = await supabase
+          .from("trade_companies")
+          .update({ legal_name: companyName || "My Company" })
+          .eq("id", companyId);
+        if (companyUpdateError) toast.error(companyUpdateError.message);
+      } else {
+        const { data: newCompany, error: compErr } = await supabase.from("trade_companies").insert({
+          legal_name: companyName || "My Company",
+          owner_profile_id: user.id,
+        }).select("id").single();
+        if (compErr) toast.error(compErr.message);
+        companyId = newCompany?.id;
+      }
+
+      if (companyId) {
+        const prefixes = serviceAreas
+          .split(",")
+          .map((area) => area.trim().toUpperCase().replace(/\s+/g, ""))
+          .filter(Boolean)
+          .slice(0, 30);
+        const { error: repairProfileError } = await supabase
+          .from("trade_repair_profiles")
+          .upsert({
+            trade_company_id: companyId,
+            trade: tradeSpecialism,
+            service_postcode_prefixes: prefixes,
+            available: acceptingWork,
+            emergency_work: emergencyWork,
+          }, { onConflict: "trade_company_id,trade" });
+        if (repairProfileError) toast.error(repairProfileError.message);
       }
     }
 
@@ -149,6 +184,21 @@ const ProfileSetupPage = () => {
                   <label className="text-sm font-medium text-muted-foreground">Years experience</label>
                   <Input type="number" value={yearsExp} onChange={(e) => setYearsExp(Number(e.target.value))} min={0} />
                 </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-muted-foreground">Postcode areas served</label>
+                <Input placeholder="NW6, NW3, W9" value={serviceAreas} onChange={(e) => setServiceAreas(e.target.value)} required />
+                <p className="text-xs text-muted-foreground">Comma-separated postcode districts or areas. Only subscribed, verified traders are matched.</p>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="flex items-center gap-2 rounded-lg border border-border p-3 text-sm">
+                  <input type="checkbox" checked={acceptingWork} onChange={(e) => setAcceptingWork(e.target.checked)} />
+                  Accepting work now
+                </label>
+                <label className="flex items-center gap-2 rounded-lg border border-border p-3 text-sm">
+                  <input type="checkbox" checked={emergencyWork} onChange={(e) => setEmergencyWork(e.target.checked)} />
+                  Emergency call-outs
+                </label>
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-muted-foreground">Services offered</label>

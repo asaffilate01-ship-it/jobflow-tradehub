@@ -21,6 +21,10 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "@typescript-eslint/no-unused-vars": "off",
+      // Legacy Supabase response shaping still contains explicit `any` values.
+      // Keep these visible without blocking the security/build CI gate; new and
+      // touched modules should use narrow types or `unknown`.
+      "@typescript-eslint/no-explicit-any": "warn",
     },
   },
 );

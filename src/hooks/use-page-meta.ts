@@ -21,7 +21,7 @@ export function usePageMeta(title: string, description?: string) {
       tag.setAttribute("content", description);
     }
 
-    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    const canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
     if (canonical) canonical.href = `${window.location.origin}${window.location.pathname}`;
   }, [title, description]);
 }

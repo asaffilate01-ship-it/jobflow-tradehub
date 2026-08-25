@@ -7,7 +7,11 @@
     "dev": "vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint .",
+    "mobile:sync": "npm run build && cap sync",
+    "mobile:android": "cap open android",
+    "mobile:ios": "cap open ios",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest"

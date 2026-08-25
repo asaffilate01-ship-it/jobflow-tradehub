@@ -36,7 +36,6 @@ export default function RepairAssistPage() {
   usePageMeta("AI Repair Assist", "Upload photos or video, understand the likely issue and request offers from verified local tradespeople.");
   const { user } = useAuth();
   const navigate = useNavigate();
-  const db = supabase as any;
   const [form, setForm] = useState({ category: "Water or leak", description: "", address: "", city: "", postcode: "", mode: "compare" });
   const [files, setFiles] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -59,20 +58,16 @@ export default function RepairAssistPage() {
     setSubmitting(true);
     let jobId: string | null = null;
     try {
-      const sector = postcodeSector(form.postcode);
-      const { data: job, error: jobError } = await db.from("jobs").insert({
-        customer_profile_id: user.id,
-        requested_trade: "other",
-        title: form.category,
-        description: form.description.trim(),
-        address_line1: form.address.trim(),
-        city: form.city.trim(),
-        postcode: form.postcode.trim().toUpperCase(),
-        postcode_sector: sector,
-        job_kind: "repair",
-        status: "posted",
-      }).select("id").single();
+      const { data: createdJobId, error: jobError } = await supabase.rpc("create_repair_job", {
+        p_title: form.category,
+        p_description: form.description.trim(),
+        p_address_line1: form.address.trim(),
+        p_city: form.city.trim(),
+        p_postcode: form.postcode.trim().toUpperCase(),
+      });
       if (jobError) throw jobError;
+      if (!createdJobId) throw new Error("Repair job could not be created");
+      const job = { id: createdJobId as string };
       jobId = job.id;
 
       for (const file of files) {
@@ -80,7 +75,7 @@ export default function RepairAssistPage() {
         const path = `${user.id}/${job.id}/${crypto.randomUUID()}_${safeName}`;
         const { error: uploadError } = await supabase.storage.from("repair-intake").upload(path, file, { upsert: false });
         if (uploadError) throw uploadError;
-        const { error: mediaError } = await db.from("repair_intake_media").insert({
+        const { error: mediaError } = await supabase.from("repair_intake_media").insert({
           job_id: job.id,
           uploaded_by: user.id,
           storage_path: path,
