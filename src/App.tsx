@@ -100,6 +100,13 @@ const App = () => (
               </ProtectedRoute>
             } />
 
+            {/* Shared job routes use a role-aware shell to avoid duplicate-route redirects. */}
+            <Route element={<RoleAwareJobsLayout />}>
+              <Route path="/jobs" element={<JobsPage />} />
+              <Route path="/jobs/:id" element={<JobDetailPage />} />
+            </Route>
+
+
             {/* Full-screen camera (outside layout — no sidebar/nav) */}
             <Route path="/site-evidence/:jobId/camera" element={
               <ProtectedRoute allowedRoles={["trade", "admin"]}>
