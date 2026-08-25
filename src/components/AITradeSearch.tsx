@@ -24,6 +24,7 @@ type Match = {
   emergency_work: boolean;
   capability_verified: boolean;
   insurance_verified: boolean;
+  subscription_verified: boolean;
   credential: string | null;
   coverage: string;
 };
@@ -83,8 +84,8 @@ const AITradeSearch = () => {
             </Badge>
             <h2 className="text-lg font-bold">Describe exactly who you need</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              The agent understands trade, UK postcode, verified credentials, availability,
-              emergency work and rating.
+              Search verified Craftvaro subscribers by trade, UK postcode, credentials,
+              availability, emergency work and rating.
             </p>
           </div>
           {result?.quota && (
@@ -178,6 +179,11 @@ const AITradeSearch = () => {
                       <Badge variant="outline" className="border-success/40 text-success">
                         <ShieldCheck className="mr-1 h-3 w-3" /> Insured
                       </Badge>
+                      {match.subscription_verified && (
+                        <Badge variant="outline" className="border-primary/40 text-primary">
+                          Craftvaro member
+                        </Badge>
+                      )}
                       {match.credential && (
                         <Badge variant="outline">{match.credential}</Badge>
                       )}

@@ -25,11 +25,18 @@ Deno.serve(async (req) => {
   const supabase = createClient(supabaseUrl, serviceKey);
 
   try {
-    // This can be called via cron (no auth) or by admin (with auth)
+    // Scheduled calls must provide the private cron secret. Interactive calls
+    // must carry an authenticated administrator token.
     const authHeader = req.headers.get("Authorization");
-    
-    if (authHeader) {
-      // If auth header present, verify it's an admin
+    const suppliedCronSecret = req.headers.get("x-cron-secret");
+    const configuredCronSecret = Deno.env.get("SCHEDULED_SYNC_SECRET");
+    const validCronCall = Boolean(
+      configuredCronSecret && suppliedCronSecret &&
+      constantTimeEqual(configuredCronSecret, suppliedCronSecret),
+    );
+
+    if (!validCronCall) {
+      if (!authHeader) throw new Error("Missing scheduled-task authentication");
       const token = authHeader.replace("Bearer ", "");
       const { data: { user } } = await supabase.auth.getUser(token);
       if (!user) throw new Error("Not authenticated");
@@ -100,3 +107,15 @@ Deno.serve(async (req) => {
     );
   }
 });
+
+function constantTimeEqual(left: string, right: string): boolean {
+  const encoder = new TextEncoder();
+  const a = encoder.encode(left);
+  const b = encoder.encode(right);
+  let mismatch = a.length ^ b.length;
+  const length = Math.max(a.length, b.length);
+  for (let index = 0; index < length; index++) {
+    mismatch |= (a[index % a.length] ?? 0) ^ (b[index % b.length] ?? 0);
+  }
+  return mismatch === 0;
+}

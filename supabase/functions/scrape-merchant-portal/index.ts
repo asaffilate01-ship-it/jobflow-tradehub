@@ -27,11 +27,13 @@ const corsHeaders = {
 
 // ── Crypto helpers (same as merchant-credentials) ──
 
-async function getKey(): Promise<CryptoKey> {
-  const secret = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+async function getKey(secretName: "MERCHANT_CREDENTIALS_ENCRYPTION_KEY" | "SUPABASE_SERVICE_ROLE_KEY"): Promise<CryptoKey> {
+  const secret = Deno.env.get(secretName);
+  if (!secret) throw new Error(`${secretName} not configured`);
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(secret));
   return await crypto.subtle.importKey(
     "raw",
-    new TextEncoder().encode(secret.slice(0, 32).padEnd(32, "0")),
+    digest,
     "AES-GCM",
     false,
     ["decrypt"],
@@ -39,8 +41,10 @@ async function getKey(): Promise<CryptoKey> {
 }
 
 async function decrypt(base64: string): Promise<string> {
-  const key = await getKey();
-  const combined = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+  const currentFormat = base64.startsWith("v2:");
+  const key = await getKey(currentFormat ? "MERCHANT_CREDENTIALS_ENCRYPTION_KEY" : "SUPABASE_SERVICE_ROLE_KEY");
+  const encoded = currentFormat ? base64.slice(3) : base64;
+  const combined = Uint8Array.from(atob(encoded), (c) => c.charCodeAt(0));
   const iv = combined.slice(0, 12);
   const ciphertext = combined.slice(12);
   const decrypted = await crypto.subtle.decrypt(

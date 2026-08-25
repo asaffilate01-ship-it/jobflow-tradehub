@@ -1,13 +1,11 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.27b4c13232814ca4a9137ce0f7915510',
+  appId: 'com.craftvaro.app',
   appName: 'Craftvaro',
   webDir: 'dist',
-  server: {
-    url: 'https://27b4c132-3281-4ca4-a913-7ce0f7915510.lovableproject.com?forceHideBadge=true',
-    cleartext: true,
-  },
+  // Production mobile builds package the audited `dist` output. Do not point
+  // release binaries at a mutable preview URL or permit clear-text traffic.
 };
 
 export default config;

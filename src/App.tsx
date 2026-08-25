@@ -1,13 +1,14 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
+import { lazy, Suspense } from "react";
 
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import SmartOrderPage from "./pages/SmartOrderPage";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "./contexts/AuthContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import AppLayout from "./components/AppLayout";
+import RoleAwareJobsLayout from "./components/RoleAwareJobsLayout";
 import ScrollToTop from "./components/ScrollToTop";
 import TraderLayout from "./components/TraderLayout";
 import DriverLayout from "./components/DriverLayout";
@@ -17,54 +18,56 @@ import TierGate from "./components/TierGate";
 
 import PromoGate, { UnlockScreen } from "./components/PromoGate";
 import PromoHomePage from "./pages/PromoHomePage";
-import LandingPage from "./pages/LandingPage";
-
-import JobsPage from "./pages/JobsPage";
-import JobDetailPage from "./pages/JobDetailPage";
-import SubmitQuotePage from "./pages/SubmitQuotePage";
-import MaterialsPage from "./pages/MaterialsPage";
-import DeliveriesPage from "./pages/DeliveriesPage";
-import MarketplacePage from "./pages/MarketplacePage";
-import TraderProfilePage from "./pages/TraderProfilePage";
-import TraderDashboard from "./pages/TraderDashboard";
-import TradeAccountsPage from "./pages/TradeAccountsPage";
-import ProfileSetupPage from "./pages/ProfileSetupPage";
-import LoginPage from "./pages/LoginPage";
-import SignupPage from "./pages/SignupPage";
-import SubscriptionPage from "./pages/SubscriptionPage";
-import MessagesPage from "./pages/MessagesPage";
-import SiteEvidencePage from "./pages/SiteEvidencePage";
-import SiteEvidenceProjectPage from "./pages/SiteEvidenceProjectPage";
-import EvidenceCameraPage from "./pages/EvidenceCameraPage";
-import EvidenceGalleryPage from "./pages/EvidenceGalleryPage";
-import ComplianceCertsPage from "./pages/ComplianceCertsPage";
-import PostJobPage from "./pages/PostJobPage";
-import RepairAssistPage from "./pages/RepairAssistPage";
-import RepairOpportunitiesPage from "./pages/RepairOpportunitiesPage";
-import DriverDashboard from "./pages/DriverDashboard";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
-import BroadcastsPage from "./pages/BroadcastsPage";
-import KycUploadPage from "./pages/KycUploadPage";
-import AdminKycPage from "./pages/AdminKycPage";
-import SchedulePage from "./pages/SchedulePage";
-import DailyLogsPage from "./pages/DailyLogsPage";
-import CustomerPortalPage from "./pages/CustomerPortalPage";
-import OrderReceiptPage from "./pages/OrderReceiptPage";
-import VerifyOrderPage from "./pages/VerifyOrderPage";
 import AgentLayout from "./components/AgentLayout";
 import AdminLayout from "./components/AdminLayout";
-import AgentDashboard from "./pages/AgentDashboard";
-import AgentReferralsPage from "./pages/AgentReferralsPage";
-import AgentCommissionsPage from "./pages/AgentCommissionsPage";
-import AgentAnalyticsPage from "./pages/AgentAnalyticsPage";
-import AgentReferralLinkPage from "./pages/AgentReferralLinkPage";
-import AccountingPage from "./pages/AccountingPage";
-import AdminDashboardPage from "./pages/AdminDashboardPage";
-import AdminUsersPage from "./pages/AdminUsersPage";
-import AdminAnalyticsPage from "./pages/AdminAnalyticsPage";
-import AdminAgentsPage from "./pages/AdminAgentsPage";
-import AdminAuditLogPage from "./pages/AdminAuditLogPage";
-import NotFound from "./pages/NotFound";
+
+const SmartOrderPage = lazy(() => import("./pages/SmartOrderPage"));
+const LandingPage = lazy(() => import("./pages/LandingPage"));
+const JobsPage = lazy(() => import("./pages/JobsPage"));
+const JobDetailPage = lazy(() => import("./pages/JobDetailPage"));
+const SubmitQuotePage = lazy(() => import("./pages/SubmitQuotePage"));
+const MaterialsPage = lazy(() => import("./pages/MaterialsPage"));
+const DeliveriesPage = lazy(() => import("./pages/DeliveriesPage"));
+const MarketplacePage = lazy(() => import("./pages/MarketplacePage"));
+const TraderProfilePage = lazy(() => import("./pages/TraderProfilePage"));
+const TraderDashboard = lazy(() => import("./pages/TraderDashboard"));
+const TradeAccountsPage = lazy(() => import("./pages/TradeAccountsPage"));
+const ProfileSetupPage = lazy(() => import("./pages/ProfileSetupPage"));
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const SignupPage = lazy(() => import("./pages/SignupPage"));
+const SubscriptionPage = lazy(() => import("./pages/SubscriptionPage"));
+const MessagesPage = lazy(() => import("./pages/MessagesPage"));
+const SiteEvidencePage = lazy(() => import("./pages/SiteEvidencePage"));
+const SiteEvidenceProjectPage = lazy(() => import("./pages/SiteEvidenceProjectPage"));
+const EvidenceCameraPage = lazy(() => import("./pages/EvidenceCameraPage"));
+const EvidenceGalleryPage = lazy(() => import("./pages/EvidenceGalleryPage"));
+const ComplianceCertsPage = lazy(() => import("./pages/ComplianceCertsPage"));
+const PostJobPage = lazy(() => import("./pages/PostJobPage"));
+const RepairAssistPage = lazy(() => import("./pages/RepairAssistPage"));
+const RepairOpportunitiesPage = lazy(() => import("./pages/RepairOpportunitiesPage"));
+const DriverDashboard = lazy(() => import("./pages/DriverDashboard"));
+const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
+const BroadcastsPage = lazy(() => import("./pages/BroadcastsPage"));
+const KycUploadPage = lazy(() => import("./pages/KycUploadPage"));
+const AdminKycPage = lazy(() => import("./pages/AdminKycPage"));
+const SchedulePage = lazy(() => import("./pages/SchedulePage"));
+const DailyLogsPage = lazy(() => import("./pages/DailyLogsPage"));
+const CustomerPortalPage = lazy(() => import("./pages/CustomerPortalPage"));
+const OrderReceiptPage = lazy(() => import("./pages/OrderReceiptPage"));
+const VerifyOrderPage = lazy(() => import("./pages/VerifyOrderPage"));
+const AgentDashboard = lazy(() => import("./pages/AgentDashboard"));
+const AgentReferralsPage = lazy(() => import("./pages/AgentReferralsPage"));
+const AgentCommissionsPage = lazy(() => import("./pages/AgentCommissionsPage"));
+const AgentAnalyticsPage = lazy(() => import("./pages/AgentAnalyticsPage"));
+const AgentReferralLinkPage = lazy(() => import("./pages/AgentReferralLinkPage"));
+const AccountingPage = lazy(() => import("./pages/AccountingPage"));
+const AdminDashboardPage = lazy(() => import("./pages/AdminDashboardPage"));
+const AdminUsersPage = lazy(() => import("./pages/AdminUsersPage"));
+const AdminAnalyticsPage = lazy(() => import("./pages/AdminAnalyticsPage"));
+const AdminAgentsPage = lazy(() => import("./pages/AdminAgentsPage"));
+const AdminAuditLogPage = lazy(() => import("./pages/AdminAuditLogPage"));
+const AdminRepairProvidersPage = lazy(() => import("./pages/AdminRepairProvidersPage"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
 
@@ -77,6 +80,7 @@ const App = () => (
       <BrowserRouter>
         <ScrollToTop />
         <AuthProvider>
+          <Suspense fallback={<div className="min-h-screen bg-background" aria-busy="true" />}>
           <Routes>
             {/* Promo homepage — public, default */}
             <Route path="/" element={<PromoHomePage />} />
@@ -96,6 +100,13 @@ const App = () => (
               </ProtectedRoute>
             } />
 
+            {/* Shared job routes use a role-aware shell to avoid duplicate-route redirects. */}
+            <Route element={<RoleAwareJobsLayout />}>
+              <Route path="/jobs" element={<JobsPage />} />
+              <Route path="/jobs/:id" element={<JobDetailPage />} />
+            </Route>
+
+
             {/* Full-screen camera (outside layout — no sidebar/nav) */}
             <Route path="/site-evidence/:jobId/camera" element={
               <ProtectedRoute allowedRoles={["trade", "admin"]}>
@@ -112,9 +123,7 @@ const App = () => (
               </ProtectedRoute>
             }>
               <Route path="/dashboard" element={<TraderDashboard />} />
-              <Route path="/jobs" element={<JobsPage />} />
               <Route path="/repair-opportunities" element={<RepairOpportunitiesPage />} />
-              <Route path="/jobs/:id" element={<JobDetailPage />} />
               <Route path="/jobs/:jobId/quote" element={<TierGate required="basic" feature="Quoting"><SubmitQuotePage /></TierGate>} />
               <Route path="/trade-accounts" element={<TierGate required="premium" feature="Trade accounts"><TradeAccountsPage /></TierGate>} />
               <Route path="/materials" element={<TierGate required="premium" feature="Material ordering"><MaterialsPage /></TierGate>} />
@@ -141,7 +150,6 @@ const App = () => (
               <Route path="/home" element={<LandingPage />} />
               <Route path="/marketplace" element={<MarketplacePage />} />
               <Route path="/trader/:id" element={<TraderProfilePage />} />
-              <Route path="/jobs" element={<JobsPage />} />
               <Route path="/post-job" element={
                 <ProtectedRoute>
                   <PostJobPage />
@@ -152,7 +160,6 @@ const App = () => (
                   <RepairAssistPage />
                 </ProtectedRoute>
               } />
-              <Route path="/jobs/:id" element={<JobDetailPage />} />
               <Route path="/my-projects" element={
                 <ProtectedRoute allowedRoles={["customer", "admin"]}>
                   <CustomerPortalPage />
@@ -169,6 +176,7 @@ const App = () => (
               <Route path="/admin" element={<AdminDashboardPage />} />
               <Route path="/admin/users" element={<AdminUsersPage />} />
               <Route path="/admin/kyc-review" element={<AdminKycPage />} />
+              <Route path="/admin/repair-providers" element={<AdminRepairProvidersPage />} />
               <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
               <Route path="/admin/agents" element={<AdminAgentsPage />} />
               <Route path="/admin/commissions" element={<AgentCommissionsPage />} />
@@ -207,6 +215,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
+          </Suspense>
 
         </AuthProvider>
       </BrowserRouter>

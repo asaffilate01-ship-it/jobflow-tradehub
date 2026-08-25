@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import webpush from "npm:web-push@3.6.7";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -35,87 +36,25 @@ async function sendWebPush(
   }
 
   try {
-    // Use the web-push approach via fetch with VAPID JWT
-    // For production, this would use the web-push library
-    // For now, we'll use a simplified approach that works with most push services
-    
-    const payloadStr = JSON.stringify(payload);
-    
-    // Create VAPID JWT header
-    const audience = new URL(subscription.endpoint).origin;
-    const expiration = Math.floor(Date.now() / 1000) + 12 * 60 * 60; // 12 hours
-    
-    const header = { typ: "JWT", alg: "ES256" };
-    const jwtPayload = {
-      aud: audience,
-      exp: expiration,
-      sub: vapidSubject,
-    };
-
-    // Import the VAPID private key
-    const rawPrivateKey = base64UrlDecode(vapidPrivateKey);
-    const cryptoKey = await crypto.subtle.importKey(
-      "pkcs8",
-      rawPrivateKey,
-      { name: "ECDSA", namedCurve: "P-256" },
-      false,
-      ["sign"],
-    );
-
-    // Create JWT
-    const headerB64 = base64UrlEncode(new TextEncoder().encode(JSON.stringify(header)));
-    const payloadB64 = base64UrlEncode(new TextEncoder().encode(JSON.stringify(jwtPayload)));
-    const unsignedToken = `${headerB64}.${payloadB64}`;
-    
-    const signature = await crypto.subtle.sign(
-      { name: "ECDSA", hash: "SHA-256" },
-      cryptoKey,
-      new TextEncoder().encode(unsignedToken),
-    );
-
-    const signatureB64 = base64UrlEncode(new Uint8Array(signature));
-    const jwt = `${unsignedToken}.${signatureB64}`;
-
-    // Send the push message
-    const res = await fetch(subscription.endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/octet-stream",
-        "Content-Encoding": "aes128gcm",
-        TTL: "86400",
-        Authorization: `vapid t=${jwt}, k=${vapidPublicKey}`,
+    webpush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey);
+    const response = await webpush.sendNotification(
+      {
+        endpoint: subscription.endpoint,
+        keys: { p256dh: subscription.p256dh, auth: subscription.auth_key },
       },
-      body: new TextEncoder().encode(payloadStr),
-    });
-
-    if (res.status === 201 || res.status === 200) {
-      return { success: true, statusCode: res.status };
-    }
-
-    // 410 Gone means the subscription is expired — should be cleaned up
-    if (res.status === 410 || res.status === 404) {
-      return { success: false, error: "subscription_expired", statusCode: res.status };
-    }
-
-    const errText = await res.text();
-    return { success: false, error: errText, statusCode: res.status };
+      JSON.stringify(payload),
+      { TTL: 86400 },
+    );
+    return { success: true, statusCode: response.statusCode };
   } catch (err) {
-    return { success: false, error: err instanceof Error ? err.message : String(err) };
+    const statusCode = typeof err === "object" && err !== null && "statusCode" in err
+      ? Number((err as { statusCode?: number }).statusCode)
+      : undefined;
+    if (statusCode === 404 || statusCode === 410) {
+      return { success: false, error: "subscription_expired", statusCode };
+    }
+    return { success: false, error: err instanceof Error ? err.message : String(err), statusCode };
   }
-}
-
-function base64UrlEncode(data: Uint8Array): string {
-  return btoa(String.fromCharCode(...data))
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
-}
-
-function base64UrlDecode(str: string): Uint8Array {
-  const padding = "=".repeat((4 - (str.length % 4)) % 4);
-  const base64 = (str + padding).replace(/-/g, "+").replace(/_/g, "/");
-  const rawData = atob(base64);
-  return Uint8Array.from(rawData, (c) => c.charCodeAt(0));
 }
 
 Deno.serve(async (req) => {
@@ -141,6 +80,14 @@ Deno.serve(async (req) => {
 
     if (!user_id || !title) {
       throw new Error("user_id and title are required");
+    }
+
+    const { data: isAdmin } = await supabase.rpc("has_role", {
+      _user_id: user.id,
+      _role: "admin",
+    });
+    if (user_id !== user.id && !isAdmin) {
+      throw new Error("Not authorised to send push notifications to this user");
     }
 
     // Get all push subscriptions for the target user

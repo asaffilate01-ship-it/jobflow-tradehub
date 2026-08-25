@@ -142,7 +142,7 @@ function useCountUp(end: number, duration = 2000, decimals = 0) {
 
   useEffect(() => {
     if (!inView) return;
-    let start = 0;
+    const start = 0;
     const startTime = Date.now();
     const step = () => {
       const elapsed = Date.now() - startTime;

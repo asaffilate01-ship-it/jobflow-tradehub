@@ -25,12 +25,13 @@ Deno.serve(async (req) => {
     }
     if (!authorised) throw new Error("Not authorised for this repair evidence case");
 
-    const [diagnosisResult, mediaResult, quotesResult, certsResult, linkResult] = await Promise.all([
+    const [diagnosisResult, mediaResult, quotesResult, certsResult, linkResult, locationResult] = await Promise.all([
       admin.from("repair_diagnoses").select("*").eq("job_id", job_id).maybeSingle(),
       admin.from("repair_intake_media").select("*").eq("job_id", job_id),
       admin.from("quotes").select("*").eq("job_id", job_id),
       admin.from("compliance_certificates").select("*").eq("job_id", job_id),
       admin.from("dokuvera_case_links").select("*").eq("job_id", job_id).maybeSingle(),
+      admin.from("repair_private_locations").select("address_line1,city,postcode").eq("job_id", job_id).maybeSingle(),
     ]);
     const media = await Promise.all((mediaResult.data ?? []).map(async (item: any) => {
       const path = item.redacted_storage_path || item.storage_path;
@@ -41,7 +42,12 @@ Deno.serve(async (req) => {
       external_system: "craftvaro",
       external_case_id: job.id,
       existing_dokuvera_case_id: linkResult.data?.dokuvera_case_id ?? null,
-      property: { address_line1: job.address_line1, city: job.city, postcode: job.postcode, country: "GB" },
+      property: {
+        address_line1: locationResult.data?.address_line1 ?? job.address_line1,
+        city: locationResult.data?.city ?? job.city,
+        postcode: locationResult.data?.postcode ?? job.postcode,
+        country: "GB",
+      },
       repair: { title: job.title, description: job.description, status: job.status, priority: job.repair_priority, requested_trade: job.requested_trade, created_at: job.created_at },
       source: { product: job.source_product, reference: job.source_reference, property_reference: job.property_reference, tenancy_reference: job.tenancy_reference },
       diagnosis: diagnosisResult.data,

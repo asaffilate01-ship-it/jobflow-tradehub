@@ -151,6 +151,13 @@ async function findMatches(admin: any, filters: Filters) {
   const companyIds = eligible.map((profile: any) => profile.trade_company_id);
   const { data: companies } = await admin.from("trade_companies").select("id,owner_profile_id,legal_name,trading_name,city,postcode").in("id", companyIds);
   const ownerIds = (companies ?? []).map((company: any) => company.owner_profile_id);
+  const { data: subscribers } = ownerIds.length
+    ? await admin.from("subscribers").select("user_id,subscription_end").in("user_id", ownerIds).eq("subscribed", true).neq("tier", "free")
+    : { data: [] };
+  const now = Date.now();
+  const paidOwnerIds = new Set((subscribers ?? [])
+    .filter((subscriber: any) => subscriber.user_id && (!subscriber.subscription_end || new Date(subscriber.subscription_end).getTime() > now))
+    .map((subscriber: any) => subscriber.user_id));
   const { data: profiles } = await admin.from("profiles").select("id,full_name,company_name,trade_specialism,rating,is_active,services_description,service_radius_miles,years_experience,trade_bodies,verified,cover_image_url").in("id", ownerIds).eq("is_active", true);
   const companyMap = new Map((companies ?? []).map((company: any) => [company.id, company]));
   const profileMap = new Map((profiles ?? []).map((profile: any) => [profile.id, profile]));
@@ -158,7 +165,7 @@ async function findMatches(admin: any, filters: Filters) {
   return eligible.map((repair: any) => {
     const company: any = companyMap.get(repair.trade_company_id);
     const profile: any = company ? profileMap.get(company.owner_profile_id) : null;
-    if (!company || !profile) return null;
+    if (!company || !profile || !paidOwnerIds.has(company.owner_profile_id)) return null;
     if (filters.minimum_rating !== null && Number(profile.rating ?? 0) < filters.minimum_rating) return null;
     const prefixes = repair.service_postcode_prefixes ?? [];
     const specificity = filters.postcode ? Math.max(0, ...prefixes.map((prefix: string) => normaliseArea(prefix).length)) : 0;
@@ -177,6 +184,7 @@ async function findMatches(admin: any, filters: Filters) {
       emergency_work: repair.emergency_work,
       capability_verified: repair.capability_verified,
       insurance_verified: repair.insurance_verified,
+      subscription_verified: true,
       credential: repair.credential_verified ? repair.credential_type : null,
       coverage: filters.postcode_sector ?? "Service area matched",
       score,

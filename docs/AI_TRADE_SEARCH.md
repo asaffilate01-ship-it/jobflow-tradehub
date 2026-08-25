@@ -6,11 +6,12 @@ AI Trade Finder is embedded at `/marketplace`. An authenticated customer can typ
 Looking for a plumber around NW6 5YT, Gas Safe and available
 ```
 
-The server extracts the trade, UK postcode, credential requirement, availability, emergency-call-out need and minimum rating. It searches the verified `trade_repair_profiles` records and returns public profile details only.
+The server extracts the trade, UK postcode, credential requirement, availability, emergency-call-out need and minimum rating. It searches only verified `trade_repair_profiles` records belonging to active paid/trial subscribers in the Craftvaro database and returns public profile details only. It never searches or imports external non-subscribing traders.
 
 ## Matching rules
 
 - Capability and insurance must be verified and unexpired.
+- The trader must have an active non-free subscription (or active paid trial) in `subscribers`.
 - The provider must have configured a service-area prefix that covers the requested postcode.
 - `available` means the provider has marked themselves as accepting work. It is not a confirmed appointment.
 - Gas work requires a verified, unexpired credential whose type contains `Gas Safe`.
@@ -24,7 +25,7 @@ Usage is enforced atomically in the database, so browser changes cannot bypass i
 
 | Account tier | Searches per UTC day |
 | --- | ---: |
-| Free | 5 |
+| Customer/free account | 5 |
 | Basic | 30 |
 | Premium | 100 |
 | Administrator | 500 |
@@ -54,4 +55,4 @@ Server-side validation restricts the AI response to supported trades and valid U
 
 ## Deployment
 
-The migration `supabase/migrations/20260824233000_ai_trade_search.sql` and the `trade-agent-search` function are already applied and deployed. The function relies on the platform-provided `SUPABASE_URL` and service-role runtime secrets.
+The migration `supabase/migrations/20260824222457_908f26c2-0158-4207-b858-db292e4ce56c.sql` and the `trade-agent-search` function are included in this repository. Apply/deploy them to the target Supabase project and verify the deployed function before launch. The function relies on the platform-provided `SUPABASE_URL` and service-role runtime secrets.

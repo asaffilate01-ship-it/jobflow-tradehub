@@ -155,10 +155,12 @@ const AppNav = () => {
                     <UserIcon className="h-4 w-4 text-muted-foreground" />
                     Profile & settings
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/subscription")} className="gap-2">
-                    <Sparkles className="h-4 w-4 text-muted-foreground" />
-                    Plans & billing
-                  </DropdownMenuItem>
+                  {(isTrade || isAdmin) && (
+                    <DropdownMenuItem onClick={() => navigate("/subscription")} className="gap-2">
+                      <Sparkles className="h-4 w-4 text-muted-foreground" />
+                      Plans & billing
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => signOut()} className="gap-2 text-destructive focus:text-destructive">
                     <LogOut className="h-4 w-4" />

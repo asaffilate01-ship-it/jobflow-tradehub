@@ -49,20 +49,21 @@ const JobsPage = () => {
   const isAdmin = roles.includes("admin");
   const [isSubscribed, setIsSubscribed] = useState(false);
 
-  // Check subscription status
+  // Marketplace access is driven by the server-owned Stripe subscription row.
   useEffect(() => {
     if (!user || !isTrade) return;
     const checkSub = async () => {
-      const { data: companies } = await supabase.from("trade_companies").select("id").eq("owner_profile_id", user.id);
-      if (companies?.length) {
-        const { data: memberships } = await supabase
-          .from("marketplace_memberships")
-          .select("id")
-          .eq("trade_company_id", companies[0].id)
-          .eq("status", "active")
-          .limit(1);
-        setIsSubscribed((memberships?.length ?? 0) > 0 || isAdmin);
-      }
+      const { data: subscriber } = await supabase
+        .from("subscribers")
+        .select("tier,subscribed,subscription_end")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      const active = Boolean(
+        subscriber?.subscribed &&
+        subscriber.tier !== "free" &&
+        (!subscriber.subscription_end || new Date(subscriber.subscription_end) > new Date()),
+      );
+      setIsSubscribed(active || isAdmin);
     };
     checkSub();
   }, [user, isTrade, isAdmin]);

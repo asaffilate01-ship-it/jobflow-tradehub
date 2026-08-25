@@ -72,7 +72,16 @@ const JobDetailPage = () => {
         supabase.from("change_orders").select("*").eq("job_id", id).order("created_at", { ascending: false }),
         supabase.from("job_media").select("*").eq("job_id", id).order("created_at", { ascending: false }),
       ]);
-      setJob(jobRes.data);
+      let visibleJob = jobRes.data;
+      if (visibleJob?.job_kind === "repair") {
+        const { data: privateLocation } = await supabase
+          .from("repair_private_locations")
+          .select("address_line1,city,postcode")
+          .eq("job_id", id)
+          .maybeSingle();
+        if (privateLocation) visibleJob = { ...visibleJob, ...privateLocation };
+      }
+      setJob(visibleJob);
       setQuotes(quotesRes.data ?? []);
       setTasks(tasksRes.data ?? []);
       setMilestones(milestonesRes.data ?? []);
@@ -88,7 +97,7 @@ const JobDetailPage = () => {
   // --- Quote acceptance ---
   const handleAcceptQuote = async (quoteId: string, tradeCompanyId: string) => {
     if (job?.job_kind === "repair") {
-      const { error } = await (supabase as any).rpc("accept_repair_offer", { p_quote_id: quoteId });
+      const { error } = await supabase.rpc("accept_repair_offer", { p_quote_id: quoteId });
       if (error) { toast.error(error.message); return; }
       const ownerId = await getCompanyOwner(tradeCompanyId);
       if (ownerId) {
@@ -439,7 +448,7 @@ const JobDetailPage = () => {
                     <Button size="sm" className="font-semibold" onClick={() => handleAcceptQuote(q.id, q.trade_company_id)}>Accept quote</Button>
                     <Button size="sm" variant="outline" onClick={async () => {
                       if (job.job_kind === "repair") {
-                        const { error } = await (supabase as any).rpc("decline_repair_offer", { p_quote_id: q.id });
+                        const { error } = await supabase.rpc("decline_repair_offer", { p_quote_id: q.id });
                         if (error) { toast.error(error.message); return; }
                         toast.success("Offer declined");
                         window.location.reload();

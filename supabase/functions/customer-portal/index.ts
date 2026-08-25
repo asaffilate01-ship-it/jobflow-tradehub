@@ -25,14 +25,17 @@ serve(async (req) => {
     if (userError) throw new Error(`Auth error: ${userError.message}`);
     if (!userData.user?.email) throw new Error("Not authenticated");
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", { apiVersion: "2025-08-27.basil" });
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    if (!stripeKey) throw new Error("STRIPE_SECRET_KEY not set");
+    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: userData.user.email, limit: 1 });
     if (customers.data.length === 0) throw new Error("No Stripe customer found");
 
-    const origin = req.headers.get("origin") || "http://localhost:3000";
+    const appUrl = Deno.env.get("PUBLIC_APP_URL");
+    if (!appUrl) throw new Error("PUBLIC_APP_URL not set");
     const session = await stripe.billingPortal.sessions.create({
       customer: customers.data[0].id,
-      return_url: `${origin}/dashboard`,
+      return_url: `${appUrl.replace(/\/$/, "")}/dashboard`,
     });
 
     return new Response(JSON.stringify({ url: session.url }), {

@@ -53,11 +53,15 @@ serve(async (req) => {
 
     const subscriptions = await stripe.subscriptions.list({
       customer: customers.data[0].id,
-      status: "active",
-      limit: 1,
+      status: "all",
+      limit: 10,
     });
 
-    if (subscriptions.data.length === 0) {
+    const currentSubscription = subscriptions.data.find((subscription) =>
+      subscription.status === "active" || subscription.status === "trialing"
+    );
+
+    if (!currentSubscription) {
       await persist({
         tier: "free",
         subscribed: false,
@@ -70,7 +74,7 @@ serve(async (req) => {
       });
     }
 
-    const sub = subscriptions.data[0];
+    const sub = currentSubscription;
     const productId = String(sub.items.data[0].price.product);
     const subscriptionEnd = new Date((sub as any).current_period_end * 1000).toISOString();
 

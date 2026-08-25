@@ -99,7 +99,7 @@ const MarketplacePage = () => {
             </Badge>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Find a Tradesperson</h1>
             <p className="text-sm text-muted-foreground max-w-lg">
-              Browse verified, rated tradespeople across the UK. Compare profiles, check reviews, and get quotes.
+              Browse verified, subscribing Craftvaro tradespeople across the UK. Compare profiles, check reviews, and get quotes.
             </p>
           </div>
           <div className="flex gap-2 shrink-0">
@@ -123,10 +123,10 @@ const MarketplacePage = () => {
         {/* Quick stats */}
         <div className="flex flex-wrap gap-6 mt-6 pt-6 border-t border-border">
           {[
-            { icon: Shield, label: "Verified traders", value: "500+" },
-            { icon: Star, label: "Avg. rating", value: "4.8★" },
-            { icon: CheckCircle, label: "Jobs completed", value: "2,400+" },
-            { icon: Clock, label: "Avg. response", value: "< 2hrs" },
+            { icon: Shield, label: "Identity & credentials", value: "Checked" },
+            { icon: Star, label: "Customer feedback", value: "Rated" },
+            { icon: CheckCircle, label: "Marketplace access", value: "Members" },
+            { icon: Clock, label: "Work status", value: "Live" },
           ].map(({ icon: Icon, label, value }) => (
             <div key={label} className="flex items-center gap-2">
               <Icon className="h-4 w-4 text-primary" />

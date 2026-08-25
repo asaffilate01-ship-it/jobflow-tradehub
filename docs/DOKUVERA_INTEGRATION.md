@@ -11,7 +11,7 @@ All products should use the Craftvaro `job.id` as the stable external repair ide
 1. The customer creates a `jobs` row with `job_kind = 'repair'` and uploads media to the private `repair-intake` bucket.
 2. `repair-diagnose` checks ownership, applies emergency rules, calls the optional vision gateway, creates `repair_diagnoses` and queues Dokuvera events.
 3. Safety-stop cases are paused and are not dispatched automatically.
-4. Non-emergency cases call `match_repair_providers`. It returns at most four providers with verified capability and insurance, valid regulated credentials where needed, availability and postcode coverage.
+4. Non-emergency cases call `match_repair_providers`. It returns at most four providers with an active non-free Craftvaro subscription, verified capability and insurance, valid regulated credentials where needed, availability and postcode coverage.
 5. Each `repair_dispatch_invites.scoped_payload` contains only the description, trade, approximate postcode sector, risk level and indicative cost. It never contains the street address.
 6. Dokuvera processes the original media and calls `dokuvera-webhook` with redaction/checksum results. Providers receive only short-lived signed URLs for media marked `safe` with a redacted storage path.
 7. A provider submits a structured offer through the `submit_repair_offer` database function.
@@ -28,6 +28,7 @@ supabase functions deploy repair-diagnose
 supabase functions deploy repair-provider-media
 supabase functions deploy dokuvera-sync
 supabase functions deploy dokuvera-webhook --no-verify-jwt
+supabase functions deploy integration-outbox-worker --no-verify-jwt
 ```
 
 Set secrets in the Supabase project:
@@ -40,7 +41,7 @@ supabase secrets set \
   DOKUVERA_WEBHOOK_SECRET=replace-with-a-different-long-random-secret
 ```
 
-The vision integration is optional. Without it, the workflow still provides text-based safety triage, low-confidence possible causes and provider matching:
+The vision integration is optional. Without it, the workflow provides text-based safety triage, low-confidence possible causes and provider matching, and the UI must describe this as rules-based rather than image AI:
 
 ```bash
 supabase secrets set \
@@ -61,7 +62,7 @@ Keep the vision gateway server-side. It must not return a definitive diagnosis a
 
 ## Provider activation
 
-The migration creates a repair profile for each existing trade company whose owner has a trade specialism. Before that company can be matched, an administrator must validate its capability and insurance; gas and electrical work also requires an appropriate, unexpired regulated credential. Providers can change coverage and availability, but database protection prevents them from self-verifying. Changing insurance or credential details automatically clears the relevant verification.
+The migration creates a repair profile for each existing trade company whose owner has a trade specialism. Before that company can be matched, it must hold an active paid/trial Craftvaro subscription and an administrator must validate its capability and insurance; gas and electrical work also requires an appropriate, unexpired regulated credential. Providers can change coverage and availability, but database protection prevents them from self-verifying. Changing insurance or credential details automatically clears the relevant verification.
 
 Until an admin screen is added, an authorised backend/admin process can activate a checked provider with:
 
@@ -193,7 +194,20 @@ Gabley or Immoviq should include these fields when their authenticated backend c
 }
 ```
 
-The adapter should create the Craftvaro repair with the signed-in user's delegated consent. `repair-diagnose` writes status events addressed to the originating product into `repair_integration_outbox`, and `dokuvera-sync` includes the same source references in the evidence case. A small retry worker can deliver Gabley/Immoviq outbox rows to those products' signed webhooks. Route customer-facing status to Gabley, portfolio/work-order status to Immoviq, provider offers to Craftvaro, and evidence/certification events to Dokuvera.
+The adapter should create the Craftvaro repair with the signed-in user's delegated consent. `repair-diagnose` writes status events addressed to the originating product into `repair_integration_outbox`, and `dokuvera-sync` includes the same source references in the evidence case. `integration-outbox-worker` delivers Gabley/Immoviq events with HMAC signatures, idempotency keys, bounded batches and exponential retry. Route customer-facing status to Gabley, portfolio/work-order status to Immoviq, provider offers to Craftvaro, and evidence/certification events to Dokuvera.
+
+Configure the product webhooks and worker authentication:
+
+```bash
+supabase secrets set \
+  GABLEY_WEBHOOK_URL=https://gabley.example/api/craftvaro/events \
+  GABLEY_WEBHOOK_SECRET=replace-with-a-long-random-secret \
+  IMMOVIQ_WEBHOOK_URL=https://immoviq.example/api/craftvaro/events \
+  IMMOVIQ_WEBHOOK_SECRET=replace-with-a-different-long-random-secret \
+  INTEGRATION_OUTBOX_CRON_SECRET=replace-with-another-random-secret
+```
+
+Schedule a POST to `/functions/v1/integration-outbox-worker` every minute with the matching `X-Cron-Secret` header. Receiving products must verify `X-Craftvaro-Signature` against the exact request bytes and deduplicate `Idempotency-Key`.
 
 ## Security and operational rules
 

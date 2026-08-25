@@ -34,6 +34,7 @@ export const notify = async ({
 
 interface BroadcastArgs {
   audienceRole: string;
+  jobId?: string;
   title: string;
   body?: string;
   link?: string;
@@ -43,6 +44,7 @@ interface BroadcastArgs {
 
 export const notifyRole = async ({
   audienceRole,
+  jobId,
   title,
   body,
   link,
@@ -51,7 +53,7 @@ export const notifyRole = async ({
 }: BroadcastArgs) => {
   try {
     const { error } = await supabase.functions.invoke("dispatch-notification", {
-      body: { broadcast: true, audience_role: audienceRole, title, body, link, type, channels },
+      body: { broadcast: true, audience_role: audienceRole, job_id: jobId, title, body, link, type, channels },
     });
     if (error) console.warn("notifyRole failed:", error.message);
   } catch (e) {
