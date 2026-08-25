@@ -200,18 +200,7 @@ $$;
 REVOKE ALL ON FUNCTION public.create_repair_job(text, text, text, text, text) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.create_repair_job(text, text, text, text, text) TO authenticated;
 
-INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-VALUES (
-  'repair-intake',
-  'repair-intake',
-  false,
-  52428800,
-  ARRAY['image/jpeg','image/png','image/webp','video/mp4','video/webm','audio/mpeg','audio/webm']
-)
-ON CONFLICT (id) DO UPDATE SET
-  public = false,
-  file_size_limit = EXCLUDED.file_size_limit,
-  allowed_mime_types = EXCLUDED.allowed_mime_types;
+-- Storage bucket `repair-intake` is managed via the storage tooling (private, 50MB limit).
 
 ALTER TABLE public.repair_integration_outbox
   ADD COLUMN IF NOT EXISTS next_attempt_at timestamptz NOT NULL DEFAULT now();
