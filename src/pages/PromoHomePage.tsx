@@ -52,12 +52,13 @@ const PromoHomePage = () => {
     <div className="min-h-screen bg-background">
       {/* ===== Top nav ===== */}
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-xl safe-top">
-        <div className="container flex h-16 items-center justify-between gap-4">
-          <a href="#top" className="flex items-center gap-2">
-            <Logo height={34} priority />
+        <div className="container flex h-16 items-center gap-3">
+          <a href="#top" className="flex items-center" aria-label="Craftvaro">
+            <Logo variant="mark" height={32} priority className="sm:hidden" />
+            <Logo height={32} priority className="hidden sm:block" />
           </a>
 
-          <nav className="hidden md:flex items-center gap-1 rounded-full border border-border bg-secondary/60 p-1">
+          <nav className="mx-auto hidden md:flex items-center gap-1 rounded-full border border-border bg-secondary/60 p-1">
             {navItems.map((i) => (
               <a
                 key={i.label}
@@ -69,15 +70,19 @@ const PromoHomePage = () => {
             ))}
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-2">
             <LanguageSwitcher />
-            <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
-              <Link to="/unlock">
-                <Lock className="mr-1.5 h-3.5 w-3.5" /> {t.cta.access}
+            <Button asChild variant="outline" size="sm" className="gap-1.5">
+              <Link to="/unlock" aria-label={t.cta.access}>
+                <Lock className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">{t.cta.access}</span>
               </Link>
             </Button>
             <Button asChild size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90">
-              <Link to="/marketplace">{lang === "de" ? "Handwerker finden" : "Find a trader"}</Link>
+              <Link to="/marketplace">
+                <span className="sm:hidden">{lang === "de" ? "Suchen" : "Find"}</span>
+                <span className="hidden sm:inline">{lang === "de" ? "Handwerker finden" : "Find a trader"}</span>
+              </Link>
             </Button>
             <button
               onClick={() => setMenuOpen((v) => !v)}
@@ -87,6 +92,8 @@ const PromoHomePage = () => {
               <ChevronDown className={`h-5 w-5 transition-transform ${menuOpen ? "rotate-180" : ""}`} />
             </button>
           </div>
+        </div>
+
         </div>
         {menuOpen && (
           <div className="md:hidden border-t border-border bg-background">
