@@ -3,14 +3,33 @@ import logoEn from "@/assets/craftvaro-logo-trim.png";
 import logoDe from "@/assets/craftvaro-logo-de-trim.png";
 import logoEnLight from "@/assets/craftvaro-logo-light.png";
 import logoDeLight from "@/assets/craftvaro-logo-de-light.png";
+import compactEn from "@/assets/craftvaro-logo-compact.png";
+import compactDe from "@/assets/craftvaro-logo-de-compact.png";
+import compactEnLight from "@/assets/craftvaro-logo-compact-light.png";
+import compactDeLight from "@/assets/craftvaro-logo-de-compact-light.png";
 import markEn from "@/assets/craftvaro-mark.png";
 import markDe from "@/assets/craftvaro-mark-de.png";
 
 type Tone = "auto" | "light" | "dark";
-type Variant = "full" | "mark";
+/** full = icon + wordmark + tagline · compact = icon + wordmark · mark = icon only */
+type Variant = "full" | "compact" | "mark";
 
-/** Intrinsic aspect ratios of the shipped assets (kept in sync with src/assets). */
-const RATIO = { full: 1607 / 433, mark: 462 / 433 } as const;
+/** Intrinsic aspect ratios of the shipped assets (keep in sync with src/assets). */
+const ASSETS: Record<
+  "en" | "de",
+  Record<Variant, { dark: string; light: string; ratio: number }>
+> = {
+  en: {
+    full: { dark: logoEn, light: logoEnLight, ratio: 1607 / 433 },
+    compact: { dark: compactEn, light: compactEnLight, ratio: 1926 / 433 },
+    mark: { dark: markEn, light: markEn, ratio: 462 / 433 },
+  },
+  de: {
+    full: { dark: logoDe, light: logoDeLight, ratio: 1196 / 325 },
+    compact: { dark: compactDe, light: compactDeLight, ratio: 1453 / 325 },
+    mark: { dark: markDe, light: markDe, ratio: 348 / 325 },
+  },
+};
 
 interface LogoProps {
   /** Rendered height in px — width is derived from the asset aspect ratio. */
@@ -23,76 +42,59 @@ interface LogoProps {
 }
 
 export const Logo = ({
-  height = 36,
-  variant = "full",
+  height = 32,
+  variant = "compact",
   tone = "auto",
   className = "",
   priority = false,
 }: LogoProps) => {
   const { lang } = useLanguage();
-  const de = lang === "de";
-  const width = Math.round(height * RATIO[variant]);
+  const asset = ASSETS[lang === "de" ? "de" : "en"][variant];
+  const width = Math.round(height * asset.ratio);
+  const loading = priority ? "eager" : "lazy";
 
-  if (variant === "mark") {
+  if (tone !== "auto" || variant === "mark") {
     return (
       <img
-        src={de ? markDe : markEn}
+        src={tone === "light" ? asset.light : asset.dark}
         alt="Craftvaro"
         width={width}
         height={height}
         style={{ height, width }}
-        loading={priority ? "eager" : "lazy"}
+        loading={loading}
         decoding="async"
-        className={`shrink-0 select-none object-contain ${className}`}
+        className={`block shrink-0 select-none object-contain ${className}`}
       />
     );
   }
 
-  const darkSrc = de ? logoDe : logoEn;
-  const lightSrc = de ? logoDeLight : logoEnLight;
-
-  // For tone="auto" we render both and toggle with dark-mode utilities so no
-  // JS theme state is needed and there is no flash on hydration.
-  if (tone === "auto") {
-    return (
-      <span
-        className={`relative inline-block shrink-0 select-none ${className}`}
-        style={{ height, width }}
-      >
-        <img
-          src={darkSrc}
-          alt="Craftvaro"
-          width={width}
-          height={height}
-          loading={priority ? "eager" : "lazy"}
-          decoding="async"
-          className="absolute inset-0 h-full w-full object-contain dark:hidden"
-        />
-        <img
-          src={lightSrc}
-          alt=""
-          aria-hidden="true"
-          width={width}
-          height={height}
-          loading={priority ? "eager" : "lazy"}
-          decoding="async"
-          className="absolute inset-0 hidden h-full w-full object-contain dark:block"
-        />
-      </span>
-    );
-  }
-
+  // tone="auto": render both and toggle with dark-mode utilities so there is
+  // no theme flash and no JS state needed.
   return (
-    <img
-      src={tone === "light" ? lightSrc : darkSrc}
-      alt="Craftvaro"
-      width={width}
-      height={height}
+    <span
+      className={`relative block shrink-0 select-none ${className}`}
       style={{ height, width }}
-      loading={priority ? "eager" : "lazy"}
-      decoding="async"
-      className={`shrink-0 select-none object-contain ${className}`}
-    />
+    >
+      <img
+        src={asset.dark}
+        alt="Craftvaro"
+        width={width}
+        height={height}
+        loading={loading}
+        decoding="async"
+        className="absolute inset-0 h-full w-full object-contain dark:hidden"
+      />
+      <img
+        src={asset.light}
+        alt=""
+        aria-hidden="true"
+        width={width}
+        height={height}
+        loading={loading}
+        decoding="async"
+        className="absolute inset-0 hidden h-full w-full object-contain dark:block"
+      />
+    </span>
   );
 };
 
