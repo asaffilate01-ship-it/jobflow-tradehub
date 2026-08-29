@@ -346,13 +346,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "change_orders_proposed_by_fkey"
-            columns: ["proposed_by"]
-            isOneToOne: false
-            referencedRelation: "trader_profiles_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       chart_of_accounts: {
@@ -472,13 +465,6 @@ export type Database = {
             columns: ["issued_by"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "compliance_certificates_issued_by_fkey"
-            columns: ["issued_by"]
-            isOneToOne: false
-            referencedRelation: "trader_profiles_public"
             referencedColumns: ["id"]
           },
           {
@@ -751,13 +737,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "delivery_events_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "trader_profiles_public"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "delivery_events_delivery_id_fkey"
             columns: ["delivery_id"]
             isOneToOne: false
@@ -921,13 +900,6 @@ export type Database = {
             columns: ["profile_id"]
             isOneToOne: true
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "driver_profiles_profile_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: true
-            referencedRelation: "trader_profiles_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1201,13 +1173,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "job_media_uploaded_by_fkey"
-            columns: ["uploaded_by"]
-            isOneToOne: false
-            referencedRelation: "trader_profiles_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       job_milestones: {
@@ -1303,13 +1268,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "job_tasks_assigned_to_fkey"
-            columns: ["assigned_to"]
-            isOneToOne: false
-            referencedRelation: "trader_profiles_public"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "job_tasks_job_id_fkey"
             columns: ["job_id"]
             isOneToOne: false
@@ -1400,13 +1358,6 @@ export type Database = {
             columns: ["customer_profile_id"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "jobs_customer_profile_id_fkey"
-            columns: ["customer_profile_id"]
-            isOneToOne: false
-            referencedRelation: "trader_profiles_public"
             referencedColumns: ["id"]
           },
           {
@@ -1532,13 +1483,6 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "material_orders_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "trader_profiles_public"
             referencedColumns: ["id"]
           },
           {
@@ -2524,13 +2468,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "repair_intake_media_uploaded_by_fkey"
-            columns: ["uploaded_by"]
-            isOneToOne: false
-            referencedRelation: "trader_profiles_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       repair_integration_outbox: {
@@ -2615,13 +2552,6 @@ export type Database = {
             columns: ["customer_profile_id"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "repair_private_locations_customer_profile_id_fkey"
-            columns: ["customer_profile_id"]
-            isOneToOne: false
-            referencedRelation: "trader_profiles_public"
             referencedColumns: ["id"]
           },
           {
@@ -2724,13 +2654,6 @@ export type Database = {
             columns: ["reported_by"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "snag_items_reported_by_fkey"
-            columns: ["reported_by"]
-            isOneToOne: false
-            referencedRelation: "trader_profiles_public"
             referencedColumns: ["id"]
           },
         ]
@@ -3090,13 +3013,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "trade_companies_owner_profile_id_fkey"
-            columns: ["owner_profile_id"]
-            isOneToOne: false
-            referencedRelation: "trader_profiles_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       trade_repair_profiles: {
@@ -3284,13 +3200,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "trader_directory_profiles_claimed_profile_id_fkey"
-            columns: ["claimed_profile_id"]
-            isOneToOne: false
-            referencedRelation: "trader_profiles_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       trader_profile_claims: {
@@ -3348,13 +3257,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "trader_profile_claims_claimant_profile_id_fkey"
-            columns: ["claimant_profile_id"]
-            isOneToOne: false
-            referencedRelation: "trader_profiles_public"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "trader_profile_claims_directory_profile_id_fkey"
             columns: ["directory_profile_id"]
             isOneToOne: false
@@ -3375,11 +3277,90 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+        ]
+      }
+      trader_public_profiles: {
+        Row: {
+          accepting_work: boolean
+          city: string
+          company_name: string | null
+          completed_jobs: number
+          cover_image_url: string | null
+          created_at: string
+          credential: string | null
+          emergency_work: boolean
+          full_name: string | null
+          id: string
+          insurance_verified: boolean
+          languages: string[]
+          postcode_district: string
+          rating: number
+          response_minutes: number | null
+          review_count: number
+          service_radius_miles: number | null
+          services_description: string | null
+          trade_bodies: string[]
+          trade_specialism: Database["public"]["Enums"]["trade_type"] | null
+          verified: boolean
+          website_url: string | null
+          years_experience: number | null
+        }
+        Insert: {
+          accepting_work?: boolean
+          city?: string
+          company_name?: string | null
+          completed_jobs?: number
+          cover_image_url?: string | null
+          created_at?: string
+          credential?: string | null
+          emergency_work?: boolean
+          full_name?: string | null
+          id: string
+          insurance_verified?: boolean
+          languages?: string[]
+          postcode_district?: string
+          rating?: number
+          response_minutes?: number | null
+          review_count?: number
+          service_radius_miles?: number | null
+          services_description?: string | null
+          trade_bodies?: string[]
+          trade_specialism?: Database["public"]["Enums"]["trade_type"] | null
+          verified?: boolean
+          website_url?: string | null
+          years_experience?: number | null
+        }
+        Update: {
+          accepting_work?: boolean
+          city?: string
+          company_name?: string | null
+          completed_jobs?: number
+          cover_image_url?: string | null
+          created_at?: string
+          credential?: string | null
+          emergency_work?: boolean
+          full_name?: string | null
+          id?: string
+          insurance_verified?: boolean
+          languages?: string[]
+          postcode_district?: string
+          rating?: number
+          response_minutes?: number | null
+          review_count?: number
+          service_radius_miles?: number | null
+          services_description?: string | null
+          trade_bodies?: string[]
+          trade_specialism?: Database["public"]["Enums"]["trade_type"] | null
+          verified?: boolean
+          website_url?: string | null
+          years_experience?: number | null
+        }
+        Relationships: [
           {
-            foreignKeyName: "trader_profile_claims_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "trader_profiles_public"
+            foreignKeyName: "trader_public_profiles_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -3609,7 +3590,15 @@ export type Database = {
           website_url?: string | null
           years_experience?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "trader_public_profiles_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {
@@ -3658,6 +3647,10 @@ export type Database = {
           ranking_score: number
           trade_company_id: string
         }[]
+      }
+      refresh_trader_public_profile: {
+        Args: { p_id: string }
+        Returns: undefined
       }
       reject_trader_profile_claim: {
         Args: { p_claim_id: string; p_reason?: string }
