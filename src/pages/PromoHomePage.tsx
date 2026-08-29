@@ -36,7 +36,6 @@ const PromoHomePage = () => {
   const t = promoCopy[lang];
   const legal = legalByLang[lang];
 
-  const logo = lang === "de" ? logoDe : logoEn;
   const shotWeb = lang === "de" ? shotWebDe : shotWebEn;
   const shotMobile = lang === "de" ? shotMobileDe : shotMobileEn;
 
