@@ -16,8 +16,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useLanguage, legalByLang } from "@/contexts/LanguageContext";
 import { promoCopy } from "@/i18n/promo";
 
-import logoEn from "@/assets/craftvaro-logo.png";
-import logoDe from "@/assets/craftvaro-logo-de.png";
+import Logo from "@/components/Logo";
 import heroImg from "@/assets/promo-hero.jpg";
 import shotWebEn from "@/assets/shot-web.jpg";
 import shotWebDe from "@/assets/shot-web-de.jpg";
@@ -56,7 +55,7 @@ const PromoHomePage = () => {
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-xl safe-top">
         <div className="container flex h-16 items-center justify-between gap-4">
           <a href="#top" className="flex items-center gap-2">
-            <img src={logo} alt="Craftvaro" className="h-8 w-auto" height={32} />
+            <Logo height={34} priority />
           </a>
 
           <nav className="hidden md:flex items-center gap-1 rounded-full border border-border bg-secondary/60 p-1">
@@ -330,7 +329,7 @@ const PromoHomePage = () => {
       {/* ===== Footer ===== */}
       <footer className="border-t border-border py-10 pb-28 md:pb-10">
         <div className="container flex flex-col items-center gap-4 text-center md:flex-row md:justify-between md:text-left">
-          <img src={logo} alt="Craftvaro" className="h-8 w-auto" height={32} />
+          <Logo height={34} priority />
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} Craftvaro. {legal.entity}. {t.footer.rights} · {legal.email}
           </p>

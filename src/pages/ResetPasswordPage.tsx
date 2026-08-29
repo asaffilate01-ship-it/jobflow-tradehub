@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Lock, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
-import craftvaroLogo from "@/assets/craftvaro-logo.png";
+import Logo from "@/components/Logo";
 import { toast } from "sonner";
 import { usePageMeta } from "@/hooks/use-page-meta";
 
@@ -63,7 +63,7 @@ const ResetPasswordPage = () => {
       <div className="auth-shell">
         <div className="glass-card-elevated p-8 w-full max-w-md text-center space-y-4 page-enter">
           <Link to="/" className="inline-flex">
-            <img src={craftvaroLogo} alt="Craftvaro" className="h-10 mx-auto dark:[filter:brightness(0)_invert(1)]" />
+            <Logo height={38} priority className="mx-auto" />
           </Link>
           <h1 className="text-xl font-bold text-foreground">Invalid reset link</h1>
           <p className="text-sm text-muted-foreground">
@@ -82,7 +82,7 @@ const ResetPasswordPage = () => {
       <div className="glass-card-elevated p-8 w-full max-w-md space-y-6 page-enter">
         <div className="flex flex-col items-center gap-3 text-center">
           <Link to="/" className="inline-flex">
-            <img src={craftvaroLogo} alt="Craftvaro" className="h-10 dark:[filter:brightness(0)_invert(1)]" />
+            <Logo height={38} priority />
           </Link>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Set new password</h1>
           <p className="text-sm text-muted-foreground">Enter your new password below</p>

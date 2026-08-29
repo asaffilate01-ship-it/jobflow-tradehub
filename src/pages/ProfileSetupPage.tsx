@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { User, Wrench, TruckIcon, ArrowRight, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
-import craftvaroLogo from "@/assets/craftvaro-logo.png";
+import Logo from "@/components/Logo";
 import type { Database } from "@/integrations/supabase/types";
 import { usePageMeta } from "@/hooks/use-page-meta";
 
@@ -147,7 +147,7 @@ const ProfileSetupPage = () => {
       <div className="glass-card-elevated p-8 w-full max-w-lg space-y-6 page-enter">
         <div className="text-center space-y-2">
           <Link to="/" className="inline-flex">
-            <img src={craftvaroLogo} alt="Craftvaro" className="h-10 mx-auto dark:[filter:brightness(0)_invert(1)]" />
+            <Logo height={38} priority className="mx-auto" />
           </Link>
           <h1 className="text-2xl font-bold text-foreground">
             Complete your profile
