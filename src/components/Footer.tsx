@@ -102,7 +102,7 @@ const Footer = () => {
         {/* Brand */}
         <div className="col-span-2 md:col-span-1 space-y-4">
           <Link to="/home" className="flex items-center gap-2">
-            <Logo height={34} />
+            <Logo variant="full" height={40} />
           </Link>
           <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
             {lang === "de"

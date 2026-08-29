@@ -147,7 +147,7 @@ const ProfileSetupPage = () => {
       <div className="glass-card-elevated p-8 w-full max-w-lg space-y-6 page-enter">
         <div className="text-center space-y-2">
           <Link to="/" className="inline-flex">
-            <Logo height={38} priority className="mx-auto" />
+            <Logo variant="full" height={42} priority className="mx-auto" />
           </Link>
           <h1 className="text-2xl font-bold text-foreground">
             Complete your profile

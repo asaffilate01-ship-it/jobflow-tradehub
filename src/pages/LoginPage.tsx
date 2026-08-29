@@ -188,7 +188,7 @@ const LoginPage = () => {
         <div className="w-full max-w-2xl space-y-8 page-enter">
           <div className="flex flex-col items-center gap-3 text-center">
             <Link to="/" className="inline-flex">
-              <Logo height={40} priority />
+              <Logo variant="full" height={44} priority />
             </Link>
             <div className="space-y-1">
               <h1 className="text-2xl font-bold tracking-tight text-foreground">Welcome back</h1>

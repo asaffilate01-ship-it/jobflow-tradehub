@@ -37,7 +37,7 @@ export const UnlockScreen = ({ onUnlocked }: { onUnlocked?: () => void }) => {
     <div className="auth-shell">
       <div className="w-full max-w-md">
         <Link to="/" className="mb-8 flex items-center justify-center">
-          <Logo height={40} priority className="mx-auto" />
+          <Logo variant="full" height={46} priority className="mx-auto" />
         </Link>
 
         <form onSubmit={submit} className="glass-card-premium space-y-5 p-7">
