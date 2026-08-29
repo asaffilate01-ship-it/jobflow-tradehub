@@ -93,8 +93,6 @@ const PromoHomePage = () => {
             </button>
           </div>
         </div>
-
-        </div>
         {menuOpen && (
           <div className="md:hidden border-t border-border bg-background">
             <div className="container grid grid-cols-2 gap-2 py-3">
