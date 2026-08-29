@@ -12,7 +12,7 @@ import {
   SidebarProvider, SidebarTrigger, useSidebar,
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
-import craftvaroLogo from "@/assets/craftvaro-logo.png";
+import Logo from "@/components/Logo";
 
 const driverNavItems = [
   { to: "/driver", label: "Dashboard", icon: LayoutDashboard },
@@ -35,7 +35,7 @@ function DriverSidebar() {
     <Sidebar collapsible="icon" className="border-r border-border bg-card">
       <SidebarContent className="pt-4">
         <div className={`px-4 mb-6 flex items-center ${collapsed ? "justify-center" : ""}`}>
-          <img src={craftvaroLogo} alt="Craftvaro" className={`${collapsed ? "h-8" : "h-9"} [filter:brightness(0)_invert(1)]`} />
+          <Logo variant={collapsed ? "mark" : "full"} height={collapsed ? 30 : 32} tone="light" priority />
         </div>
 
         <SidebarGroup>
@@ -116,7 +116,7 @@ const DriverLayout = () => {
             <div className="flex items-center gap-3">
               <SidebarTrigger className="hidden md:flex" />
               <div className="md:hidden">
-                <img src={craftvaroLogo} alt="Craftvaro" className="h-7" />
+                <Logo height={26} priority />
               </div>
             </div>
             <NotificationBell />

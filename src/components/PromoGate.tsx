@@ -4,7 +4,7 @@ import { Lock, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import logo from "@/assets/craftvaro-logo.png";
+import Logo from "@/components/Logo";
 
 const STORAGE_KEY = "craftvaro_preview_access";
 /** Promo-phase soft gate only — not a security boundary (real data is protected by auth + RLS). */
@@ -37,7 +37,7 @@ export const UnlockScreen = ({ onUnlocked }: { onUnlocked?: () => void }) => {
     <div className="auth-shell">
       <div className="w-full max-w-md">
         <Link to="/" className="mb-8 flex items-center justify-center">
-          <img src={logo} alt="Craftvaro" className="h-10 w-auto" width={200} height={40} />
+          <Logo variant="full" height={46} priority className="mx-auto" />
         </Link>
 
         <form onSubmit={submit} className="glass-card-premium space-y-5 p-7">

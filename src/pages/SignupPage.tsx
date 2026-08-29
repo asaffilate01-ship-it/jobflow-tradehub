@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { User, Wrench, TruckIcon, Phone, ArrowRight, Eye, EyeOff, Info, Home } from "lucide-react";
-import craftvaroLogo from "@/assets/craftvaro-logo.png";
+import Logo from "@/components/Logo";
 import { toast } from "sonner";
 import { usePageMeta } from "@/hooks/use-page-meta";
 
@@ -219,7 +219,7 @@ const SignupPage = () => {
       <div className="glass-card-elevated p-8 w-full max-w-md space-y-6 page-enter">
         <div className="flex flex-col items-center gap-3 text-center">
           <Link to="/" className="inline-flex">
-            <img src={craftvaroLogo} alt="Craftvaro" className="h-10 dark:[filter:brightness(0)_invert(1)]" />
+            <Logo variant="full" height={42} priority />
           </Link>
           <div className="space-y-1">
             <h1 className="text-2xl font-bold tracking-tight text-foreground">Create your account</h1>

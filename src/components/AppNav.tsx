@@ -12,8 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { motion, AnimatePresence } from "framer-motion";
 import NotificationBell from "@/components/NotificationBell";
-import craftvaroLogo from "@/assets/craftvaro-logo.png";
-import craftvaroLogoDe from "@/assets/craftvaro-logo-de.png";
+import Logo from "@/components/Logo";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -75,11 +74,7 @@ const AppNav = () => {
     <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className="container flex h-16 items-center gap-4">
         <Link to="/home" className="flex shrink-0 items-center gap-2 group" aria-label="Craftvaro home">
-          <img
-            src={lang === "de" ? craftvaroLogoDe : craftvaroLogo}
-            alt="Craftvaro"
-            className="h-9 transition-opacity group-hover:opacity-90 dark:[filter:brightness(0)_invert(1)]"
-          />
+          <Logo height={34} priority className="transition-opacity group-hover:opacity-90" />
         </Link>
 
         {/* Desktop nav — segmented pill */}

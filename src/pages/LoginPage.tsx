@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Wrench, Shield, TruckIcon, Lock, AlertTriangle, Eye, EyeOff, Home, UserCheck, Users, ChevronRight, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
-import craftvaroLogo from "@/assets/craftvaro-logo.png";
+import Logo from "@/components/Logo";
 import { usePageMeta } from "@/hooks/use-page-meta";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
@@ -188,7 +188,7 @@ const LoginPage = () => {
         <div className="w-full max-w-2xl space-y-8 page-enter">
           <div className="flex flex-col items-center gap-3 text-center">
             <Link to="/" className="inline-flex">
-              <img src={craftvaroLogo} alt="Craftvaro" className="h-11 dark:[filter:brightness(0)_invert(1)]" />
+              <Logo variant="full" height={44} priority />
             </Link>
             <div className="space-y-1">
               <h1 className="text-2xl font-bold tracking-tight text-foreground">Welcome back</h1>

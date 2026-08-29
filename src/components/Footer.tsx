@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
-import craftvaroLogo from "@/assets/craftvaro-logo.png";
-import craftvaroLogoDe from "@/assets/craftvaro-logo-de.png";
+import Logo from "@/components/Logo";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useLanguage, legalByLang } from "@/contexts/LanguageContext";
 
@@ -103,11 +102,7 @@ const Footer = () => {
         {/* Brand */}
         <div className="col-span-2 md:col-span-1 space-y-4">
           <Link to="/home" className="flex items-center gap-2">
-            <img
-              src={lang === "de" ? craftvaroLogoDe : craftvaroLogo}
-              alt="Craftvaro"
-              className="h-9 dark:[filter:brightness(0)_invert(1)]"
-            />
+            <Logo variant="full" height={40} />
           </Link>
           <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
             {lang === "de"

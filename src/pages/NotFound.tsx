@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Home, Search, HardHat } from "lucide-react";
-import craftvaroLogo from "@/assets/craftvaro-logo.png";
+import Logo from "@/components/Logo";
 import { usePageMeta } from "@/hooks/use-page-meta";
 
 const NotFound = () => {
@@ -28,7 +28,7 @@ const NotFound = () => {
       >
         <div className="flex flex-col items-center gap-5">
           <Link to="/" className="inline-flex">
-            <img src={craftvaroLogo} alt="Craftvaro" className="h-9 dark:[filter:brightness(0)_invert(1)]" />
+            <Logo height={34} priority />
           </Link>
           <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-primary/10 border border-primary/20">
             <HardHat className="h-10 w-10 text-primary" />
