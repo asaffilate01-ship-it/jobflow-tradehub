@@ -70,6 +70,7 @@ const AdminAuditLogPage = lazy(() => import("./pages/AdminAuditLogPage"));
 const AdminRepairProvidersPage = lazy(() => import("./pages/AdminRepairProvidersPage"));
 const AdminTraderDirectoryPage = lazy(() => import("./pages/AdminTraderDirectoryPage"));
 const AdminLaunchReadinessPage = lazy(() => import("./pages/AdminLaunchReadinessPage"));
+const AdminPilotRunsPage = lazy(() => import("./pages/AdminPilotRunsPage"));
 const AdminDeletionRequestsPage = lazy(() => import("./pages/AdminDeletionRequestsPage"));
 const AdminIntegrationOperationsPage = lazy(() => import("./pages/AdminIntegrationOperationsPage"));
 const ClaimTraderProfilePage = lazy(() => import("./pages/ClaimTraderProfilePage"));
@@ -200,6 +201,7 @@ const App = () => (
               <Route path="/admin/repair-providers" element={<AdminRepairProvidersPage />} />
               <Route path="/admin/trader-directory" element={<AdminTraderDirectoryPage />} />
               <Route path="/admin/launch-readiness" element={<AdminLaunchReadinessPage />} />
+              <Route path="/admin/pilot-runs" element={<AdminPilotRunsPage />} />
               <Route path="/admin/deletion-requests" element={<AdminDeletionRequestsPage />} />
               <Route path="/admin/integration-operations" element={<AdminIntegrationOperationsPage />} />
               <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />

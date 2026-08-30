@@ -14,6 +14,7 @@ const report = (blockers: number, warnings: number): LaunchReadinessReport => ({
     pending_deletion_requests: 0,
     integration_queue_problems: 0,
     dokuvera_queue_problems: 0,
+    signed_off_pilot_runs: 0,
   },
 });
 

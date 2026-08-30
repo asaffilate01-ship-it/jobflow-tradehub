@@ -8,6 +8,7 @@ const requiredFiles = [
   "public/sitemap.xml",
   "docs/GO_LIVE_PHASES.md",
   "supabase/migrations/20260830130000_go_live_account_deletion.sql",
+  "supabase/migrations/20260830223000_launch_pilot_signoff.sql",
   "supabase/functions/launch-readiness/index.ts",
 ];
 
@@ -28,6 +29,9 @@ const launchReadiness = existsSync("supabase/functions/launch-readiness/index.ts
 if (launchReadiness.includes("storage.buckets")) failures.push("Launch readiness must configure repair storage through the Storage API, not storage.buckets SQL");
 if (!launchReadiness.includes("admin.storage.createBucket") || !launchReadiness.includes("admin.storage.updateBucket")) {
   failures.push("Launch readiness is missing repair bucket Storage API provisioning");
+}
+if (!launchReadiness.includes('count(admin, "launch_pilot_runs"') || !launchReadiness.includes('id: "pilot-signoff"')) {
+  failures.push("Launch readiness is missing the controlled-pilot sign-off gate");
 }
 
 const outboxWorker = existsSync("supabase/functions/integration-outbox-worker/index.ts")

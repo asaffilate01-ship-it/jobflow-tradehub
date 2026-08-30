@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import {
-  AlertTriangle, CheckCircle2, CircleDotDashed, Database,
+  AlertTriangle, CheckCircle2, CircleDotDashed, Database, ClipboardCheck,
   RefreshCw, Rocket, ShieldAlert, Users, Wrench,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -58,6 +58,7 @@ export default function AdminLaunchReadinessPage() {
     { label: lang === "de" ? "Bezahlte Händler" : "Paid traders", value: report.metrics.paid_marketplace_profiles, icon: Users },
     { label: lang === "de" ? "Beanspruchbare Profile" : "Claimable profiles", value: report.metrics.active_claimable_directory_profiles, icon: CircleDotDashed },
     { label: lang === "de" ? "Reparaturanbieter" : "Repair providers", value: report.metrics.verified_available_repair_profiles, icon: Wrench },
+    { label: lang === "de" ? "Freigegebene Piloten" : "Signed pilots", value: report.metrics.signed_off_pilot_runs, icon: ClipboardCheck },
     { label: lang === "de" ? "Löschanfragen" : "Deletion requests", value: report.metrics.pending_deletion_requests, icon: ShieldAlert },
   ] : [];
 
@@ -85,7 +86,7 @@ export default function AdminLaunchReadinessPage() {
       </div>
 
       {loading && !report ? <div className="glass-card h-56 animate-pulse" /> : report && <>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {metrics.map((metric) => <Card key={metric.label}>
             <CardContent className="flex items-center justify-between p-5">
               <div><p className="text-xs text-muted-foreground">{metric.label}</p><p className="mt-1 text-2xl font-bold tabular-nums">{metric.value}</p></div>
