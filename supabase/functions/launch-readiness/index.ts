@@ -92,7 +92,7 @@ async function buildReport(admin: ReturnType<typeof createClient>) {
     admin.storage.getBucket(REPAIR_BUCKET),
     count(admin, "trader_public_profiles"),
     count(admin, "trader_directory_profiles", (query) => query.eq("is_active", true)),
-    admin.from("trade_repair_profiles").select("available,capability_verified,insurance_verified,credential_verified,credential_expires_at"),
+    admin.from("trade_repair_profiles").select("available,capability_verified,insurance_verified,insurance_expires_at,credential_type,credential_verified,credential_expires_at"),
     count(admin, "account_deletion_requests", (query) => query.in("status", ["requested", "processing"])),
     count(admin, "repair_integration_outbox", (query) => query.in("status", ["retry", "failed"])),
     count(admin, "dokuvera_case_links", (query) => query.in("status", ["pending", "failed"])),
@@ -103,7 +103,11 @@ async function buildReport(admin: ReturnType<typeof createClient>) {
     profile.available &&
     profile.capability_verified &&
     profile.insurance_verified &&
-    (!profile.credential_expires_at || new Date(profile.credential_expires_at).getTime() >= Date.now())
+    (!profile.insurance_expires_at || new Date(profile.insurance_expires_at).getTime() >= Date.now()) &&
+    (!profile.credential_type || (
+      profile.credential_verified &&
+      (!profile.credential_expires_at || new Date(profile.credential_expires_at).getTime() >= Date.now())
+    ))
   ).length;
 
   const checks: ReadinessCheck[] = [

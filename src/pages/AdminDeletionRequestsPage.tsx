@@ -57,13 +57,17 @@ export default function AdminDeletionRequestsPage() {
     setSaving(request.id);
     const processedAt = status === "completed" || status === "cancelled" ? new Date().toISOString() : null;
     const { error } = await supabase.from("account_deletion_requests").update({ status, processed_at: processedAt }).eq("id", request.id);
-    if (!error) await supabase.from("audit_logs").insert({
-      user_id: request.user_id,
-      action: `privacy.deletion.${status}`,
-      entity_type: "account_deletion_request",
-      entity_id: request.id,
-      metadata: { previous_status: request.status },
-    });
+    if (!error) {
+      const { data: { user: actor } } = await supabase.auth.getUser();
+      const { error: auditError } = await supabase.from("audit_logs").insert({
+        user_id: actor?.id ?? request.user_id,
+        action: `privacy.deletion.${status}`,
+        entity_type: "account_deletion_request",
+        entity_id: request.id,
+        metadata: { previous_status: request.status, target_user_id: request.user_id },
+      });
+      if (auditError) toast.warning(lang === "de" ? "Status gespeichert, aber Audit-Eintrag fehlgeschlagen" : "Status saved, but the audit event failed");
+    }
     setSaving(null);
     if (error) return toast.error(error.message);
     setCompletionTarget(null);
