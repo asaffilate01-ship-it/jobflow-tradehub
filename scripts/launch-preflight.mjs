@@ -30,6 +30,13 @@ if (!launchReadiness.includes("admin.storage.createBucket") || !launchReadiness.
   failures.push("Launch readiness is missing repair bucket Storage API provisioning");
 }
 
+const outboxWorker = existsSync("supabase/functions/integration-outbox-worker/index.ts")
+  ? readFileSync("supabase/functions/integration-outbox-worker/index.ts", "utf8")
+  : "";
+if (!outboxWorker.includes('principal !== "admin"') || !outboxWorker.includes("retry_event_id")) {
+  failures.push("Integration recovery must restrict failed-event resets to administrators");
+}
+
 for (const warning of warnings) console.warn(`WARN: ${warning}`);
 for (const failure of failures) console.error(`FAIL: ${failure}`);
 if (failures.length) process.exit(1);

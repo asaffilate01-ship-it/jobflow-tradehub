@@ -134,18 +134,18 @@ async function buildReport(admin: ReturnType<typeof createClient>) {
     {
       id: "paid-members",
       label: "Paid marketplace supply",
-      state: paidMembers.count > 0 ? "ready" : "blocker",
+      state: paidMembers.count >= 10 ? "ready" : paidMembers.count > 0 ? "warning" : "blocker",
       detail: paidMembers.error
         ? `Could not inspect paid marketplace profiles: ${paidMembers.error}`
-        : `${paidMembers.count} verified paid/trial trader profile${paidMembers.count === 1 ? "" : "s"} currently public and lead-eligible.`,
+        : `${paidMembers.count} verified paid/trial trader profile${paidMembers.count === 1 ? "" : "s"} currently public and lead-eligible. The controlled pilot target is at least 10.`,
     },
     {
       id: "repair-providers",
       label: "Verified repair providers",
-      state: verifiedRepairProfiles > 0 ? "ready" : "warning",
+      state: verifiedRepairProfiles >= 4 ? "ready" : verifiedRepairProfiles > 0 ? "warning" : "blocker",
       detail: repairProfiles.error
         ? `Could not inspect repair providers: ${repairProfiles.error.message}`
-        : `${verifiedRepairProfiles} verified provider profile${verifiedRepairProfiles === 1 ? " is" : "s are"} accepting work. Paid eligibility is still enforced during matching.`,
+        : `${verifiedRepairProfiles} verified provider profile${verifiedRepairProfiles === 1 ? " is" : "s are"} accepting work. The four-provider pilot target is 4; paid eligibility is still enforced during matching.`,
     },
     {
       id: "integration-queue",
