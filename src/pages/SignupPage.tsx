@@ -223,7 +223,7 @@ const SignupPage = () => {
           </Link>
           <div className="space-y-1">
             <h1 className="text-2xl font-bold tracking-tight text-foreground">Create your account</h1>
-            <p className="text-sm text-muted-foreground">Free to join — no card required</p>
+            <p className="text-sm text-muted-foreground">Free to join, no card required. Customers never pay — trade businesses subscribe to receive work.</p>
           </div>
         </div>
 
