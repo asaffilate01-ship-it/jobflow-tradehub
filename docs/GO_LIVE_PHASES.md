@@ -17,6 +17,7 @@ Operational tooling now available:
 
 - `/admin/launch-readiness` checks the deployed environment without exposing secrets and provisions `repair-intake` through the Storage API.
 - `/admin/deletion-requests` tracks review, cancellation and confirmed completion with audit events; it does not perform automatic destructive deletion.
+- `/admin/integration-operations` exposes delivery failures without payload contents and provides administrator-only retries for Gabley, Immoviq and Dokuvera.
 
 ## Phase 1 — Staging backend (operator action)
 
@@ -38,6 +39,8 @@ Exit gate: a fresh database deploy succeeds, webhook signature rejection tests p
 - Confirm expired/cancelled/unpaid traders disappear immediately and cannot receive or quote on a lead.
 
 Exit gate: five complete pilot jobs with no privacy or subscription bypass and documented support handling.
+
+The live readiness gate reports zero paid traders as a blocker, 1–9 as a pilot warning, and 10+ as ready for the controlled marketplace pilot. Repair dispatch reports zero verified/available providers as a blocker, 1–3 as a warning, and 4+ as ready for four-provider dispatch testing.
 
 ## Phase 3 — AI Repair and Dokuvera pilot
 

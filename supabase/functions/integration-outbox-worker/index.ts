@@ -7,6 +7,7 @@ const responseHeaders = {
 };
 
 type Destination = "gabley" | "immoviq";
+type Principal = "admin" | "cron";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: responseHeaders });
@@ -18,7 +19,26 @@ Deno.serve(async (req) => {
   );
 
   try {
-    await authorise(req, admin);
+    const principal = await authorise(req, admin);
+    const body = await req.json().catch(() => ({}));
+    let requeued: string | null = null;
+    if (body?.retry_event_id) {
+      if (principal !== "admin") throw new Error("Administrator access required to retry a failed event");
+      if (typeof body.retry_event_id !== "string" || !/^[0-9a-f-]{36}$/i.test(body.retry_event_id)) {
+        throw new Error("Invalid retry_event_id");
+      }
+      const { data: reset, error: resetError } = await admin
+        .from("repair_integration_outbox")
+        .update({ status: "retry", next_attempt_at: new Date().toISOString(), last_error: null })
+        .eq("id", body.retry_event_id)
+        .in("status", ["retry", "failed"])
+        .select("id")
+        .maybeSingle();
+      if (resetError) throw resetError;
+      if (!reset) throw new Error("Retryable integration event not found");
+      requeued = reset.id;
+    }
+
     const { data: pending, error } = await admin
       .from("repair_integration_outbox")
       .select("id,event_type,aggregate_type,aggregate_id,destination,payload,idempotency_key,status,attempts")
@@ -85,7 +105,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    return json({ success: true, processed: results.length, results });
+    return json({ success: true, requeued, processed: results.length, results });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Outbox delivery failed";
     console.error("integration-outbox-worker:", message);
@@ -101,10 +121,10 @@ function destinationConfig(destination: Destination): { url: string; secret: str
   return { url, secret };
 }
 
-async function authorise(req: Request, admin: ReturnType<typeof createClient>): Promise<void> {
+async function authorise(req: Request, admin: ReturnType<typeof createClient>): Promise<Principal> {
   const configuredSecret = Deno.env.get("INTEGRATION_OUTBOX_CRON_SECRET");
   const suppliedSecret = req.headers.get("x-cron-secret");
-  if (configuredSecret && suppliedSecret && constantTimeEqual(configuredSecret, suppliedSecret)) return;
+  if (configuredSecret && suppliedSecret && constantTimeEqual(configuredSecret, suppliedSecret)) return "cron";
 
   const authHeader = req.headers.get("Authorization");
   if (!authHeader) throw new Error("Missing worker authentication");
@@ -112,6 +132,7 @@ async function authorise(req: Request, admin: ReturnType<typeof createClient>): 
   if (!user) throw new Error("Not authenticated");
   const { data: isAdmin } = await admin.rpc("has_role", { _user_id: user.id, _role: "admin" });
   if (!isAdmin) throw new Error("Administrator access required");
+  return "admin";
 }
 
 function constantTimeEqual(left: string, right: string): boolean {

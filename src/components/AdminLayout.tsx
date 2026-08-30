@@ -4,7 +4,7 @@ import { NavLink } from "@/components/NavLink";
 import {
   LayoutDashboard, Users, Shield, BarChart3, UserCheck,
   DollarSign, LogOut, Radio, ScrollText, Store, Wrench,
-  Rocket, UserRoundX,
+  Rocket, UserRoundX, Webhook,
 } from "lucide-react";
 import Logo from "@/components/Logo";
 import NotificationBell from "@/components/NotificationBell";
@@ -26,6 +26,7 @@ const navGroups = [
       { to: "/admin/trader-directory", label: "Trader Directory", icon: Store },
       { to: "/admin/launch-readiness", label: "Launch Readiness", icon: Rocket },
       { to: "/admin/deletion-requests", label: "Deletion Requests", icon: UserRoundX },
+      { to: "/admin/integration-operations", label: "Integration Operations", icon: Webhook },
       { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
       { to: "/admin/audit-log", label: "Audit Log", icon: ScrollText },
     ],
