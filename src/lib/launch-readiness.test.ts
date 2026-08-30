@@ -38,4 +38,19 @@ describe("launch readiness", () => {
     expect(marketplace).toContain("Claimable profiles");
     expect(marketplace).toContain("Claimable profiles only");
   });
+
+  it("keeps failed-event retries admin-only and preserves idempotency", () => {
+    const worker = readFileSync("supabase/functions/integration-outbox-worker/index.ts", "utf8");
+    expect(worker).toContain('principal !== "admin"');
+    expect(worker).toContain('body.retry_event_id');
+    expect(worker).toContain('Idempotency-Key');
+    expect(worker).not.toContain("DOKUVERA_RETRY_CRON_SECRET");
+    expect(worker).not.toContain("DOKUVERA_INTERNAL_SECRET");
+  });
+
+  it("uses meaningful controlled-pilot supply thresholds", () => {
+    const readiness = readFileSync("supabase/functions/launch-readiness/index.ts", "utf8");
+    expect(readiness).toContain("paidMembers.count >= 10");
+    expect(readiness).toContain("verifiedRepairProfiles >= 4");
+  });
 });
