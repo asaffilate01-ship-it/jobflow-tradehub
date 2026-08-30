@@ -2,15 +2,15 @@
 
 ## Marketplace rule
 
-Only verified traders with an active non-free Craftvaro subscription are visible or matchable. This is enforced by the public marketplace projection, AI Trade Finder, four-provider repair matcher, job notification targeting and repair-offer trigger. External or non-subscribing traders are not searched.
+Claimable factual directory profiles remain visible but cannot receive leads, appear in AI results or expose contact details until claimed, verified and subscribed. Only verified traders with an active non-free Craftvaro subscription are matchable. Paid eligibility is enforced by AI Trade Finder, the four-provider repair matcher, job notification targeting and the repair-offer trigger.
 
 ## Required deployment order
 
 1. Review the target project's migration history. `20260824215000_repair_hub_dokuvera.sql` is intentionally a no-op marker because the canonical Lovable migration is `20260824221602_75248a38-3b14-48fc-90b8-6c87fdaf6b58.sql`.
-2. Apply migrations through `20260825113000_marketplace_directory_claims.sql`.
+2. Apply every migration in order through `20260830130000_go_live_account_deletion.sql`. Do not rename or rewrite migrations already recorded by Supabase.
 3. Deploy every function under `supabase/functions`; deploy `stripe-webhook`, `dokuvera-webhook` and `integration-outbox-worker` without Supabase JWT verification because each uses its own signature/cron authentication.
 4. Configure secrets and test each integration in a non-production environment.
-5. Run `npm run typecheck`, `npm run lint`, `npm test` and `npm run build` before release.
+5. Run `bun run launch:preflight`, `bun run typecheck`, `bun run lint`, `bun run test` and `bun run build` before release.
 
 The manual **Deploy Supabase production** GitHub Action performs a database dry run, applies pending migrations, and deploys all Edge Functions. Create a protected GitHub `production` environment and add encrypted `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, and `SUPABASE_PROJECT_ID` secrets before running it. Keep the workflow manually approved until a separate staging project is available.
 
@@ -39,6 +39,10 @@ Generate independent random values for each secret. Never reuse the Supabase ser
 - Gabley/Immoviq deliveries use `X-Craftvaro-Signature` and `Idempotency-Key`.
 - Scheduled price sync requires either an administrator JWT or `X-Cron-Secret` matching `SCHEDULED_SYNC_SECRET`.
 - The outbox worker requires either an administrator JWT or its separate cron secret.
+
+## Media privacy
+
+Create and configure the `repair-intake` bucket through Lovable/Supabase storage tools, not a SQL insert into `storage.buckets`. Original photos and videos are never used as a fallback for Dokuvera delivery: only rows already marked `safe` with a redacted path can leave Craftvaro. Until an approved redaction process produces that safe copy, the evidence case contains metadata but no media.
 
 ## Mobile release
 
