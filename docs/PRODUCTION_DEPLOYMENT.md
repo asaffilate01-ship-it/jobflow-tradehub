@@ -41,6 +41,7 @@ Generate independent random values for each secret. Never reuse the Supabase ser
 - Gabley/Immoviq deliveries use `X-Craftvaro-Signature` and `Idempotency-Key`.
 - Scheduled price sync requires either an administrator JWT or `X-Cron-Secret` matching `SCHEDULED_SYNC_SECRET`.
 - The outbox worker requires either an administrator JWT or its separate cron secret.
+- Administrators can inspect and retry Gabley/Immoviq and Dokuvera failures at `/admin/integration-operations`. A cron-authenticated worker may process due events but cannot reset a failed event; manual resets require an administrator JWT and preserve the original idempotency key.
 
 ## Media privacy
 
