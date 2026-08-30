@@ -12,6 +12,8 @@ Claimable factual directory profiles remain visible but cannot receive leads, ap
 4. Configure secrets and test each integration in a non-production environment.
 5. Run `bun run launch:preflight`, `bun run typecheck`, `bun run lint`, `bun run test` and `bun run build` before release.
 
+After deploying the `launch-readiness` Edge Function, an administrator can open `/admin/launch-readiness` to inspect configuration presence, private storage, paid trader supply and failed/pending integration queues. The page never returns secret values. Its **Configure storage** action creates or updates `repair-intake` through the Supabase Storage API with private access, a 50 MB object limit and the approved image/video MIME types.
+
 The manual **Deploy Supabase production** GitHub Action performs a database dry run, applies pending migrations, and deploys all Edge Functions. Create a protected GitHub `production` environment and add encrypted `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, and `SUPABASE_PROJECT_ID` secrets before running it. Keep the workflow manually approved until a separate staging project is available.
 
 The Supabase workflow does not publish the Vite frontend. After the backend action succeeds, publish the same commit through Lovable so the live UI and database contract cannot drift.
@@ -43,6 +45,10 @@ Generate independent random values for each secret. Never reuse the Supabase ser
 ## Media privacy
 
 Create and configure the `repair-intake` bucket through Lovable/Supabase storage tools, not a SQL insert into `storage.buckets`. Original photos and videos are never used as a fallback for Dokuvera delivery: only rows already marked `safe` with a redacted path can leave Craftvaro. Until an approved redaction process produces that safe copy, the evidence case contains metadata but no media.
+
+## Privacy operations
+
+Administrators process user requests at `/admin/deletion-requests`. Moving a request to `processing`, `cancelled` or `completed` writes an audit event. **Completed is a confirmation step, not an automatic destructive action**: first check identity, open jobs, payments and retention duties, then remove or anonymise data in Supabase Auth, Stripe, Dokuvera, Gabley and Immoviq as applicable.
 
 ## Mobile release
 

@@ -4,6 +4,7 @@ import { NavLink } from "@/components/NavLink";
 import {
   LayoutDashboard, Users, Shield, BarChart3, UserCheck,
   DollarSign, LogOut, Radio, ScrollText, Store, Wrench,
+  Rocket, UserRoundX,
 } from "lucide-react";
 import Logo from "@/components/Logo";
 import NotificationBell from "@/components/NotificationBell";
@@ -23,6 +24,8 @@ const navGroups = [
       { to: "/admin/kyc-review", label: "KYC Review", icon: Shield },
       { to: "/admin/repair-providers", label: "Repair Providers", icon: Wrench },
       { to: "/admin/trader-directory", label: "Trader Directory", icon: Store },
+      { to: "/admin/launch-readiness", label: "Launch Readiness", icon: Rocket },
+      { to: "/admin/deletion-requests", label: "Deletion Requests", icon: UserRoundX },
       { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
       { to: "/admin/audit-log", label: "Audit Log", icon: ScrollText },
     ],

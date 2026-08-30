@@ -13,6 +13,11 @@ This runbook separates code that is ready to deploy from work that needs product
 
 Exit gate: CI green and `bun run launch:preflight` has no failures.
 
+Operational tooling now available:
+
+- `/admin/launch-readiness` checks the deployed environment without exposing secrets and provisions `repair-intake` through the Storage API.
+- `/admin/deletion-requests` tracks review, cancellation and confirmed completion with audit events; it does not perform automatic destructive deletion.
+
 ## Phase 1 — Staging backend (operator action)
 
 1. Create or select a separate Supabase staging project.
