@@ -62,7 +62,7 @@ const emptyStats: Stat[] = [
 const howItWorks = [
   { step: "1", title: "Search & Post", desc: "Tell us what you need and where. We'll match you with verified tradespeople in your area.", icon: Search },
   { step: "2", title: "Compare Quotes", desc: "Receive itemised quotes from rated tradespeople. Compare prices, reviews, and credentials.", icon: FileText },
-  { step: "3", title: "Hire & Track", desc: "Choose your trade, track progress with GPS-stamped photos, milestones, and secure payments.", icon: CheckCircle },
+  { step: "3", title: "Hire & Track", desc: "Choose your trade, track progress with GPS-stamped photos, milestones, and agreed payment records.", icon: CheckCircle },
 ];
 
 const whyBetter = [

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import type { Database } from "@/integrations/supabase/types";
@@ -12,6 +13,16 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ children, allowedRoles, requireAuth = true }: ProtectedRouteProps) => {
   const { user, roles, loading } = useAuth();
+
+  useEffect(() => {
+    let robots = document.querySelector('meta[name="robots"]');
+    if (!robots) {
+      robots = document.createElement("meta");
+      robots.setAttribute("name", "robots");
+      document.head.appendChild(robots);
+    }
+    robots.setAttribute("content", "noindex,nofollow");
+  }, []);
 
   if (loading) {
     return (

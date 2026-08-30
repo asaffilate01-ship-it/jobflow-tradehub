@@ -15,6 +15,7 @@ import DriverLayout from "./components/DriverLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import KycGate from "./components/KycGate";
 import TierGate from "./components/TierGate";
+import CookieNotice from "./components/CookieNotice";
 
 import PromoGate, { UnlockScreen } from "./components/PromoGate";
 import PromoHomePage from "./pages/PromoHomePage";
@@ -69,6 +70,8 @@ const AdminAuditLogPage = lazy(() => import("./pages/AdminAuditLogPage"));
 const AdminRepairProvidersPage = lazy(() => import("./pages/AdminRepairProvidersPage"));
 const AdminTraderDirectoryPage = lazy(() => import("./pages/AdminTraderDirectoryPage"));
 const ClaimTraderProfilePage = lazy(() => import("./pages/ClaimTraderProfilePage"));
+const LegalPage = lazy(() => import("./pages/LegalPage"));
+const DeleteAccountPage = lazy(() => import("./pages/DeleteAccountPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -87,6 +90,9 @@ const App = () => (
             {/* Promo homepage — public, default */}
             <Route path="/" element={<PromoHomePage />} />
             <Route path="/unlock" element={<UnlockScreen />} />
+            <Route path="/privacy" element={<LegalPage />} />
+            <Route path="/terms" element={<LegalPage />} />
+            <Route path="/cookies" element={<LegalPage />} />
 
             {/* Everything below requires the promo access password */}
             <Route element={<PromoGate><Outlet /></PromoGate>}>
@@ -172,6 +178,11 @@ const App = () => (
                   <CustomerPortalPage />
                 </ProtectedRoute>
               } />
+              <Route path="/account/delete" element={
+                <ProtectedRoute>
+                  <DeleteAccountPage />
+                </ProtectedRoute>
+              } />
             </Route>
 
             {/* Admin layout */}
@@ -224,6 +235,7 @@ const App = () => (
             </Route>
           </Routes>
           </Suspense>
+          <CookieNotice />
 
         </AuthProvider>
       </BrowserRouter>
