@@ -33,9 +33,11 @@ Deno.serve(async (req) => {
       admin.from("dokuvera_case_links").select("*").eq("job_id", job_id).maybeSingle(),
       admin.from("repair_private_locations").select("address_line1,city,postcode").eq("job_id", job_id).maybeSingle(),
     ]);
-    const media = await Promise.all((mediaResult.data ?? []).map(async (item: any) => {
-      const path = item.redacted_storage_path || item.storage_path;
-      const { data } = await admin.storage.from("repair-intake").createSignedUrl(path, 600);
+    const safeMediaRows = (mediaResult.data ?? []).filter(
+      (item: any) => item.redaction_status === "safe" && item.redacted_storage_path,
+    );
+    const media = await Promise.all(safeMediaRows.map(async (item: any) => {
+      const { data } = await admin.storage.from("repair-intake").createSignedUrl(item.redacted_storage_path, 600);
       return { source_id: item.id, media_type: item.media_type, captured_at: item.captured_at, checksum: item.checksum, redaction_status: item.redaction_status, signed_url: data?.signedUrl, expires_in: 600 };
     }));
     const payload = {
@@ -52,6 +54,11 @@ Deno.serve(async (req) => {
       source: { product: job.source_product, reference: job.source_reference, property_reference: job.property_reference, tenancy_reference: job.tenancy_reference },
       diagnosis: diagnosisResult.data,
       media,
+      media_privacy: {
+        originals_shared: false,
+        safe_media_count: media.length,
+        pending_media_count: (mediaResult.data ?? []).length - media.length,
+      },
       offers: quotesResult.data ?? [],
       certificates: certsResult.data ?? [],
     };

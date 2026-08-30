@@ -172,6 +172,10 @@ export default function MarketplacePage() {
           <Metric icon={BriefcaseBusiness} value={stats.completed_jobs} label="Completed jobs" />
           <Metric icon={Star} value={stats.average_rating ? stats.average_rating.toFixed(1) : "—"} label="Verified rating" />
         </div>
+        <p className="mt-4 text-xs text-muted-foreground">
+          Browsing and contacting subscribed members is open to everyone. Claimable profiles are factual directory
+          listings and cannot receive leads until claimed and subscribed. AI search needs a free account.
+        </p>
       </section>
 
       <AITradeSearch />

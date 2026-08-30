@@ -18,9 +18,9 @@ const footerLinks = {
   ],
   Company: [
     { label: "About Craftvaro", to: "/" },
-    { label: "Blog", to: "/" },
-    { label: "Privacy Policy", to: "/" },
-    { label: "Terms of Service", to: "/" },
+    { label: "Privacy Policy", to: "/privacy" },
+    { label: "Terms of Service", to: "/terms" },
+    { label: "Cookie Policy", to: "/cookies" },
   ],
 };
 
@@ -88,6 +88,7 @@ const deLabels: Record<string, string> = {
   Blog: "Blog",
   "Privacy Policy": "Datenschutz",
   "Terms of Service": "AGB",
+  "Cookie Policy": "Cookie-Richtlinie",
 };
 
 const Footer = () => {
