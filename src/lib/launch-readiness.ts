@@ -18,6 +18,7 @@ export interface LaunchReadinessReport {
     pending_deletion_requests: number;
     integration_queue_problems: number;
     dokuvera_queue_problems: number;
+    signed_off_pilot_runs: number;
   };
 }
 

@@ -7,12 +7,14 @@ Claimable factual directory profiles remain visible but cannot receive leads, ap
 ## Required deployment order
 
 1. Review the target project's migration history. `20260824215000_repair_hub_dokuvera.sql` is intentionally a no-op marker because the canonical Lovable migration is `20260824221602_75248a38-3b14-48fc-90b8-6c87fdaf6b58.sql`.
-2. Apply every migration in order through `20260830130000_go_live_account_deletion.sql`. Do not rename or rewrite migrations already recorded by Supabase.
+2. Apply every migration in order through `20260830223000_launch_pilot_signoff.sql`. Do not rename or rewrite migrations already recorded by Supabase.
 3. Deploy every function under `supabase/functions`; deploy `stripe-webhook`, `dokuvera-webhook` and `integration-outbox-worker` without Supabase JWT verification because each uses its own signature/cron authentication.
 4. Configure secrets and test each integration in a non-production environment.
 5. Run `bun run launch:preflight`, `bun run typecheck`, `bun run lint`, `bun run test` and `bun run build` before release.
 
-After deploying the `launch-readiness` Edge Function, an administrator can open `/admin/launch-readiness` to inspect configuration presence, private storage, paid trader supply and failed/pending integration queues. The page never returns secret values. Its **Configure storage** action creates or updates `repair-intake` through the Supabase Storage API with private access, a 50 MB object limit and the approved image/video MIME types.
+After deploying the `launch-readiness` Edge Function, an administrator can open `/admin/launch-readiness` to inspect configuration presence, private storage, paid trader supply, pilot sign-off and failed/pending integration queues. The page never returns secret values. Its **Configure storage** action creates or updates `repair-intake` through the Supabase Storage API with private access, a 50 MB object limit and the approved image/video MIME types.
+
+Create the controlled launch record at `/admin/pilot-runs`. Each run is bound to a postcode area and contains the required supply, customer, safety, dispatch, completion, integration, subscription and privacy checks. Record notes and an evidence link/reference for every check. The server rejects sign-off until all required checks pass, and a signed run and its checks cannot be edited afterwards.
 
 The manual **Deploy Supabase production** GitHub Action performs a database dry run, applies pending migrations, and deploys all Edge Functions. Create a protected GitHub `production` environment and add encrypted `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, and `SUPABASE_PROJECT_ID` secrets before running it. Keep the workflow manually approved until a separate staging project is available.
 

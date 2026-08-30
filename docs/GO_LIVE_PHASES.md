@@ -18,12 +18,13 @@ Operational tooling now available:
 - `/admin/launch-readiness` checks the deployed environment without exposing secrets and provisions `repair-intake` through the Storage API.
 - `/admin/deletion-requests` tracks review, cancellation and confirmed completion with audit events; it does not perform automatic destructive deletion.
 - `/admin/integration-operations` exposes delivery failures without payload contents and provides administrator-only retries for Gabley, Immoviq and Dokuvera.
+- `/admin/pilot-runs` creates postcode-specific pilot runs, stores evidence and prevents sign-off until every required check passes. Signed runs are immutable.
 
 ## Phase 1 — Staging backend (operator action)
 
 1. Create or select a separate Supabase staging project.
 2. Set all secrets listed in `docs/PRODUCTION_DEPLOYMENT.md`.
-3. Apply all migrations, including `20260830130000_go_live_account_deletion.sql`.
+3. Apply all migrations, including `20260830223000_launch_pilot_signoff.sql`.
 4. Deploy every Edge Function.
 5. Create or update the private `repair-intake` bucket with Lovable/Supabase storage tools; do not insert into `storage.buckets` through this migration path.
 6. Schedule the existing `integration-outbox-worker` with its approved cron secret.
@@ -38,9 +39,9 @@ Exit gate: a fresh database deploy succeeds, webhook signature rejection tests p
 - Test the customer flow: search → profile → job → up to four offers → acceptance → address release.
 - Confirm expired/cancelled/unpaid traders disappear immediately and cannot receive or quote on a lead.
 
-Exit gate: five complete pilot jobs with no privacy or subscription bypass and documented support handling.
+Exit gate: record five complete pilot jobs with no privacy or subscription bypass, attach the evidence in `/admin/pilot-runs`, and pass every required check.
 
-The live readiness gate reports zero paid traders as a blocker, 1–9 as a pilot warning, and 10+ as ready for the controlled marketplace pilot. Repair dispatch reports zero verified/available providers as a blocker, 1–3 as a warning, and 4+ as ready for four-provider dispatch testing.
+The live readiness gate reports zero paid traders as a blocker, 1–9 as a pilot warning, and 10+ as ready for the controlled marketplace pilot. Repair dispatch reports zero verified/available providers as a blocker, 1–3 as a warning, and 4+ as ready for four-provider dispatch testing. It continues to report a warning until an administrator signs off a fully passed pilot run.
 
 ## Phase 3 — AI Repair and Dokuvera pilot
 

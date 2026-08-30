@@ -1396,6 +1396,110 @@ export type Database = {
           },
         ]
       }
+      launch_pilot_checks: {
+        Row: {
+          category: string
+          check_key: string
+          created_at: string
+          evidence_reference: string | null
+          id: string
+          label: string
+          notes: string | null
+          required: boolean
+          run_id: string
+          sort_order: number
+          status: string
+          tested_at: string | null
+          tested_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          check_key: string
+          created_at?: string
+          evidence_reference?: string | null
+          id?: string
+          label: string
+          notes?: string | null
+          required?: boolean
+          run_id: string
+          sort_order?: number
+          status?: string
+          tested_at?: string | null
+          tested_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          check_key?: string
+          created_at?: string
+          evidence_reference?: string | null
+          id?: string
+          label?: string
+          notes?: string | null
+          required?: boolean
+          run_id?: string
+          sort_order?: number
+          status?: string
+          tested_at?: string | null
+          tested_by?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "launch_pilot_checks_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "launch_pilot_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      launch_pilot_runs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+          notes: string | null
+          postcode_area: string
+          signed_off_at: string | null
+          signed_off_by: string | null
+          started_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          name: string
+          notes?: string | null
+          postcode_area: string
+          signed_off_at?: string | null
+          signed_off_by?: string | null
+          started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          postcode_area?: string
+          signed_off_at?: string | null
+          signed_off_by?: string | null
+          started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       marketplace_memberships: {
         Row: {
           ends_at: string | null
@@ -3643,6 +3747,10 @@ export type Database = {
           used: number
         }[]
       }
+      create_launch_pilot_run: {
+        Args: { p_name: string; p_notes?: string | null; p_postcode_area: string }
+        Returns: string
+      }
       create_repair_job: {
         Args: {
           p_address_line1: string
@@ -3698,6 +3806,7 @@ export type Database = {
         }
         Returns: string
       }
+      sign_off_launch_pilot: { Args: { p_run_id: string }; Returns: string }
       verify_order_status: { Args: { order_id: string }; Returns: Json }
     }
     Enums: {

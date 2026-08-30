@@ -88,6 +88,7 @@ async function buildReport(admin: ReturnType<typeof createClient>) {
     deletionRequests,
     outboxProblems,
     dokuveraProblems,
+    signedPilots,
   ] = await Promise.all([
     admin.storage.getBucket(REPAIR_BUCKET),
     count(admin, "trader_public_profiles"),
@@ -96,6 +97,7 @@ async function buildReport(admin: ReturnType<typeof createClient>) {
     count(admin, "account_deletion_requests", (query) => query.in("status", ["requested", "processing"])),
     count(admin, "repair_integration_outbox", (query) => query.in("status", ["retry", "failed"])),
     count(admin, "dokuvera_case_links", (query) => query.in("status", ["pending", "failed"])),
+    count(admin, "launch_pilot_runs", (query) => query.eq("status", "passed").not("signed_off_at", "is", null)),
   ]);
 
   const storageReady = Boolean(bucketResult.data && bucketResult.data.public === false);
@@ -148,6 +150,16 @@ async function buildReport(admin: ReturnType<typeof createClient>) {
         : `${verifiedRepairProfiles} verified provider profile${verifiedRepairProfiles === 1 ? " is" : "s are"} accepting work. The four-provider pilot target is 4; paid eligibility is still enforced during matching.`,
     },
     {
+      id: "pilot-signoff",
+      label: "Controlled pilot sign-off",
+      state: signedPilots.count > 0 ? "ready" : "warning",
+      detail: signedPilots.error
+        ? `Could not inspect pilot sign-offs: ${signedPilots.error}`
+        : signedPilots.count > 0
+          ? `${signedPilots.count} controlled postcode pilot${signedPilots.count === 1 ? " has" : "s have"} passed every required check and been signed off.`
+          : "Complete and sign off at least one postcode pilot before opening the marketplace beyond controlled users.",
+    },
+    {
       id: "integration-queue",
       label: "Integration delivery queue",
       state: outboxProblems.count === 0 ? "ready" : "warning",
@@ -180,6 +192,7 @@ async function buildReport(admin: ReturnType<typeof createClient>) {
       pending_deletion_requests: deletionRequests.count,
       integration_queue_problems: outboxProblems.count,
       dokuvera_queue_problems: dokuveraProblems.count,
+      signed_off_pilot_runs: signedPilots.count,
     },
   };
 }

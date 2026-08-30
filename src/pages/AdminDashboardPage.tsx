@@ -8,7 +8,7 @@ import {
   Users, Briefcase, Truck, UserCheck, DollarSign, Shield,
   Activity, AlertTriangle, ScrollText, CreditCard, Clock,
   ChevronRight, TrendingUp,
-  Rocket, UserRoundX, Webhook,
+  Rocket, UserRoundX, Webhook, ClipboardCheck,
 } from "lucide-react";
 import { usePageMeta } from "@/hooks/use-page-meta";
 
@@ -134,6 +134,7 @@ const AdminDashboardPage = () => {
               { label: "Send Broadcast", href: "/admin/broadcasts", icon: Activity, badge: null, badgeColor: "" },
               { label: "Audit Log", href: "/admin/audit-log", icon: ScrollText, badge: null, badgeColor: "" },
               { label: "Launch Readiness", href: "/admin/launch-readiness", icon: Rocket, badge: null, badgeColor: "" },
+              { label: "Pilot Runs", href: "/admin/pilot-runs", icon: ClipboardCheck, badge: null, badgeColor: "" },
               { label: "Deletion Requests", href: "/admin/deletion-requests", icon: UserRoundX, badge: null, badgeColor: "" },
               { label: "Integration Operations", href: "/admin/integration-operations", icon: Webhook, badge: null, badgeColor: "" },
             ].map((action) => (
