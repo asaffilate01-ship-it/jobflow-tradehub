@@ -47,5 +47,6 @@ describe("ProtectedRoute", () => {
   it("renders for an allowed role", () => {
     renderProtected(["customer"]);
     expect(screen.getByText("Secure")).toBeInTheDocument();
+    expect(document.querySelector('meta[name="robots"]')?.getAttribute("content")).toBe("noindex,nofollow");
   });
 });

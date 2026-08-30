@@ -1,16 +1,19 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
 Allow: /
+Disallow: /account/
+Disallow: /admin/
+Disallow: /agent/
+Disallow: /dashboard
+Disallow: /driver/
+Disallow: /jobs
+Disallow: /login
+Disallow: /messages
+Disallow: /my-projects
+Disallow: /post-job
+Disallow: /profile-setup
+Disallow: /repair-assist
+Disallow: /reset-password
+Disallow: /signup
+Disallow: /subscription
 
 Sitemap: https://craftvaro.com/sitemap.xml
