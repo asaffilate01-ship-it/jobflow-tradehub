@@ -69,6 +69,8 @@ const AdminAgentsPage = lazy(() => import("./pages/AdminAgentsPage"));
 const AdminAuditLogPage = lazy(() => import("./pages/AdminAuditLogPage"));
 const AdminRepairProvidersPage = lazy(() => import("./pages/AdminRepairProvidersPage"));
 const AdminTraderDirectoryPage = lazy(() => import("./pages/AdminTraderDirectoryPage"));
+const AdminLaunchReadinessPage = lazy(() => import("./pages/AdminLaunchReadinessPage"));
+const AdminDeletionRequestsPage = lazy(() => import("./pages/AdminDeletionRequestsPage"));
 const ClaimTraderProfilePage = lazy(() => import("./pages/ClaimTraderProfilePage"));
 const LegalPage = lazy(() => import("./pages/LegalPage"));
 const DeleteAccountPage = lazy(() => import("./pages/DeleteAccountPage"));
@@ -196,6 +198,8 @@ const App = () => (
               <Route path="/admin/kyc-review" element={<AdminKycPage />} />
               <Route path="/admin/repair-providers" element={<AdminRepairProvidersPage />} />
               <Route path="/admin/trader-directory" element={<AdminTraderDirectoryPage />} />
+              <Route path="/admin/launch-readiness" element={<AdminLaunchReadinessPage />} />
+              <Route path="/admin/deletion-requests" element={<AdminDeletionRequestsPage />} />
               <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
               <Route path="/admin/agents" element={<AdminAgentsPage />} />
               <Route path="/admin/commissions" element={<AgentCommissionsPage />} />
