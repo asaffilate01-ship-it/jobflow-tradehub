@@ -11,8 +11,8 @@ import { usePageMeta } from "@/hooks/use-page-meta";
 type RoleOption = "customer" | "trade" | "driver";
 
 const roleCards: { value: RoleOption; label: string; desc: string; icon: typeof User }[] = [
-  { value: "customer", label: "Customer", desc: "Post jobs & hire trades", icon: User },
-  { value: "trade", label: "Tradesperson", desc: "Find work & manage jobs", icon: Wrench },
+  { value: "customer", label: "Customer", desc: "Post jobs & hire trades — always free", icon: User },
+  { value: "tradeperson_placeholder" as RoleOption, label: "", desc: "", icon: Wrench },
   { value: "driver", label: "Driver", desc: "Deliver materials to sites", icon: TruckIcon },
 ];
 
