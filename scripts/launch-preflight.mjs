@@ -8,6 +8,7 @@ const requiredFiles = [
   "public/sitemap.xml",
   "docs/GO_LIVE_PHASES.md",
   "supabase/migrations/20260830130000_go_live_account_deletion.sql",
+  "supabase/functions/launch-readiness/index.ts",
 ];
 
 for (const file of requiredFiles) if (!existsSync(file)) failures.push(`Missing ${file}`);
@@ -19,6 +20,14 @@ for (const key of ["SUPABASE_ACCESS_TOKEN", "SUPABASE_DB_PASSWORD", "SUPABASE_PR
 const config = existsSync("supabase/config.toml") ? readFileSync("supabase/config.toml", "utf8") : "";
 for (const name of ["stripe-webhook", "dokuvera-webhook", "integration-outbox-worker"]) {
   if (!config.includes(`[functions.${name}]`)) failures.push(`Missing Supabase config for ${name}`);
+}
+
+const launchReadiness = existsSync("supabase/functions/launch-readiness/index.ts")
+  ? readFileSync("supabase/functions/launch-readiness/index.ts", "utf8")
+  : "";
+if (launchReadiness.includes("storage.buckets")) failures.push("Launch readiness must configure repair storage through the Storage API, not storage.buckets SQL");
+if (!launchReadiness.includes("admin.storage.createBucket") || !launchReadiness.includes("admin.storage.updateBucket")) {
+  failures.push("Launch readiness is missing repair bucket Storage API provisioning");
 }
 
 for (const warning of warnings) console.warn(`WARN: ${warning}`);
