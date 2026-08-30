@@ -23,7 +23,7 @@ const copy = {
       title: "Terms of service",
       intro: "The rules for using Craftvaro’s subscription marketplace.",
       sections: [
-        ["Marketplace role", "Craftvaro connects customers with independently operated, subscribing tradespeople. Unless clearly stated for a specific service, Craftvaro is not the contractor and is not a party to the repair contract between customer and trader."],
+        ["Marketplace role", "Craftvaro is open to everyone: browsing the marketplace is free, a free account unlocks AI features, and businesses pay a membership. Craftvaro connects customers with independently operated, subscribing tradespeople. Unless clearly stated for a specific service, Craftvaro is not the contractor and is not a party to the repair contract between customer and trader."],
         ["Trader membership", "Only traders with an active paid or trial subscription may be shown, receive leads or submit offers. Traders must keep identity, insurance, qualifications, availability, pricing and service-area information accurate and current."],
         ["AI Repair Assist", "Possible causes, urgency and cost ranges are informational estimates. They are not a diagnosis, quotation or instruction to perform regulated work. Emergency guidance takes priority, and a qualified professional must inspect and confirm the work."],
         ["Offers and jobs", "A trader’s offer sets the commercial terms, subject to clearly approved variations. Customers must provide accurate job information and safe access. Exact addresses are disclosed only to the selected provider after acceptance."],
@@ -47,7 +47,7 @@ const copy = {
       title: "Datenschutzerklärung",
       intro: "Wie Craftvaro personenbezogene Daten verwendet und schützt.",
       sections: [
-        ["Verantwortlicher", "Craftvaro ist ein Handelsname der iTechLounge Ltd. Datenschutzanfragen können an privacy@craftvaro.com gerichtet werden."],
+        ["Verantwortlicher", "Craftvaro ist ein Handelsname der iTechLounge GmbH. Datenschutzanfragen können an privacy@craftvaro.com gerichtet werden."],
         ["Verarbeitete Daten", "Wir verarbeiten Konto- und Profildaten, Abonnementstatus, Aufträge, Angebote, Nachrichten, ungefähre und nach Auftragsannahme vollständige Standorte, Reparaturmedien, Sicherheitsbewertungen, Nachweise, Geräte- und Sicherheitsprotokolle sowie Supportanfragen."],
         ["Zwecke", "Wir verwenden Daten, um den Marktplatz bereitzustellen, zahlende Betriebe und Nachweise zu prüfen, Aufträge zu vermitteln, Betrug zu verhindern, Repair Assist zu betreiben, Nachweise zu führen, Support zu leisten und rechtliche Pflichten zu erfüllen."],
         ["Reparaturfotos und -videos", "Originalmedien bleiben privat. Betriebe und Dokuvera erhalten Medien nur, wenn eine getrennte Kopie durch den Freigabeprozess als sicher markiert wurde. Automatische Bewertungen ersetzen keine Fachkraft."],
@@ -60,7 +60,7 @@ const copy = {
       title: "Nutzungsbedingungen",
       intro: "Regeln für den Craftvaro-Abonnement-Marktplatz.",
       sections: [
-        ["Rolle des Marktplatzes", "Craftvaro verbindet Kunden mit selbstständigen, abonnierenden Handwerksbetrieben. Soweit nicht ausdrücklich anders angegeben, ist Craftvaro nicht Auftragnehmer und nicht Partei des Vertrags zwischen Kunde und Betrieb."],
+        ["Rolle des Marktplatzes", "Der Marktplatz ist für alle offen: Suchen ist kostenlos, ein kostenloses Konto schaltet KI-Funktionen frei, und Betriebe zahlen eine Mitgliedschaft. Craftvaro verbindet Kunden mit selbstständigen, abonnierenden Handwerksbetrieben. Soweit nicht ausdrücklich anders angegeben, ist Craftvaro nicht Auftragnehmer und nicht Partei des Vertrags zwischen Kunde und Betrieb."],
         ["Mitgliedschaft", "Nur Betriebe mit aktivem bezahltem oder Test-Abonnement dürfen angezeigt werden, Anfragen erhalten oder Angebote abgeben. Identität, Versicherung, Qualifikationen, Verfügbarkeit, Preise und Einsatzgebiet müssen aktuell sein."],
         ["AI Repair Assist", "Mögliche Ursachen, Dringlichkeit und Kostenbereiche sind unverbindliche Hinweise. Sie sind weder Diagnose noch Angebot oder Anleitung für regulierte Arbeiten. Sicherheitsanweisungen haben Vorrang; eine Fachkraft muss den Auftrag prüfen."],
         ["Angebote und Aufträge", "Das Angebot des Betriebs bestimmt die Konditionen, vorbehaltlich ausdrücklich bestätigter Änderungen. Kunden müssen richtige Angaben und sicheren Zugang gewährleisten. Die genaue Adresse wird erst nach Annahme freigegeben."],
