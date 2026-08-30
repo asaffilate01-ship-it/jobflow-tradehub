@@ -278,10 +278,12 @@ const AppNav = () => {
                       <UserIcon className="h-4 w-4" />
                       Profile & settings
                     </Link>
-                    <Link to="/subscription" className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-foreground/80 hover:bg-secondary/50">
-                      <Sparkles className="h-4 w-4" />
-                      Plans & billing
-                    </Link>
+                    {(isTrade || isAdmin) && (
+                      <Link to="/subscription" className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-foreground/80 hover:bg-secondary/50">
+                        <Sparkles className="h-4 w-4" />
+                        Plans & billing
+                      </Link>
+                    )}
                   </div>
                 </>
               )}
