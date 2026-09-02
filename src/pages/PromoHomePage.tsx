@@ -338,6 +338,11 @@ const PromoHomePage = () => {
             © {new Date().getFullYear()} Craftvaro. {legal.entity}. {t.footer.rights} · {legal.email}
           </p>
         </div>
+        <div className="container mt-4 text-center md:text-right">
+          <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground/50">
+            {lang === "de" ? "Betrieben von iTechLounge" : "Powered by iTechLounge"}
+          </p>
+        </div>
       </footer>
 
       {/* ===== Mobile bottom nav (native feel) ===== */}

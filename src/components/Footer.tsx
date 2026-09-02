@@ -155,6 +155,12 @@ const Footer = () => {
           {lang === "de" ? "Made in Europe 🇪🇺" : "Built in the UK 🇬🇧"}
         </p>
       </div>
+
+      <div className="mt-4 text-center">
+        <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground/50">
+          {lang === "de" ? "Betrieben von iTechLounge" : "Powered by iTechLounge"}
+        </p>
+      </div>
     </div>
   </footer>
   );
