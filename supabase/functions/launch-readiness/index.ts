@@ -88,6 +88,7 @@ async function buildReport(admin: ReturnType<typeof createClient>) {
     deletionRequests,
     outboxProblems,
     dokuveraProblems,
+    projectSchema, subcontractSchema, paymentSchema,
   ] = await Promise.all([
     admin.storage.getBucket(REPAIR_BUCKET),
     count(admin, "trader_public_profiles"),
@@ -96,6 +97,7 @@ async function buildReport(admin: ReturnType<typeof createClient>) {
     count(admin, "account_deletion_requests", (query) => query.in("status", ["requested", "processing"])),
     count(admin, "repair_integration_outbox", (query) => query.in("status", ["retry", "failed"])),
     count(admin, "dokuvera_case_links", (query) => query.in("status", ["pending", "failed"])),
+    count(admin, "project_opportunities"), count(admin, "subcontract_work_orders"), count(admin, "subcontract_payment_records"),
   ]);
 
   const storageReady = Boolean(bucketResult.data && bucketResult.data.public === false);
@@ -111,6 +113,8 @@ async function buildReport(admin: ReturnType<typeof createClient>) {
   ).length;
 
   const checks: ReadinessCheck[] = [
+    { id: "property-project-schema", label: "Property and subcontractor schema", state: projectSchema.error || subcontractSchema.error || paymentSchema.error ? "blocker" : "ready", detail: projectSchema.error || subcontractSchema.error || paymentSchema.error ? "Apply the September property project, subcontractor and performance migrations." : "Opportunity, work order and payment tables are accessible. Validate role policies separately." },
+    { id: "planning-source-setup", label: "Planning and funding sources", state: "warning", detail: "Confirm provider coverage and display licences. Source records are manually curated until a licensed connector is configured." },
     {
       id: "repair-storage",
       label: "Private repair media storage",

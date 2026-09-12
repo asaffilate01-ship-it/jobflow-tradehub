@@ -23,6 +23,10 @@ import PromoHomePage from "./pages/PromoHomePage";
 import AgentLayout from "./components/AgentLayout";
 import AdminLayout from "./components/AdminLayout";
 
+const PropertyProjectsPage = lazyWithRetry(() => import("./pages/PropertyProjectsPage"));
+const ProjectOpportunitiesPage = lazyWithRetry(() => import("./pages/ProjectOpportunitiesPage"));
+const SubcontractorsPage = lazyWithRetry(() => import("./pages/SubcontractorsPage"));
+const BusinessPerformancePage = lazyWithRetry(() => import("./pages/BusinessPerformancePage"));
 const SmartOrderPage = lazyWithRetry(() => import("./pages/SmartOrderPage"));
 const LandingPage = lazyWithRetry(() => import("./pages/LandingPage"));
 const JobsPage = lazyWithRetry(() => import("./pages/JobsPage"));
@@ -134,6 +138,9 @@ const App = () => (
                 </KycGate>
               </ProtectedRoute>
             }>
+              <Route path="/project-opportunities" element={<TierGate required="basic" feature="Project opportunities"><ProjectOpportunitiesPage /></TierGate>} />
+              <Route path="/subcontractors" element={<SubcontractorsPage />} />
+              <Route path="/business-performance" element={<BusinessPerformancePage />} />
               <Route path="/dashboard" element={<TraderDashboard />} />
               <Route path="/repair-opportunities" element={<RepairOpportunitiesPage />} />
               <Route path="/jobs/:jobId/quote" element={<TierGate required="basic" feature="Quoting"><SubmitQuotePage /></TierGate>} />
@@ -159,6 +166,8 @@ const App = () => (
 
             {/* Public / Customer layout (top nav) */}
             <Route element={<AppLayout />}>
+              <Route path="/property-projects" element={<PropertyProjectsPage />} />
+              <Route path="/funding-opportunities" element={<ProtectedRoute><ProjectOpportunitiesPage /></ProtectedRoute>} />
               <Route path="/home" element={<LandingPage />} />
               <Route path="/marketplace" element={<MarketplacePage />} />
               <Route path="/trader/:id" element={<TraderProfilePage />} />
@@ -195,6 +204,7 @@ const App = () => (
                 <AdminLayout />
               </ProtectedRoute>
             }>
+              <Route path="/admin/project-opportunities" element={<ProjectOpportunitiesPage />} />
               <Route path="/admin" element={<AdminDashboardPage />} />
               <Route path="/admin/users" element={<AdminUsersPage />} />
               <Route path="/admin/kyc-review" element={<AdminKycPage />} />

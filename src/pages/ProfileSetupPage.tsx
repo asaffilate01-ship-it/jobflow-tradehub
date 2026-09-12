@@ -58,7 +58,7 @@ const ProfileSetupPage = () => {
     setLoading(true);
 
     // Update profile
-    const profileUpdate: Record<string, any> = { phone };
+    const profileUpdate: Database["public"]["Tables"]["profiles"]["Update"] = { phone };
     if (isTrade) {
       profileUpdate.company_name = companyName;
       profileUpdate.trade_specialism = tradeSpecialism;

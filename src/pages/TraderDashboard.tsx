@@ -36,9 +36,9 @@ const TraderDashboard = () => {
       const companyIds = companies?.map((c) => c.id) ?? [];
 
       const [{ data: quotes }, { data: jobs }, { data: awards }] = await Promise.all([
-        supabase.from("quotes").select("id, status, total_amount").in("trade_company_id", companyIds.length ? companyIds : ["none"]),
+        supabase.from("quotes").select("id, status, total_amount").in("trade_company_id", companyIds),
         supabase.from("jobs").select("id, title, requested_trade, city, status, created_at, budget_min, budget_max").in("status", ["posted", "quoted", "awarded", "active"]).order("created_at", { ascending: false }).limit(6),
-        supabase.from("job_awards").select("job_id").in("trade_company_id", companyIds.length ? companyIds : ["none"]),
+        supabase.from("job_awards").select("job_id").in("trade_company_id", companyIds),
       ]);
 
       const pendingQuotes = quotes?.filter((q) => q.status === "submitted").length ?? 0;
@@ -71,7 +71,11 @@ const TraderDashboard = () => {
         .select("id", { count: "exact", head: true })
         .eq("uploaded_by", user.id);
 
-      setStats({ activeJobs: acceptedQuotes.length, pendingQuotes, totalOrders: 0, revenue, completedJobs: 0, evidenceCount: evidenceCount ?? 0 });
+      const { data: ownedJobs, error: ownedError } = companyIds.length
+        ? await supabase.from("jobs").select("id,status").in("id", awardedJobIds)
+        : { data: [], error: null };
+      if (ownedError) console.error("Could not load awarded job counts", ownedError.message);
+      setStats({ activeJobs: ownedJobs?.filter(j => ["awarded", "active"].includes(j.status)).length ?? 0, pendingQuotes, totalOrders: 0, revenue, completedJobs: ownedJobs?.filter(j => j.status === "completed").length ?? 0, evidenceCount: evidenceCount ?? 0 });
       setRecentJobs(jobs ?? []);
       setLoading(false);
     };
@@ -89,10 +93,13 @@ const TraderDashboard = () => {
     { label: "Active Jobs", value: stats.activeJobs, icon: Briefcase, color: "text-primary", bgColor: "bg-primary/10", link: "/jobs" },
     { label: "Pending Quotes", value: stats.pendingQuotes, icon: FileText, color: "text-info", bgColor: "bg-info/10", link: "/jobs" },
     { label: "Evidence Captured", value: stats.evidenceCount, icon: Camera, color: "text-warning", bgColor: "bg-warning/10", link: "/site-evidence" },
-    { label: "Revenue", value: `£${stats.revenue.toLocaleString()}`, icon: DollarSign, color: "text-success", bgColor: "bg-success/10", link: "#" },
+    { label: "Accepted quote value", value: `£${stats.revenue.toLocaleString()}`, icon: DollarSign, color: "text-success", bgColor: "bg-success/10", link: "/business-performance" },
   ];
 
   const quickActions = [
+    { to: "/subcontractors", icon: Briefcase, iconColor: "text-primary", title: "Subcontractors", desc: "Delegate work, track progress and payments" },
+    { to: "/business-performance", icon: TrendingUp, iconColor: "text-success", title: "Performance", desc: "Company KPIs and financial records" },
+    { to: "/project-opportunities", icon: Briefcase, iconColor: "text-info", title: "Project Opportunities", desc: "Planning, tenders and funding" },
     { to: "/jobs", icon: Briefcase, iconColor: "text-primary", title: "Browse Jobs", desc: "Find new jobs & submit quotes" },
     { to: "/materials", icon: Package, iconColor: "text-warning", title: "Order Materials", desc: "Compare prices across merchants" },
     { to: "/site-evidence", icon: Camera, iconColor: "text-info", title: "Site Evidence", desc: "Capture GPS-stamped photos" },

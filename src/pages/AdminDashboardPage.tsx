@@ -42,24 +42,24 @@ const AdminDashboardPage = () => {
 
   useEffect(() => {
     const fetchStats = async () => {
-      const [profiles, jobs, deliveries, kycPending, agents, commissions, subs, logs] = await Promise.all([
+      const [profiles, jobs, activeJobs, deliveries, kycPending, agents, commissions, subs, logs] = await Promise.all([
         supabase.from("profiles").select("id", { count: "exact", head: true }),
-        supabase.from("jobs").select("id, status"),
+        supabase.from("jobs").select("id", { count: "exact", head: true }),
+        supabase.from("jobs").select("id", { count: "exact", head: true }).in("status", ["active", "awarded"]),
         supabase.from("deliveries").select("id", { count: "exact", head: true }),
         supabase.from("profiles").select("id", { count: "exact", head: true }).eq("kyc_status", "submitted"),
         supabase.from("agents").select("id", { count: "exact", head: true }),
         supabase.from("agent_commissions").select("amount").eq("status", "pending"),
-        supabase.from("marketplace_memberships").select("id", { count: "exact", head: true }).eq("status", "active"),
+        supabase.from("subscribers").select("user_id", { count: "exact", head: true }).eq("subscribed", true).neq("tier", "free").or(`subscription_end.is.null,subscription_end.gt.${new Date().toISOString()}`),
         supabase.from("audit_logs").select("id, action, entity_type, created_at, user_id").order("created_at", { ascending: false }).limit(8),
       ]);
 
-      const jobsData = jobs.data ?? [];
-      const activeJobCount = jobsData.filter(j => ["active", "awarded"].includes(j.status)).length;
+      const activeJobCount = activeJobs.count ?? 0;
       const pendingCommTotal = (commissions.data ?? []).reduce((sum, c) => sum + Number(c.amount), 0);
 
       setStats({
         totalUsers: profiles.count ?? 0,
-        totalJobs: jobsData.length,
+        totalJobs: jobs.count ?? 0,
         activeJobs: activeJobCount,
         totalDeliveries: deliveries.count ?? 0,
         pendingKyc: kycPending.count ?? 0,

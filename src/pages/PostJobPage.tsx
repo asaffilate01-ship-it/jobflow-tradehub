@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { projectCategories, fundingStages, planningStages, humanise, validBudget } from "@/features/projects/catalog";
+import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -47,10 +49,13 @@ const PostJobPage = () => {
   usePageMeta("Post a job for free", "Describe your project and get quotes from vetted local tradespeople on Craftvaro.");
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
+    project_category: projectCategories.find(c => c.value === params.get("category"))?.value ?? "maintenance",
+    funding_stage: "self_funded", planning_stage: "unknown", planning_reference: "", council_name: "", required_credentials: "", scope_notes: "", site_visit_required: false,
     trade: "" as TradeType | "",
     title: "",
     description: "",
@@ -62,19 +67,22 @@ const PostJobPage = () => {
     target_start_date: "",
   });
 
-  const set = (field: string, value: string) => setForm((f) => ({ ...f, [field]: value }));
+  const set = (field: string, value: string | boolean) => setForm((f) => ({ ...f, [field]: value }));
 
   const canNext = () => {
     if (step === 0) return !!form.trade;
     if (step === 1) return !!form.title;
-    if (step === 2) return !!form.address_line1 && !!form.city && !!form.postcode;
-    return true;
+    if (step === 3) return !!form.address_line1 && !!form.city && !!form.postcode;
+    return validBudget(form.budget_min, form.budget_max);
   };
 
   const handleSubmit = async () => {
-    if (!user) return;
+    if (!user || submitting) return;
+    if (!form.trade || !form.title.trim() || !form.address_line1.trim() || !form.city.trim() || !form.postcode.trim() || !validBudget(form.budget_min, form.budget_max)) return toast.error("Check the required details and budget range.");
     setSubmitting(true);
     const { data: inserted, error } = await supabase.from("jobs").insert({
+      project_category: form.project_category, funding_stage: form.funding_stage, planning_stage: form.planning_stage,
+      planning_reference: form.planning_reference.trim() || null, council_name: form.council_name.trim() || null, required_credentials: form.required_credentials.trim() || null, scope_notes: form.scope_notes.trim() || null, site_visit_required: form.site_visit_required,
       customer_profile_id: user.id,
       requested_trade: form.trade as TradeType,
       title: form.title,
@@ -122,6 +130,7 @@ const PostJobPage = () => {
         <h2 className="text-2xl font-bold">What kind of work do you need?</h2>
         <p className="text-muted-foreground">Select the trade that best matches your project</p>
       </div>
+      <label className="block max-w-2xl mx-auto space-y-2">Project category<select className="w-full rounded-md border bg-background p-3" value={form.project_category} onChange={e => set("project_category", e.target.value)}>{projectCategories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}</select></label>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-w-2xl mx-auto">
         {trades.map(({ slug, label, icon: Icon }) => (
           <button
@@ -156,6 +165,20 @@ const PostJobPage = () => {
           <Textarea placeholder="Describe the work needed, room sizes, materials preferred…" value={form.description} onChange={(e) => set("description", e.target.value)} rows={5} />
         </div>
       </div>
+    </div>,
+
+    // Project brief keeps funding and approval claims explicitly customer-reported.
+    <div className="max-w-xl mx-auto space-y-5">
+      <h2 className="text-2xl font-bold">Scope, permissions & funding</h2>
+      <p className="text-sm text-muted-foreground">Approval and funding details are provided by you and must be verified before work begins. Do not include medical records, bank details or private grant documents.</p>
+      <label className="block space-y-2">Funding stage<select className="w-full border rounded-md p-3 bg-background" value={form.funding_stage} onChange={e => set("funding_stage", e.target.value)}>{fundingStages.map(v => <option key={v} value={v}>{humanise(v)}</option>)}</select></label>
+      <label className="block space-y-2">Planning stage<select className="w-full border rounded-md p-3 bg-background" value={form.planning_stage} onChange={e => set("planning_stage", e.target.value)}>{planningStages.map(v => <option key={v} value={v}>{humanise(v)}</option>)}</select></label>
+      <label className="block space-y-2">Council / administering body<Input value={form.council_name} onChange={e => set("council_name", e.target.value)} /></label>
+      <label className="block space-y-2">Planning reference<Input value={form.planning_reference} onChange={e => set("planning_reference", e.target.value)} /></label>
+      <label className="block space-y-2">Required credentials<Textarea value={form.required_credentials} onChange={e => set("required_credentials", e.target.value)} placeholder="Relevant trade qualifications, retrofit certification or named council framework" /></label>
+      <label className="block space-y-2">Work packages and scope<Textarea value={form.scope_notes} onChange={e => set("scope_notes", e.target.value)} placeholder="Rooms, dimensions, access, programme and separate trades required" /></label>
+      <label className="flex gap-3 items-center"><input type="checkbox" checked={form.site_visit_required} onChange={e => set("site_visit_required", e.target.checked)} />Site visit needed before a final quotation</label>
+      {form.project_category === "adaptations" && <p className="text-sm text-muted-foreground">For grant-funded adaptations, agree the assessment, scope and approval with the council before starting work.</p>}
     </div>,
 
     // Step 2 — Location

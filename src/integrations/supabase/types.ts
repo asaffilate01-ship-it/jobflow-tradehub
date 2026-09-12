@@ -1303,8 +1303,185 @@ export type Database = {
           },
         ]
       }
+      project_opportunities: {
+        Row: {
+          id: string
+          source_name: string
+          source_reference: string
+          source_url: string
+          title: string
+          summary: string
+          opportunity_kind: string
+          project_category: string
+          nation: string
+          council_name: string
+          postcode_area: string
+          decision_status: string
+          decision_date: string | null
+          deadline: string | null
+          eligibility: string
+          required_credentials: string
+          reuse_basis: string
+          published: boolean
+          verified_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          source_name: string
+          source_reference: string
+          source_url: string
+          title: string
+          summary?: string
+          opportunity_kind: string
+          project_category: string
+          nation: string
+          council_name?: string
+          postcode_area?: string
+          decision_status?: string
+          decision_date?: string | null
+          deadline?: string | null
+          eligibility?: string
+          required_credentials?: string
+          reuse_basis: string
+          published?: boolean
+          verified_at?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          source_name?: string
+          source_reference?: string
+          source_url?: string
+          title?: string
+          summary?: string
+          opportunity_kind?: string
+          project_category?: string
+          nation?: string
+          council_name?: string
+          postcode_area?: string
+          decision_status?: string
+          decision_date?: string | null
+          deadline?: string | null
+          eligibility?: string
+          required_credentials?: string
+          reuse_basis?: string
+          published?: boolean
+          verified_at?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
+      project_opportunity_saves: {
+        Row: {
+          profile_id: string
+          opportunity_id: string
+          created_at: string
+        }
+        Insert: {
+          profile_id: string
+          opportunity_id: string
+          created_at?: string
+        }
+        Update: {
+          profile_id?: string
+          opportunity_id?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
+      subcontract_work_orders: {
+        Row: {
+          id: string
+          trade_company_id: string
+          subcontractor_id: string
+          job_id: string
+          assignee_profile_id: string | null
+          title: string
+          scope: string
+          due_date: string | null
+          agreed_amount: number
+          status: string
+          progress: number
+          progress_note: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          trade_company_id?: string
+          subcontractor_id?: string
+          job_id?: string
+          assignee_profile_id?: string | null
+          title?: string
+          scope?: string
+          due_date?: string | null
+          agreed_amount?: number
+          status?: string
+          progress?: number
+          progress_note?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          trade_company_id?: string
+          subcontractor_id?: string
+          job_id?: string
+          assignee_profile_id?: string | null
+          title?: string
+          scope?: string
+          due_date?: string | null
+          agreed_amount?: number
+          status?: string
+          progress?: number
+          progress_note?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      subcontract_payment_records: {
+        Row: {
+          id: string
+          work_order_id: string
+          amount: number
+          paid_on: string
+          reference: string
+          recorded_by: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          work_order_id?: string
+          amount?: number
+          paid_on?: string
+          reference?: string
+          recorded_by?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          work_order_id?: string
+          amount?: number
+          paid_on?: string
+          reference?: string
+          recorded_by?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       jobs: {
         Row: {
+          project_category: string
+          funding_stage: string
+          planning_stage: string
+          planning_reference: string | null
+          council_name: string | null
+          required_credentials: string | null
+          scope_notes: string | null
+          site_visit_required: boolean
+
           address_line1: string
           budget_max: number | null
           budget_min: number | null
@@ -1330,6 +1507,15 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          project_category?: string
+          funding_stage?: string
+          planning_stage?: string
+          planning_reference?: string | null
+          council_name?: string | null
+          required_credentials?: string | null
+          scope_notes?: string | null
+          site_visit_required?: boolean
+
           address_line1: string
           budget_max?: number | null
           budget_min?: number | null
@@ -1355,6 +1541,15 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          project_category?: string
+          funding_stage?: string
+          planning_stage?: string
+          planning_reference?: string | null
+          council_name?: string | null
+          required_credentials?: string | null
+          scope_notes?: string | null
+          site_visit_required?: boolean
+
           address_line1?: string
           budget_max?: number | null
           budget_min?: number | null
@@ -3629,6 +3824,11 @@ export type Database = {
       }
     }
     Functions: {
+      create_subcontract_work_order: { Args: { p_company: string; p_subcontractor: string; p_job: string; p_title: string; p_scope: string; p_due: string | null; p_amount: number; p_assignee_email?: string | null }; Returns: string }
+      update_subcontract_progress: { Args: { p_id: string; p_status: string; p_progress: number; p_note: string }; Returns: undefined }
+      record_subcontract_payment: { Args: { p_id: string; p_amount: number; p_paid_on: string; p_reference: string }; Returns: string }
+      trader_business_metrics: { Args: { p_company: string }; Returns: Json }
+
       accept_repair_offer: { Args: { p_quote_id: string }; Returns: string }
       approve_trader_profile_claim: {
         Args: { p_claim_id: string }

@@ -84,7 +84,7 @@ const AccountingPage = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Accounting</h1>
-          <p className="text-muted-foreground">Manage your books, tax obligations & payroll.</p>
+          <p className="text-muted-foreground">Review accounting records and business reporting.</p>
         </div>
         <Select value={businessType} onValueChange={(v) => setBusinessType(v as BusinessType)}>
           <SelectTrigger className="w-[200px]">
@@ -98,13 +98,14 @@ const AccountingPage = () => {
         </Select>
       </div>
 
+      <p className="rounded-lg border p-3 text-sm text-muted-foreground">This page summarises recent records (up to 20 invoices), including draft and void statuses. These figures are not complete income, cash flow or profit. <Link to="/business-performance" className="underline">View all-time business metrics</Link>.</p>
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-4 pb-4 text-center">
             <TrendingUp className="h-5 w-5 mx-auto mb-1 text-emerald-500" />
             <div className="text-xl font-bold">£{totalIncome.toFixed(2)}</div>
-            <div className="text-xs text-muted-foreground">Total Income</div>
+            <div className="text-xs text-muted-foreground">Recent invoice value</div>
           </CardContent>
         </Card>
         <Card>

@@ -73,7 +73,8 @@ const TraderProfilePage = () => {
             supabase.from("job_media").select("storage_path, media_type").in("job_id", jobIds).eq("media_type", "photo").limit(12),
             supabase.from("jobs").select("id", { count: "exact", head: true }).in("id", jobIds).eq("status", "completed"),
           ]);
-          setPortfolioImages((media ?? []).map(m => supabase.storage.from("job-evidence").getPublicUrl(m.storage_path).data.publicUrl));
+          // Job evidence is private. A public portfolio needs a separate owner-consented publication flow.
+          setPortfolioImages([]);
           setCompletedJobCount(count ?? 0);
         }
       }

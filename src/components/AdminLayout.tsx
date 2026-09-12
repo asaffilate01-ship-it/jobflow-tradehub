@@ -20,6 +20,7 @@ const navGroups = [
     label: "Platform",
     items: [
       { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
+      { to: "/admin/project-opportunities", label: "Project sources", icon: Store },
       { to: "/admin/users", label: "Users", icon: Users },
       { to: "/admin/kyc-review", label: "KYC Review", icon: Shield },
       { to: "/admin/repair-providers", label: "Repair Providers", icon: Wrench },
@@ -146,14 +147,12 @@ const AdminLayout = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
-        <div className="hidden md:block">
-          <AdminSidebar />
-        </div>
+        <AdminSidebar />
 
         <div className="flex-1 flex flex-col min-w-0">
           <header className="sticky top-0 z-40 h-14 flex items-center justify-between gap-3 border-b border-border bg-background/80 backdrop-blur-xl px-4">
             <div className="flex items-center gap-3">
-              <SidebarTrigger className="hidden md:flex" />
+              <SidebarTrigger />
               <div className="md:hidden">
                 <Logo height={26} priority />
               </div>

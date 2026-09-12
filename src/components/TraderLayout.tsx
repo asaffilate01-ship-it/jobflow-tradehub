@@ -21,6 +21,9 @@ const navGroups = [
     items: [
       { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
       { to: "/jobs", label: "Jobs", icon: Briefcase },
+      { to: "/project-opportunities", label: "Project opportunities", icon: Building2 },
+      { to: "/subcontractors", label: "Subcontractors", icon: Briefcase },
+      { to: "/business-performance", label: "Performance", icon: Calculator },
       { to: "/repair-opportunities", label: "Repairs", icon: Siren },
       { to: "/schedule", label: "Schedule", icon: Calendar },
       { to: "/messages", label: "Messages", icon: MessageCircle },
@@ -149,15 +152,13 @@ const TraderLayout = () => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
         {/* Desktop sidebar */}
-        <div className="hidden md:block">
-          <TraderSidebar />
-        </div>
+        <TraderSidebar />
 
         <div className="flex-1 flex flex-col min-w-0">
           {/* Top bar */}
           <header className="sticky top-0 z-40 h-14 flex items-center justify-between gap-3 border-b border-border bg-background/80 backdrop-blur-xl px-4">
             <div className="flex items-center gap-3">
-              <SidebarTrigger className="hidden md:flex" />
+              <SidebarTrigger />
               <div className="md:hidden">
                 <Logo height={26} priority />
               </div>

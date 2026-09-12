@@ -1,3 +1,4 @@
+import { useEvidenceUrls } from "@/hooks/use-evidence-urls";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,6 +40,7 @@ const CustomerPortalPage = () => {
   const [tasks, setTasks] = useState<any[]>([]);
   const [dailyLogs, setDailyLogs] = useState<any[]>([]);
   const [evidence, setEvidence] = useState<any[]>([]);
+  const evidenceUrls = useEvidenceUrls(evidence);
   const [snags, setSnags] = useState<any[]>([]);
   const [quotes, setQuotes] = useState<any[]>([]);
 
@@ -233,7 +235,7 @@ const CustomerPortalPage = () => {
               <h2 className="font-semibold flex items-center gap-2"><Camera className="h-4 w-4 text-primary" />Site Evidence</h2>
               <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2">
                 {evidence.map(e => {
-                  const url = supabase.storage.from("job-evidence").getPublicUrl(e.storage_path).data.publicUrl;
+                  const url = evidenceUrls[e.storage_path];
                   return (
                     <div key={e.id} className="aspect-square rounded-lg overflow-hidden bg-secondary">
                       {e.media_type === "photo" ? (

@@ -1,3 +1,5 @@
+import { useEvidenceUrls } from "@/hooks/use-evidence-urls";
+import type { Database } from "@/integrations/supabase/types";
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { categoryLabel, humanise } from "@/features/projects/catalog";
 import RepairIntelligencePanel from "@/components/RepairIntelligencePanel";
 import {
   ArrowLeft, Briefcase, FileText, CheckCircle, Clock, DollarSign,
@@ -55,6 +58,7 @@ const JobDetailPage = () => {
   const [certs, setCerts] = useState<any[]>([]);
   const [changes, setChanges] = useState<any[]>([]);
   const [evidence, setEvidence] = useState<any[]>([]);
+  const evidenceUrls = useEvidenceUrls(evidence);
 
   const isCustomer = job?.customer_profile_id === user?.id;
   const isTrade = roles.includes("trade");
@@ -196,7 +200,7 @@ const JobDetailPage = () => {
   };
 
   const handleChangeStatus = async (coId: string, status: string) => {
-    const updates: Record<string, any> = { status };
+    const updates: Database["public"]["Tables"]["change_orders"]["Update"] = { status };
     if (status === "accepted") {
       if (isCustomer) updates.signed_by_customer = true;
       if (isTrade) updates.signed_by_trader = true;
@@ -314,6 +318,15 @@ const JobDetailPage = () => {
         )}
       </div>
 
+      {job.job_kind !== "repair" && <section className="glass-card p-5 space-y-3">
+        <h2 className="font-semibold">{categoryLabel(job.project_category ?? "maintenance")}</h2>
+        <p className="text-sm">Funding: {humanise(job.funding_stage ?? "self_funded")} · Planning: {humanise(job.planning_stage ?? "unknown")} (customer-reported)</p>
+        {job.council_name && <p className="text-sm">Council / body: {job.council_name}</p>}
+        {job.planning_reference && <p className="text-sm">Planning reference: {job.planning_reference}</p>}
+        {job.site_visit_required && <Badge variant="outline">Site visit required</Badge>}
+        {job.required_credentials && <p className="text-sm whitespace-pre-wrap">Required credentials: {job.required_credentials}</p>}
+        {job.scope_notes && <p className="text-sm whitespace-pre-wrap">{job.scope_notes}</p>}
+      </section>}
       <RepairIntelligencePanel job={job} />
 
       {/* Tabs */}
@@ -568,7 +581,7 @@ const JobDetailPage = () => {
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 {evidence.map((e: any) => {
-                  const url = supabase.storage.from("job-evidence").getPublicUrl(e.storage_path).data.publicUrl;
+                  const url = evidenceUrls[e.storage_path];
                   return (
                     <div key={e.id} className="glass-card overflow-hidden group">
                       {e.media_type === "video" ? (

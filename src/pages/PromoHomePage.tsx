@@ -160,6 +160,7 @@ const PromoHomePage = () => {
       </section>
 
       {/* ===== Platform modules ===== */}
+      {lang === "en" && <section className="container py-10"><div className="rounded-2xl border bg-secondary/30 p-6 md:p-9 space-y-4"><h2 className="text-2xl font-bold">Repairs today. Bigger projects tomorrow.</h2><p className="text-muted-foreground">Plan renovations, energy retrofit, empty-home refurbishment, accessible bathrooms and commercial fit-outs. Keep your brief, quotations, milestones and subcontracted work together.</p><Button asChild><Link to="/property-projects">Explore property projects <ArrowRight className="ml-2 h-4 w-4" /></Link></Button></div></section>}
       <section id="platform" className="container scroll-mt-20 py-16 md:py-24">
         <div className="mx-auto max-w-2xl text-center">
           <Badge variant="secondary" className="mb-4">{t.modules.badge}</Badge>
