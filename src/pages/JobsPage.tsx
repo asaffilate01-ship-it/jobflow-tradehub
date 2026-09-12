@@ -1,3 +1,4 @@
+import { projectCategories, categoryLabel } from "@/features/projects/catalog";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ const trades: Database["public"]["Enums"]["trade_type"][] = [
 const JobsPage = () => {
   usePageMeta("Live job board", "Browse live construction and trade jobs posted by customers on Craftvaro.");
   const { user, roles } = useAuth();
+  const [category, setCategory] = useState("");
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -127,6 +129,7 @@ const JobsPage = () => {
         )}
       </div>
 
+      <div className="flex flex-wrap items-center gap-3"><select aria-label="Project category" className="border rounded-md p-3 bg-background" value={category} onChange={e=>setCategory(e.target.value)}><option value="">All project categories</option>{projectCategories.map(c=><option key={c.value} value={c.value}>{c.label}</option>)}</select><Link className="text-sm underline" to="/post-job">Post a detailed project brief</Link></div>
       {showForm && (
         <form onSubmit={handlePostJob} className="glass-card p-6 space-y-4 animate-slide-up">
           <h2 className="text-lg font-semibold">New job listing</h2>
@@ -196,7 +199,7 @@ const JobsPage = () => {
             <p className="text-sm font-medium text-foreground">Upgrade to see full job details</p>
             <p className="text-xs text-muted-foreground">Subscribe to view budgets, addresses, and contact customers directly.</p>
           </div>
-          <Button size="sm" className="shrink-0">Subscribe</Button>
+          <Button asChild size="sm" className="shrink-0"><Link to="/subscription">Subscribe</Link></Button>
         </div>
       )}
 
@@ -211,7 +214,7 @@ const JobsPage = () => {
             </div>
           ))}
         </div>
-      ) : jobs.length === 0 ? (
+      ) : jobs.filter(j=>!category||j.project_category===category).length === 0 ? (
         <div className="empty-state glass-card">
           <Briefcase className="empty-state-icon" />
           <p className="empty-state-title">No jobs posted yet</p>
@@ -219,7 +222,7 @@ const JobsPage = () => {
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {jobs.map((job) => (
+          {jobs.filter(j=>!category||j.project_category===category).map((job) => (
             <Link key={job.id} to={`/jobs/${job.id}`} className="glass-card p-5 space-y-3 hover:border-primary/30 transition-colors block">
               <div className="flex items-start justify-between">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary">
@@ -229,7 +232,7 @@ const JobsPage = () => {
                   {job.status}
                 </Badge>
               </div>
-              <h3 className="font-semibold text-foreground">{job.title}</h3>
+              <h3 className="font-semibold text-foreground">{job.title}</h3><p className="text-xs text-muted-foreground">{categoryLabel(job.project_category)}</p>
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <span className="capitalize">{job.requested_trade.replace("_", " ")}</span>
                 <span className="flex items-center gap-1">

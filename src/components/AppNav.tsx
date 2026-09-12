@@ -53,6 +53,7 @@ const AppNav = () => {
 
   const navItems = [
     { to: "/home", label: "Home", icon: Home, show: true },
+    { to: "/property-projects", label: "Projects", icon: FolderOpen, show: true },
     { to: "/marketplace", label: "Find Trades", icon: Search, show: true },
     { to: "/repair-assist", label: "Repair Assist", icon: Siren, show: Boolean(user) && (isCustomer || isAdmin) },
     { to: "/jobs", label: "Jobs", icon: Briefcase, show: true },
@@ -78,7 +79,7 @@ const AppNav = () => {
         </Link>
 
         {/* Desktop nav — segmented pill */}
-        <div className="hidden md:flex items-center gap-1 rounded-full border border-border/60 bg-secondary/40 p-1">
+        <div className="hidden xl:flex items-center gap-1 rounded-full border border-border/60 bg-secondary/40 p-1">
           {navItems.map(({ to, label, icon: Icon }) => {
             const active = isActive(to);
             return (
@@ -104,7 +105,7 @@ const AppNav = () => {
           })}
         </div>
 
-        <div className="ml-auto hidden md:flex items-center gap-2">
+        <div className="ml-auto hidden xl:flex items-center gap-2">
           <LanguageSwitcher />
           <Button
             variant="ghost"
@@ -178,7 +179,7 @@ const AppNav = () => {
         </div>
 
         {/* Mobile controls */}
-        <div className="ml-auto flex items-center gap-1 md:hidden">
+        <div className="ml-auto flex items-center gap-1 xl:hidden">
           {user && <NotificationBell />}
           <button
             onClick={() => setDark(!dark)}
@@ -209,7 +210,7 @@ const AppNav = () => {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
               onClick={() => setMobileOpen(false)}
-              className="fixed inset-0 top-16 z-40 bg-foreground/40 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 top-16 z-40 bg-foreground/40 backdrop-blur-sm xl:hidden"
             />
             <motion.div
               id="mobile-nav"
@@ -217,7 +218,7 @@ const AppNav = () => {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", stiffness: 380, damping: 34 }}
-              className="fixed right-0 top-16 z-50 flex h-[calc(100dvh-4rem)] w-[85%] max-w-sm flex-col overflow-y-auto border-l border-border bg-card px-4 pb-8 pt-4 shadow-2xl safe-bottom md:hidden"
+              className="fixed right-0 top-16 z-50 flex h-[calc(100dvh-4rem)] w-[85%] max-w-sm flex-col overflow-y-auto border-l border-border bg-card px-4 pb-8 pt-4 shadow-2xl safe-bottom xl:hidden"
             >
               {user && (
                 <div className="mb-4 flex items-center gap-3 rounded-xl border border-border/60 bg-secondary/40 p-3">

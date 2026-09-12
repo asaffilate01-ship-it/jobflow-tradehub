@@ -1,3 +1,4 @@
+import { useEvidenceUrls } from "@/hooks/use-evidence-urls";
 import { useState, useEffect } from "react";
 import { EVIDENCE_PHASES, EVIDENCE_SUBFOLDERS } from "@/lib/evidence-constants";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -65,10 +66,8 @@ const EvidenceGalleryPage = () => {
     return () => { supabase.removeChannel(channel); };
   }, [user, jobId, phaseFilter, subFilter]);
 
-  const getPublicUrl = (path: string) => {
-    const { data } = supabase.storage.from("job-evidence").getPublicUrl(path);
-    return data.publicUrl;
-  };
+  const evidenceUrls = useEvidenceUrls(media);
+  const getEvidenceUrl = (path: string) => evidenceUrls[path];
 
   const handleDelete = async (item: MediaItem) => {
     if (!confirm("Delete this evidence? This cannot be undone.")) return;
@@ -132,7 +131,7 @@ const EvidenceGalleryPage = () => {
             >
               {item.media_type === "photo" ? (
                 <img
-                  src={getPublicUrl(item.storage_path)}
+                  src={getEvidenceUrl(item.storage_path)}
                   alt="Evidence"
                   className="w-full h-full object-cover"
                   loading="lazy"
@@ -170,7 +169,7 @@ const EvidenceGalleryPage = () => {
               </button>
               <div className="flex gap-2">
                 <a
-                  href={getPublicUrl(selectedItem.storage_path)}
+                  href={getEvidenceUrl(selectedItem.storage_path)}
                   download
                   className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center"
                 >
@@ -193,13 +192,13 @@ const EvidenceGalleryPage = () => {
             <div className="flex-1 flex items-center justify-center p-4">
               {selectedItem.media_type === "photo" ? (
                 <img
-                  src={getPublicUrl(selectedItem.storage_path)}
+                  src={getEvidenceUrl(selectedItem.storage_path)}
                   alt="Evidence"
                   className="max-w-full max-h-full object-contain rounded-lg"
                 />
               ) : (
                 <video
-                  src={getPublicUrl(selectedItem.storage_path)}
+                  src={getEvidenceUrl(selectedItem.storage_path)}
                   controls
                   className="max-w-full max-h-full rounded-lg"
                 />

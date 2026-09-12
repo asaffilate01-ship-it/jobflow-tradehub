@@ -8,10 +8,10 @@ This runbook separates code that is ready to deploy from work that needs product
 - Paid/trial traders only in AI search, lead dispatch, job access and offers.
 - Forward-only account-deletion migration; existing marketplace and Lovable storage migrations are unchanged.
 - Lovable-managed `.env` and preview authentication storage are preserved unchanged.
-- CI uses Bun and the committed Bun lockfile to run type-check, lint, tests and build.
+- CI uses npm and the committed package-lock.json to run type-check, lint, tests and build.
 - Canonical URL, robots rules, public-only sitemap and protected-route `noindex` handling.
 
-Exit gate: CI green and `bun run launch:preflight` has no failures.
+Exit gate: CI green and `npm run launch:preflight` has no failures.
 
 Operational tooling now available:
 
@@ -87,3 +87,7 @@ Exit gate: production smoke test signed off and no Sev-1/Sev-2 issue during the 
 - Customer-to-trader marketplace payment and payout: Stripe currently covers trader subscriptions; escrow/payout needs a separate commercial and regulated design.
 - Legal approval: included policy text is an operational draft for counsel review.
 - Production secrets, DNS, Lovable publish and Supabase deployment: these require account-holder access.
+
+## September property expansion
+
+See [PROPERTY_PROJECTS_AND_LAUNCH_REVIEW.md](PROPERTY_PROJECTS_AND_LAUNCH_REVIEW.md) for the property, subcontractor, permissions and financial-reporting release boundaries. Apply its new migrations before publishing this frontend.
