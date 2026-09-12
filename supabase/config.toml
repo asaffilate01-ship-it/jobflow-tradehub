@@ -8,3 +8,8 @@ verify_jwt = false
 
 [functions.integration-outbox-worker]
 verify_jwt = false
+
+
+# Veyumo validates the local user or server signature inside the function.
+[functions.veyumo-bridge]
+verify_jwt = false
