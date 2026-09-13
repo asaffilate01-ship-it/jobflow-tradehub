@@ -26,6 +26,9 @@ beforeAll(async () => {
  CREATE FUNCTION auth.role() RETURNS text LANGUAGE sql STABLE AS $$SELECT current_setting('role',true)$$;
  CREATE SCHEMA storage; CREATE TABLE storage.objects(id uuid,bucket_id text,name text); ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY; GRANT USAGE ON SCHEMA storage TO authenticated; GRANT SELECT,INSERT,DELETE ON storage.objects TO authenticated;
  CREATE TABLE public.job_media(job_id uuid,storage_path text,uploaded_by uuid);
+ CREATE TABLE public.notifications(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),recipient_id uuid,type text,title text,body text,link text,metadata jsonb,read_at timestamptz,created_at timestamptz DEFAULT now());
+ ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+ CREATE POLICY recipient_read ON public.notifications FOR SELECT TO authenticated USING(recipient_id=auth.uid());
  CREATE TABLE public.user_roles(user_id uuid,role text);
  CREATE FUNCTION public.has_role(p_user uuid,p_role text) RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path=public AS $$SELECT EXISTS(SELECT 1 FROM user_roles WHERE user_id=p_user AND role=p_role)$$;
  CREATE TABLE public.trade_companies(id uuid PRIMARY KEY,owner_profile_id uuid,legal_name text);
@@ -45,6 +48,7 @@ beforeAll(async () => {
     "20260912100000_trader_business_metrics.sql",
     "20260912110000_verification_write_guards.sql",
     "20260912120000_job_evidence_access.sql",
+    "20260913080000_subcontract_activity_notifications.sql",
   ])
     await db.exec(
       readFileSync(
@@ -285,6 +289,33 @@ describe.sequential("Property and subcontractor database boundaries", () => {
       3,
       `insert into storage.objects values ('${id(91)}','job-evidence','${id(31)}/before/other.jpg')`,
     );
+  });
+  it("activity is immutable and visible only to participants",async()=>{
+    const owner=await as(1,`select * from subcontract_activity where work_order_id='${workId}'`);
+    expect(owner.rows.map(r=>r.event_type)).toEqual(expect.arrayContaining(['assigned','submitted_review','payment_recorded','completed']));
+    expect((await as(2,'select * from subcontract_activity')).rows.length).toBe(owner.rows.length);
+    expect((await as(3,'select * from subcontract_activity')).rows).toHaveLength(0);
+    expect((await as(4,'select * from subcontract_activity')).rows).toHaveLength(0);
+    await fails(2,`update subcontract_activity set note='rewritten'`);
+    await fails(1,`delete from subcontract_activity`);
+    await fails(1,`insert into subcontract_activity(work_order_id,event_type,status,progress) values ('${workId}','completed','completed',100)`);
+  });
+  it("assignment/payment/signoff notify the subbie; progress notifies the main contractor",async()=>{
+    const sub=await as(2,'select title,body,link from notifications');
+    expect(sub.rows.map(r=>r.title)).toEqual(expect.arrayContaining(['New subcontract work assigned','Subcontract payment recorded','Subcontract work signed off']));
+    expect(sub.rows.every(r=>r.link==='/subcontractors')).toBe(true);
+    const main=await as(1,'select title from notifications');
+    expect(main.rows.map(r=>r.title)).toContain('Subcontract work ready for review');
+    expect((await as(3,'select * from notifications')).rows).toHaveLength(0);
+    expect((await as(4,'select * from notifications')).rows).toHaveLength(0);
+  });
+  it("no-op saves and rejected actions create no activity or notifications",async()=>{
+    const before=await as(1,'select count(*) as n from subcontract_activity');
+    const alerts=await as(2,'select count(*) as n from notifications');
+    await as(1,`select update_subcontract_progress('${workId}','completed',100,'Approved')`);
+    await fails(2,`select record_subcontract_payment('${workId}',5,current_date,'not-allowed')`);
+    expect((await as(1,'select count(*) as n from subcontract_activity')).rows).toEqual(before.rows);
+    expect((await as(2,'select count(*) as n from notifications')).rows).toEqual(alerts.rows);
   });
   it("anonymous callers cannot invoke financial or assignment functions", async () => {
     await db.exec("RESET ROLE; SET ROLE anon;");

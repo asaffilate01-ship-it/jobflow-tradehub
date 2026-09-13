@@ -1,3 +1,4 @@
+import WorkActivity from "@/features/subcontractors/WorkActivity";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
@@ -92,6 +93,7 @@ export default function SubcontractorsPage() {
       if (error) throw error;
       return data;
     },
+    refetchInterval: 30000,
   });
   const { data: payments = [], error: paymentError } = useQuery({
     queryKey: ["sub-payments", user?.id],
@@ -112,6 +114,7 @@ export default function SubcontractorsPage() {
       await action();
       await qc.invalidateQueries({ queryKey: ["sub-work"] });
       await qc.invalidateQueries({ queryKey: ["sub-payments"] });
+      await qc.invalidateQueries({ queryKey: ["sub-activity"] });
       await qc.invalidateQueries({ queryKey: ["trader-metrics"] });
     } catch (e) {
       toast.error(
@@ -570,6 +573,7 @@ function WorkCard({
           ))}
         </ul>
       )}
+      <WorkActivity workId={w.id} />
     </article>
   );
 }

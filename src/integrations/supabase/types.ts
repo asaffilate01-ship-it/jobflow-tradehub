@@ -1390,6 +1390,42 @@ export type Database = {
         }
         Relationships: []
       }
+      subcontract_activity: {
+        Row: {
+          id: string
+          work_order_id: string
+          actor_profile_id: string | null
+          event_type: string
+          status: string
+          progress: number
+          note: string
+          payment_record_id: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          work_order_id?: string
+          actor_profile_id?: string | null
+          event_type?: string
+          status?: string
+          progress?: number
+          note?: string
+          payment_record_id?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          work_order_id?: string
+          actor_profile_id?: string | null
+          event_type?: string
+          status?: string
+          progress?: number
+          note?: string
+          payment_record_id?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
       subcontract_work_orders: {
         Row: {
           id: string
