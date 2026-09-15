@@ -1,3 +1,4 @@
+import { PortfolioServices } from "@/components/PortfolioServices";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -372,8 +373,10 @@ const TraderDashboard = () => {
           </Card>
         </div>
       </div>
+      <PortfolioServices source="craftvaro" placement="dashboard" country="GB" locale="en" />
     </div>
   );
 };
 
 export default TraderDashboard;
+

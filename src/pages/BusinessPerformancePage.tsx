@@ -1,3 +1,4 @@
+import { PortfolioServices } from "@/components/PortfolioServices";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
@@ -144,6 +145,8 @@ export default function BusinessPerformancePage() {
           Accounting records
         </Link>
       </div>
+      <PortfolioServices source="craftvaro" placement="billing" country="GB" locale="en" />
     </div>
   );
 }
+
