@@ -1,3 +1,4 @@
+import { VeyumoMobile } from "@/components/veyumo/VeyumoMobile";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,7 +11,10 @@ import { useSubscription } from "@/hooks/use-subscription";
 import { usePageMeta } from "@/hooks/use-page-meta";
 
 const SubscriptionPage = () => {
-  usePageMeta("Plans & pricing", "Compare Craftvaro Free, Basic and Premium plans for trade businesses.");
+  usePageMeta(
+    "Plans & pricing",
+    "Compare Craftvaro Free, Basic and Premium plans for trade businesses.",
+  );
   const { user } = useAuth();
   const { tier: currentTier, subscriptionEnd, loading, refresh } = useSubscription();
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
@@ -20,7 +24,6 @@ const SubscriptionPage = () => {
     if (user) refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
-
 
   const handleCheckout = async (priceId: string) => {
     if (!user) {
@@ -75,6 +78,7 @@ const SubscriptionPage = () => {
 
   return (
     <div className="space-y-8">
+      {user && <VeyumoMobile />}
       <div className="text-center">
         <h1 className="text-3xl font-bold tracking-tight">Choose Your Plan</h1>
         <p className="text-muted-foreground mt-2">Unlock the full Craftvaro platform</p>
@@ -84,7 +88,9 @@ const SubscriptionPage = () => {
         <div className="glass-card p-4 flex items-center justify-between">
           <div>
             <span className="text-sm text-muted-foreground">Current plan: </span>
-            <span className="font-semibold text-foreground">{SUBSCRIPTION_TIERS[currentTier].name}</span>
+            <span className="font-semibold text-foreground">
+              {SUBSCRIPTION_TIERS[currentTier].name}
+            </span>
             {subscriptionEnd && (
               <span className="text-xs text-muted-foreground ml-2">
                 Renews {new Date(subscriptionEnd).toLocaleDateString()}
@@ -102,68 +108,72 @@ const SubscriptionPage = () => {
         </div>
       )}
 
-
       <div className="grid md:grid-cols-3 gap-6">
-        {(Object.entries(SUBSCRIPTION_TIERS) as [SubscriptionTier, typeof SUBSCRIPTION_TIERS[SubscriptionTier]][]).map(
-          ([key, tier]) => {
-            const Icon = tierIcons[key];
-            const isCurrent = key === currentTier;
-            return (
-              <div
-                key={key}
-                className={`glass-card p-6 space-y-6 relative ${tierColors[key]} ${isCurrent ? "ring-2 ring-primary" : ""}`}
-              >
-                {isCurrent && (
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground">
-                    Your Plan
-                  </Badge>
-                )}
-                <div className="text-center space-y-2">
-                  <Icon className="h-8 w-8 mx-auto text-primary" />
-                  <h2 className="text-xl font-bold">{tier.name}</h2>
-                  <div className="text-3xl font-bold text-gradient">
-                    {tier.price === 0 ? "Free" : `£${tier.price}`}
-                    {tier.price > 0 && <span className="text-sm font-normal text-muted-foreground">/mo</span>}
-                  </div>
-                </div>
-
-                <ul className="space-y-3">
-                  {tier.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-sm">
-                      <Check className="h-4 w-4 text-success shrink-0 mt-0.5" />
-                      <span className="text-muted-foreground">{f}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="pt-2">
-                  {key === "free" ? (
-                    <Button variant="outline" className="w-full" disabled>
-                      {isCurrent ? "Current Plan" : "Free"}
-                    </Button>
-                  ) : isCurrent ? (
-                    <Button variant="outline" className="w-full" onClick={handleManage}>
-                      Manage Plan
-                    </Button>
-                  ) : (
-                    <Button
-                      className="w-full font-semibold gap-2"
-                      onClick={() => handleCheckout(tier.price_id!)}
-                      disabled={checkoutLoading === tier.price_id}
-                    >
-                      {checkoutLoading === tier.price_id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Zap className="h-4 w-4" />
-                      )}
-                      Subscribe — £{tier.price}/mo
-                    </Button>
+        {(
+          Object.entries(SUBSCRIPTION_TIERS) as [
+            SubscriptionTier,
+            (typeof SUBSCRIPTION_TIERS)[SubscriptionTier],
+          ][]
+        ).map(([key, tier]) => {
+          const Icon = tierIcons[key];
+          const isCurrent = key === currentTier;
+          return (
+            <div
+              key={key}
+              className={`glass-card p-6 space-y-6 relative ${tierColors[key]} ${isCurrent ? "ring-2 ring-primary" : ""}`}
+            >
+              {isCurrent && (
+                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground">
+                  Your Plan
+                </Badge>
+              )}
+              <div className="text-center space-y-2">
+                <Icon className="h-8 w-8 mx-auto text-primary" />
+                <h2 className="text-xl font-bold">{tier.name}</h2>
+                <div className="text-3xl font-bold text-gradient">
+                  {tier.price === 0 ? "Free" : `£${tier.price}`}
+                  {tier.price > 0 && (
+                    <span className="text-sm font-normal text-muted-foreground">/mo</span>
                   )}
                 </div>
               </div>
-            );
-          }
-        )}
+
+              <ul className="space-y-3">
+                {tier.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2 text-sm">
+                    <Check className="h-4 w-4 text-success shrink-0 mt-0.5" />
+                    <span className="text-muted-foreground">{f}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="pt-2">
+                {key === "free" ? (
+                  <Button variant="outline" className="w-full" disabled>
+                    {isCurrent ? "Current Plan" : "Free"}
+                  </Button>
+                ) : isCurrent ? (
+                  <Button variant="outline" className="w-full" onClick={handleManage}>
+                    Manage Plan
+                  </Button>
+                ) : (
+                  <Button
+                    className="w-full font-semibold gap-2"
+                    onClick={() => handleCheckout(tier.price_id!)}
+                    disabled={checkoutLoading === tier.price_id}
+                  >
+                    {checkoutLoading === tier.price_id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Zap className="h-4 w-4" />
+                    )}
+                    Subscribe — £{tier.price}/mo
+                  </Button>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
