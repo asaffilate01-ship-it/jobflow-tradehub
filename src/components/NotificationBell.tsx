@@ -32,7 +32,9 @@ const NotificationBell = () => {
   const unreadCount = notifications.filter((n) => !n.read_at).length;
 
   useEffect(() => {
+    setNotifications([]);
     if (!user) return;
+    let active = true;
 
     const fetchNotifications = async () => {
       const { data } = await supabase
@@ -41,10 +43,11 @@ const NotificationBell = () => {
         .eq("recipient_id", user.id)
         .order("created_at", { ascending: false })
         .limit(20);
-      if (data) setNotifications(data as Notification[]);
+      if (active && data) setNotifications(data as Notification[]);
     };
 
-    fetchNotifications();
+    void fetchNotifications();
+    const refreshTimer = window.setInterval(() => void fetchNotifications(), 30000);
 
     // Realtime subscription
     const channel = supabase
@@ -64,6 +67,8 @@ const NotificationBell = () => {
       .subscribe();
 
     return () => {
+      active = false;
+      window.clearInterval(refreshTimer);
       supabase.removeChannel(channel);
     };
   }, [user]);
