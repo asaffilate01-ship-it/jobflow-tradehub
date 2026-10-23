@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { callDriverRpc } from "@/lib/driver-rpc";
 import { logAudit } from "@/lib/audit";
 import { notify } from "@/lib/notify";
 import { useAuth } from "@/contexts/AuthContext";
