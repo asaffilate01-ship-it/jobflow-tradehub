@@ -3824,6 +3824,11 @@ export type Database = {
       }
     }
     Functions: {
+      driver_delivery_board: { Args: Record<PropertyKey, never>; Returns: Json }
+      driver_delivery_action: { Args: { p_delivery: string; p_status: Database["public"]["Enums"]["delivery_status"] }; Returns: string }
+      save_material_comparison: { Args: { p_quote: string; p_job: string }; Returns: string[] }
+      accept_project_quote: { Args: { p_quote: string }; Returns: string }
+      create_material_request: { Args: { p_request_key: string; p_order: Json; p_items: Json }; Returns: string }
       create_subcontract_work_order: { Args: { p_company: string; p_subcontractor: string; p_job: string; p_title: string; p_scope: string; p_due: string | null; p_amount: number; p_assignee_email?: string | null }; Returns: string }
       update_subcontract_progress: { Args: { p_id: string; p_status: string; p_progress: number; p_note: string }; Returns: undefined }
       record_subcontract_payment: { Args: { p_id: string; p_amount: number; p_paid_on: string; p_reference: string }; Returns: string }

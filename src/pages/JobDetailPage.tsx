@@ -119,14 +119,8 @@ const JobDetailPage = () => {
       window.location.reload();
       return;
     }
-    const { error: quoteErr } = await supabase.from("quotes").update({ status: "accepted" }).eq("id", quoteId);
+    const { error: quoteErr } = await supabase.rpc("accept_project_quote", { p_quote: quoteId });
     if (quoteErr) { toast.error(quoteErr.message); return; }
-    // Reject others
-    await supabase.from("quotes").update({ status: "rejected" }).eq("job_id", id).neq("id", quoteId);
-    // Create job award
-    await supabase.from("job_awards").insert({ job_id: id!, accepted_quote_id: quoteId, trade_company_id: tradeCompanyId });
-    // Update job status
-    await supabase.from("jobs").update({ status: "awarded", trade_company_id: tradeCompanyId }).eq("id", id!);
 
     // Notify winning trade + audit
     const ownerId = await getCompanyOwner(tradeCompanyId);
