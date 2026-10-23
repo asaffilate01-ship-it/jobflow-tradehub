@@ -47,7 +47,7 @@ const DriverDashboard = () => {
     if (!user) return;
     const [{ data: dp }, { data: board, error }] = await Promise.all([
       supabase.from("driver_profiles").select("*").eq("profile_id", user.id).maybeSingle(),
-      supabase.rpc("driver_delivery_board"),
+      callDriverRpc("driver_delivery_board"),
     ]);
     setDriverProfile(dp);
     if (error) toast.error(error.message);
@@ -64,7 +64,7 @@ const DriverDashboard = () => {
   const acceptDelivery = async (deliveryId: string) => {
     if (!user) return;
     setAccepting(deliveryId);
-    const { error } = await supabase.rpc("driver_delivery_action", { p_delivery: deliveryId, p_status: "assigned" });
+    const { error } = await callDriverRpc("driver_delivery_action", { p_delivery: deliveryId, p_status: "assigned" });
     if (error) { toast.error(error.message); }
     else {
       await supabase.from("delivery_events").insert({
@@ -79,7 +79,7 @@ const DriverDashboard = () => {
   const updateStatus = async (deliveryId: string, nextStatus: string) => {
     if (!user) return;
     setUpdating(deliveryId);
-    const { error } = await supabase.rpc("driver_delivery_action", { p_delivery: deliveryId, p_status: nextStatus as "arrived_at_pickup" | "collected" | "en_route" | "delivered" });
+    const { error } = await callDriverRpc("driver_delivery_action", { p_delivery: deliveryId, p_status: nextStatus });
     if (error) { toast.error(error.message); }
     else {
       await supabase.from("delivery_events").insert({

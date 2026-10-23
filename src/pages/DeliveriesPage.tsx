@@ -78,7 +78,7 @@ const DeliveriesPage = () => {
 
   const fetchDeliveries = async () => {
     if (isDriver) {
-      const { data, error } = await supabase.rpc("driver_delivery_board");
+      const { data, error } = await callDriverRpc("driver_delivery_board");
       if (error) toast.error(error.message);
       else setDeliveries((data ?? []) as unknown as DeliveryRow[]);
       setLoading(false);
@@ -147,7 +147,7 @@ const DeliveriesPage = () => {
   // Driver: accept a broadcast delivery
   const acceptDelivery = async (deliveryId: string) => {
     if (!user) return;
-    const { error } = await supabase.rpc("driver_delivery_action", { p_delivery: deliveryId, p_status: "assigned" });
+    const { error } = await callDriverRpc("driver_delivery_action", { p_delivery: deliveryId, p_status: "assigned" });
 
     if (error) {
       toast.error(error.message);
@@ -161,7 +161,7 @@ const DeliveriesPage = () => {
 
   // Driver: update delivery status
   const updateStatus = async (deliveryId: string, newStatus: DeliveryStatus) => {
-    const { error } = await supabase.rpc("driver_delivery_action", { p_delivery: deliveryId, p_status: newStatus });
+    const { error } = await callDriverRpc("driver_delivery_action", { p_delivery: deliveryId, p_status: newStatus });
     if (error) {
       toast.error(error.message);
     } else {
