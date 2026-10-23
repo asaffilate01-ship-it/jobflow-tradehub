@@ -15,6 +15,8 @@ import { motion, useInView } from "framer-motion";
 import { FadeIn, StaggerContainer, StaggerItem, ScaleOnHover } from "@/components/MotionWrapper";
 import { supabase } from "@/integrations/supabase/client";
 
+import PromoHomePage from "./PromoHomePage";
+
 import heroBanner from "@/assets/hero-banner.jpg";
 
 import plumberIcon from "@/assets/icons/plumber-3d.png";
@@ -498,6 +500,8 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
+
+      <PromoHomePage />
 
       {/* Final CTA */}
       <section className="py-24 text-center px-4">

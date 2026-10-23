@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Suspense } from "react";
 import { lazyWithRetry } from "@/lib/lazy-retry";
 
@@ -18,8 +18,6 @@ import KycGate from "./components/KycGate";
 import TierGate from "./components/TierGate";
 import CookieNotice from "./components/CookieNotice";
 
-import PromoGate, { UnlockScreen } from "./components/PromoGate";
-import PromoHomePage from "./pages/PromoHomePage";
 import AgentLayout from "./components/AgentLayout";
 import AdminLayout from "./components/AdminLayout";
 
@@ -95,15 +93,13 @@ const App = () => (
         <AuthProvider>
           <Suspense fallback={<div className="min-h-screen bg-background" aria-busy="true" />}>
           <Routes>
-            {/* Promo homepage — public, default */}
-            <Route path="/" element={<PromoHomePage />} />
-            <Route path="/unlock" element={<UnlockScreen />} />
+            {/* Legacy public entry points share the unified homepage. */}
+            <Route path="/home" element={<Navigate to="/" replace />} />
+            <Route path="/unlock" element={<Navigate to="/" replace />} />
             <Route path="/privacy" element={<LegalPage />} />
             <Route path="/terms" element={<LegalPage />} />
             <Route path="/cookies" element={<LegalPage />} />
 
-            {/* Everything below requires the promo access password */}
-            <Route element={<PromoGate><Outlet /></PromoGate>}>
             {/* Public pages */}
 
             <Route path="/login" element={<LoginPage />} />
@@ -168,7 +164,7 @@ const App = () => (
             <Route element={<AppLayout />}>
               <Route path="/property-projects" element={<PropertyProjectsPage />} />
               <Route path="/funding-opportunities" element={<ProtectedRoute><ProjectOpportunitiesPage /></ProtectedRoute>} />
-              <Route path="/home" element={<LandingPage />} />
+              <Route path="/" element={<LandingPage />} />
               <Route path="/marketplace" element={<MarketplacePage />} />
               <Route path="/trader/:id" element={<TraderProfilePage />} />
               <Route path="/claim-trader/:id" element={
@@ -249,7 +245,6 @@ const App = () => (
             </Route>
 
             <Route path="*" element={<NotFound />} />
-            </Route>
           </Routes>
           </Suspense>
           <CookieNotice />

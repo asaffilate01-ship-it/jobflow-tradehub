@@ -38,7 +38,7 @@ const en: PromoCopy = {
     access: "Platform access",
     demo: "Request a demo",
     inside: "See what's inside",
-    enterPassword: "Enter access password",
+    enterPassword: "Browse the platform",
   },
   hero: {
     badge: "Launching in the UK",
@@ -106,13 +106,13 @@ const en: PromoCopy = {
       { q: "How does materials pricing work?", a: "We pull catalogues and live prices from merchant accounts, compare them per line item, and show trade-price totals before you order. Delivery is quoted from base rate, distance, manpower and load." },
       { q: "How are tradespeople verified?", a: "Every trade completes KYC — ID, insurance and trade certificates — reviewed by our admin team before they can quote. Compliance certificates stay on file and are visible to customers." },
       { q: "What does it cost?", a: "Customers post jobs free. Trades choose Free, Basic or Premium — Basic unlocks quoting and messaging, Premium unlocks materials, deliveries, site evidence, scheduling, compliance and accounting." },
-      { q: "Can I see the live platform?", a: "The full platform is behind a password during our launch phase. Request access and we'll send you credentials for a guided walkthrough." },
+      { q: "Can I see the live platform?", a: "Browse the homepage and marketplace without an access password. Create an account to post jobs or use your workspace; some features require verification or a paid plan." },
     ],
   },
   access: {
-    heading: "The live platform is invite-only",
+    heading: "Explore Craftvaro",
     lede:
-      "We're onboarding trades, merchants and drivers in waves. Already have an access password? Unlock the full platform below.",
+      "Browse tradespeople and explore the platform. Sign up to post jobs or manage your work.",
   },
   footer: { rights: "All rights reserved." },
 };
@@ -128,7 +128,7 @@ const de: PromoCopy = {
     access: "Plattform-Zugang",
     demo: "Demo anfragen",
     inside: "Alle Funktionen ansehen",
-    enterPassword: "Zugangspasswort eingeben",
+    enterPassword: "Plattform ansehen",
   },
   hero: {
     badge: "Jetzt im Aufbau",
@@ -196,13 +196,13 @@ const de: PromoCopy = {
       { q: "Wie funktioniert die Materialpreisfindung?", a: "Wir holen Kataloge und Live-Preise aus Händlerkonten, vergleichen sie pro Position und zeigen die Handwerkerpreise vor der Bestellung. Die Lieferung wird aus Grundpreis, Entfernung, Personal und Ladung berechnet." },
       { q: "Wie werden Betriebe geprüft?", a: "Jeder Betrieb durchläuft KYC — Ausweis, Versicherung und Qualifikationsnachweise — geprüft von unserem Team, bevor Angebote abgegeben werden dürfen. Zertifikate bleiben hinterlegt und sind für Kunden sichtbar." },
       { q: "Was kostet Craftvaro?", a: "Kunden stellen Aufträge kostenlos ein. Betriebe wählen Free, Basic oder Premium — Basic schaltet Angebote und Nachrichten frei, Premium zusätzlich Material, Lieferungen, Dokumentation, Planung, Compliance und Buchhaltung." },
-      { q: "Kann ich die Live-Plattform sehen?", a: "Die vollständige Plattform ist in der Startphase passwortgeschützt. Fragen Sie Zugang an, und wir senden Ihnen Zugangsdaten für eine geführte Tour." },
+      { q: "Kann ich die Live-Plattform sehen?", a: "Startseite und Marktplatz sind ohne Zugangspasswort zugänglich. Erstellen Sie ein Konto, um Aufträge einzustellen oder Ihren Arbeitsbereich zu nutzen. Einige Funktionen erfordern eine Verifizierung oder ein kostenpflichtiges Paket." },
     ],
   },
   access: {
-    heading: "Die Live-Plattform ist auf Einladung",
+    heading: "Craftvaro entdecken",
     lede:
-      "Wir nehmen Betriebe, Händler und Fahrer in Wellen auf. Sie haben schon ein Zugangspasswort? Dann öffnen Sie hier die vollständige Plattform.",
+      "Entdecken Sie Handwerksbetriebe und die Plattform. Registrieren Sie sich, um Aufträge einzustellen oder Ihre Arbeit zu verwalten.",
   },
   footer: { rights: "Alle Rechte vorbehalten." },
 };
