@@ -45,21 +45,17 @@ const DriverDashboard = () => {
 
   const fetchData = async () => {
     if (!user) return;
-    const [{ data: dp }, { data: mine }, { data: available }] = await Promise.all([
+    const [{ data: dp }, { data: board, error }] = await Promise.all([
       supabase.from("driver_profiles").select("*").eq("profile_id", user.id).maybeSingle(),
-      supabase.from("deliveries")
-        .select("*, material_orders(delivery_address, pickup_address, goods_total, urgency, merchants(name))")
-        .eq("driver_profile_id", user.id)
-        .order("created_at", { ascending: false }).limit(30),
-      supabase.from("deliveries")
-        .select("*, material_orders(delivery_address, pickup_address, goods_total, urgency, required_vehicle, merchants(name))")
-        .in("status", ["unassigned", "broadcast"])
-        .is("driver_profile_id", null)
-        .order("created_at", { ascending: false }).limit(20),
+      supabase.rpc("driver_delivery_board"),
     ]);
     setDriverProfile(dp);
-    setMyDeliveries(mine ?? []);
-    setBroadcastDeliveries(available ?? []);
+    if (error) toast.error(error.message);
+    const rows = ((board ?? []) as any[]).map(d => ({ ...d, material_orders: {
+      ...d.material_order, merchants: d.material_order?.merchant,
+    }}));
+    setMyDeliveries(rows.filter(d => d.driver_profile_id === user.id));
+    setBroadcastDeliveries(rows.filter(d => !d.driver_profile_id));
     setLoading(false);
   };
 
@@ -68,9 +64,7 @@ const DriverDashboard = () => {
   const acceptDelivery = async (deliveryId: string) => {
     if (!user) return;
     setAccepting(deliveryId);
-    const { error } = await supabase.from("deliveries")
-      .update({ driver_profile_id: user.id, status: "assigned", assigned_at: new Date().toISOString() })
-      .eq("id", deliveryId);
+    const { error } = await supabase.rpc("driver_delivery_action", { p_delivery: deliveryId, p_status: "assigned" });
     if (error) { toast.error(error.message); }
     else {
       await supabase.from("delivery_events").insert({
@@ -85,10 +79,7 @@ const DriverDashboard = () => {
   const updateStatus = async (deliveryId: string, nextStatus: string) => {
     if (!user) return;
     setUpdating(deliveryId);
-    const updateData: any = { status: nextStatus };
-    if (nextStatus === "delivered") updateData.delivered_at = new Date().toISOString();
-
-    const { error } = await supabase.from("deliveries").update(updateData).eq("id", deliveryId);
+    const { error } = await supabase.rpc("driver_delivery_action", { p_delivery: deliveryId, p_status: nextStatus as "arrived_at_pickup" | "collected" | "en_route" | "delivered" });
     if (error) { toast.error(error.message); }
     else {
       await supabase.from("delivery_events").insert({

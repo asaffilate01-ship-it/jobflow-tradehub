@@ -52,6 +52,8 @@ const SmartOrderPage = () => {
   const [items, setItems] = useState<ShoppingItem[]>([
     { key: crypto.randomUUID(), item_name: "", quantity: 1, unit: "each" },
   ]);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [comparing, setComparing] = useState(false);
 
   // Results
@@ -130,18 +132,29 @@ const SmartOrderPage = () => {
     // Default delivery methods
     const defaults: Record<string, string> = {};
     (data.delivery_summary ?? []).forEach((d: DeliverySummary) => {
-      defaults[d.merchant_id] = "platform_driver";
+      defaults[d.merchant_id] = "trade_collect";
     });
     setSelectedDeliveryMethods(defaults);
 
+    setSaved(false);
     setStep("results");
     toast.success(`Found prices from ${data.merchant_count} suppliers`);
   };
 
   const handleAcceptQuote = async () => {
-    if (!quoteId) return;
-    // In a real implementation, this would create material_orders per merchant group
-    toast.success("Orders placed! Merchants will be notified.");
+    if (!quoteId || saving || saved) return;
+    if (!selectedJob) { toast.error("Select an awarded job before saving requests"); return; }
+    if (Object.values(selectedDeliveryMethods).some(method => method !== "trade_collect")) {
+      toast.error("Delivery needs a confirmed route and rate. Save for collection or use Materials to request delivery."); return;
+    }
+    setSaving(true);
+    try {
+      const { data, error } = await supabase.rpc("save_material_comparison", { p_quote: quoteId, p_job: selectedJob });
+      if (error) throw error;
+      setSaved(true);
+      toast.success(`${data.length} collection request(s) saved. Confirm prices and collection with merchants. No payment taken.`);
+    } catch (error) { toast.error(error instanceof Error ? error.message : "Could not save requests. Retry safely."); }
+    finally { setSaving(false); }
   };
 
   const selectClass = "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
@@ -294,13 +307,13 @@ const SmartOrderPage = () => {
               <div className="text-3xl font-bold text-primary">£{grandTotal.toFixed(2)}</div>
             </div>
             <div className="text-right text-xs text-muted-foreground">
-              <div>Materials paid direct to merchants</div>
-              <div>Platform delivery fees paid to Craftvaro</div>
+              <div>Merchant confirmation and payment arranged separately</div>
+              <div>Delivery estimates are not confirmed bookings</div>
             </div>
           </div>
-          <Button className="w-full font-semibold gap-2 h-12 text-base" onClick={handleAcceptQuote}>
+          <Button className="w-full font-semibold gap-2 h-12 text-base" onClick={handleAcceptQuote} disabled={saving || saved}>
             <CheckCircle className="h-5 w-5" />
-            Accept & Place Orders
+            {saved ? "Requests saved" : saving ? "Saving…" : "Save collection requests"}
           </Button>
         </div>
       </div>
@@ -325,9 +338,9 @@ const SmartOrderPage = () => {
         <h2 className="font-semibold">Delivery Location</h2>
         <div className="grid sm:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">Link to job (optional)</label>
+            <label className="text-sm font-medium text-muted-foreground">Awarded job (required to save)</label>
             <select className={selectClass} value={selectedJob} onChange={(e) => setSelectedJob(e.target.value)}>
-              <option value="">No job selected</option>
+              <option value="">Select an awarded job</option>
               {jobs.map(j => <option key={j.id} value={j.id}>{j.title} ({j.postcode})</option>)}
             </select>
           </div>

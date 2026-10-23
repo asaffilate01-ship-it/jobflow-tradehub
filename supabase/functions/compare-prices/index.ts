@@ -39,7 +39,8 @@ Deno.serve(async (req) => {
 
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+    Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+    { global: { headers: { Authorization: req.headers.get("Authorization") ?? "" } } }
   );
 
   try {
@@ -55,6 +56,23 @@ Deno.serve(async (req) => {
       throw new Error("items, trade_company_id, and delivery_postcode are required");
     }
 
+    if (!Array.isArray(items) || items.length > 100 || items.some((item: ShoppingItem) =>
+      typeof item.item_name !== "string" || !item.item_name.trim() || item.item_name.length > 300 ||
+      !Number.isFinite(item.quantity) || item.quantity <= 0 || item.quantity > 100000 ||
+      typeof item.unit !== "string" || !item.unit.trim())) throw new Error("Invalid materials list");
+    const { data: company, error: companyError } = await supabase.from("trade_companies")
+      .select("id").eq("id", trade_company_id).eq("owner_profile_id", user.id).maybeSingle();
+    if (companyError || !company) throw new Error("Company not owned by caller");
+    const { data: subscription } = await supabase.from("subscribers").select("subscribed,tier,subscription_end")
+      .eq("user_id", user.id).maybeSingle();
+    if (!subscription?.subscribed || subscription.tier !== "premium" ||
+      (subscription.subscription_end && new Date(subscription.subscription_end).getTime() <= Date.now()))
+      throw new Error("Active Premium subscription required");
+    if (job_id) {
+      const { data: job } = await supabase.from("jobs").select("id").eq("id", job_id)
+        .eq("trade_company_id", trade_company_id).in("status", ["awarded", "active"]).maybeSingle();
+      if (!job) throw new Error("Select an active job awarded to your company");
+    }
     const shoppingList: ShoppingItem[] = items;
 
     // Fetch all merchants, catalog items, trade accounts, and rate card in parallel
@@ -192,8 +210,8 @@ Deno.serve(async (req) => {
         item_count: items.length,
         subtotal: items.reduce((s, i) => s + i.line_total, 0),
         delivery_options: [
-          { method: "platform_driver", label: "Craftvaro Delivery", cost: estimatedDeliveryCost },
-          { method: "merchant_delivery", label: "Merchant Delivery", cost: 0 },
+          { method: "platform_driver", label: "Estimated delivery (8 miles)", cost: estimatedDeliveryCost },
+
           { method: "trade_collect", label: "Self Collect", cost: 0 },
         ],
       })
@@ -239,7 +257,11 @@ Deno.serve(async (req) => {
       alternatives: r.alternatives,
     }));
 
-    await adminClient.from("price_quote_items").insert(itemsToInsert);
+    const { error: itemsError } = await adminClient.from("price_quote_items").insert(itemsToInsert);
+    if (itemsError) {
+      await adminClient.from("price_quotes").delete().eq("id", quote!.id);
+      throw itemsError;
+    }
 
     return new Response(
       JSON.stringify({

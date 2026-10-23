@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -107,6 +107,7 @@ const MaterialsPage = () => {
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [notes, setNotes] = useState("");
   const [items, setItems] = useState<OrderItem[]>([{ key: crypto.randomUUID(), item_name: "", quantity: 1, unit: "each", unit_price: 0, category: "Other", sku: "" }]);
+  const requestKey = useRef(crypto.randomUUID());
   const [submitting, setSubmitting] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -254,31 +255,21 @@ const MaterialsPage = () => {
     if (validItems.length === 0) { toast.error("Add at least one item"); return; }
     setSubmitting(true);
     try {
-      const { data: order, error: orderErr } = await supabase.from("material_orders").insert({
-        trade_company_id: companyId, created_by: user.id, merchant_id: selectedMerchant,
-        merchant_branch_id: selectedBranch || null, job_id: selectedJob,
-        trade_account_id: selectedAccount || null, delivery_mode: deliveryMode,
-        delivery_address: deliveryAddress,
-        pickup_address: filteredBranches.find(b => b.id === selectedBranch)?.address_line1 ?? null,
-        required_vehicle: deliveryMode === "platform_driver" ? vehicle : null,
-        urgency, manpower_required: manpower, goods_total: goodsTotal,
-        platform_delivery_fee: pricing.total, notes: notes || null, order_status: "submitted",
-      }).select("id").single();
-      if (orderErr) throw orderErr;
-      const orderItemsData = validItems.map(i => ({
-        material_order_id: order!.id, item_name: i.item_name, quantity: i.quantity,
-        unit: i.unit, unit_price: i.unit_price, category: i.category, sku: i.sku,
-      }));
-      const { error: itemsErr } = await supabase.from("order_items").insert(orderItemsData);
-      if (itemsErr) throw itemsErr;
-      if (deliveryMode === "platform_driver") {
-        await supabase.from("deliveries").insert({
-          material_order_id: order!.id, price_charged: pricing.total,
-          driver_payout: pricing.driverPayout, platform_margin: pricing.platformMargin,
-          estimated_distance_miles: miles, status: "broadcast",
-        });
-      }
-      toast.success("Material order submitted!");
+      const { error } = await supabase.rpc("create_material_request", {
+        p_request_key: requestKey.current,
+        p_order: {
+          trade_company_id: companyId, job_id: selectedJob, merchant_id: selectedMerchant,
+          merchant_branch_id: selectedBranch || null, trade_account_id: selectedAccount || null,
+          delivery_mode: deliveryMode, delivery_address: deliveryAddress,
+          required_vehicle: deliveryMode === "platform_driver" ? vehicle : null,
+          urgency, manpower_required: manpower, estimated_distance_miles: miles, notes,
+        },
+        p_items: validItems.map(i => ({ item_name: i.item_name, quantity: i.quantity, unit: i.unit,
+          unit_price: i.unit_price, category: i.category, sku: i.sku })),
+      });
+      if (error) throw error;
+      requestKey.current = crypto.randomUUID();
+      toast.success("Request saved. Arrange merchant confirmation before dispatch; no payment has been taken.");
       setItems([{ key: crypto.randomUUID(), item_name: "", quantity: 1, unit: "each", unit_price: 0, category: "Other", sku: "" }]);
       setNotes("");
       const { data: refreshed } = await supabase.from("material_orders").select("*, merchants(name)").eq("trade_company_id", companyId).order("created_at", { ascending: false }).limit(20);

@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Shield, Clock, FileText, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface KycGateProps {
   children: React.ReactNode;
@@ -14,27 +14,36 @@ interface KycGateProps {
 const KycGate = ({ children, requiredFor = ["trade", "driver"] }: KycGateProps) => {
   const { user, roles } = useAuth();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const isUploadRoute = pathname === "/kyc-upload" || pathname === "/driver/kyc-upload";
   const [kycStatus, setKycStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const needsKyc = roles.some((r) => requiredFor.includes(r));
 
   useEffect(() => {
+    let cancelled = false;
     if (!user || !needsKyc) {
       setLoading(false);
       return;
     }
 
+    setLoading(true);
+    setKycStatus(null);
     supabase
       .from("profiles")
       .select("kyc_status")
       .eq("id", user.id)
       .single()
-      .then(({ data }) => {
-        setKycStatus((data as any)?.kyc_status ?? "approved");
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        setKycStatus(error ? "pending" : (data?.kyc_status ?? "pending"));
         setLoading(false);
       });
-  }, [user, needsKyc]);
+    return () => { cancelled = true; };
+  }, [user, needsKyc, pathname]);
+
+  if (isUploadRoute) return <>{children}</>;
 
   if (loading) {
     return (
@@ -95,7 +104,7 @@ const KycGate = ({ children, requiredFor = ["trade", "driver"] }: KycGateProps) 
             <p className="text-xs text-muted-foreground text-center">
               Required documents: Government-issued photo ID, proof of address, and any trade certifications.
             </p>
-            <Button className="w-full" onClick={() => navigate("/kyc-upload")}>
+            <Button className="w-full" onClick={() => navigate(roles.includes("driver") && !roles.includes("trade") ? "/driver/kyc-upload" : "/kyc-upload")}>
               <Shield className="h-4 w-4 mr-2" />
               Upload verification documents
             </Button>

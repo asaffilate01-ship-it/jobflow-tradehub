@@ -77,6 +77,13 @@ const DeliveriesPage = () => {
   const isDriver = roles.includes("driver");
 
   const fetchDeliveries = async () => {
+    if (isDriver) {
+      const { data, error } = await supabase.rpc("driver_delivery_board");
+      if (error) toast.error(error.message);
+      else setDeliveries((data ?? []) as unknown as DeliveryRow[]);
+      setLoading(false);
+      return;
+    }
     // The RLS handles what data the user can see
     const { data, error } = await supabase
       .from("deliveries")
@@ -140,11 +147,7 @@ const DeliveriesPage = () => {
   // Driver: accept a broadcast delivery
   const acceptDelivery = async (deliveryId: string) => {
     if (!user) return;
-    const { error } = await supabase.from("deliveries").update({
-      driver_profile_id: user.id,
-      status: "assigned" as DeliveryStatus,
-      assigned_at: new Date().toISOString(),
-    }).eq("id", deliveryId);
+    const { error } = await supabase.rpc("driver_delivery_action", { p_delivery: deliveryId, p_status: "assigned" });
 
     if (error) {
       toast.error(error.message);
@@ -158,10 +161,7 @@ const DeliveriesPage = () => {
 
   // Driver: update delivery status
   const updateStatus = async (deliveryId: string, newStatus: DeliveryStatus) => {
-    const updates: any = { status: newStatus };
-    if (newStatus === "delivered") updates.delivered_at = new Date().toISOString();
-
-    const { error } = await supabase.from("deliveries").update(updates).eq("id", deliveryId);
+    const { error } = await supabase.rpc("driver_delivery_action", { p_delivery: deliveryId, p_status: newStatus });
     if (error) {
       toast.error(error.message);
     } else {
