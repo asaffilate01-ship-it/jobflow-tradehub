@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.4"
   }
   public: {
     Tables: {
@@ -1303,200 +1303,31 @@ export type Database = {
           },
         ]
       }
-      project_opportunities: {
-        Row: {
-          id: string
-          source_name: string
-          source_reference: string
-          source_url: string
-          title: string
-          summary: string
-          opportunity_kind: string
-          project_category: string
-          nation: string
-          council_name: string
-          postcode_area: string
-          decision_status: string
-          decision_date: string | null
-          deadline: string | null
-          eligibility: string
-          required_credentials: string
-          reuse_basis: string
-          published: boolean
-          verified_at: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          source_name: string
-          source_reference: string
-          source_url: string
-          title: string
-          summary?: string
-          opportunity_kind: string
-          project_category: string
-          nation: string
-          council_name?: string
-          postcode_area?: string
-          decision_status?: string
-          decision_date?: string | null
-          deadline?: string | null
-          eligibility?: string
-          required_credentials?: string
-          reuse_basis: string
-          published?: boolean
-          verified_at?: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          source_name?: string
-          source_reference?: string
-          source_url?: string
-          title?: string
-          summary?: string
-          opportunity_kind?: string
-          project_category?: string
-          nation?: string
-          council_name?: string
-          postcode_area?: string
-          decision_status?: string
-          decision_date?: string | null
-          deadline?: string | null
-          eligibility?: string
-          required_credentials?: string
-          reuse_basis?: string
-          published?: boolean
-          verified_at?: string
-          created_at?: string
-        }
-        Relationships: []
-      }
-      project_opportunity_saves: {
-        Row: {
-          profile_id: string
-          opportunity_id: string
-          created_at: string
-        }
-        Insert: {
-          profile_id: string
-          opportunity_id: string
-          created_at?: string
-        }
-        Update: {
-          profile_id?: string
-          opportunity_id?: string
-          created_at?: string
-        }
-        Relationships: []
-      }
-      subcontract_work_orders: {
-        Row: {
-          id: string
-          trade_company_id: string
-          subcontractor_id: string
-          job_id: string
-          assignee_profile_id: string | null
-          title: string
-          scope: string
-          due_date: string | null
-          agreed_amount: number
-          status: string
-          progress: number
-          progress_note: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          trade_company_id?: string
-          subcontractor_id?: string
-          job_id?: string
-          assignee_profile_id?: string | null
-          title?: string
-          scope?: string
-          due_date?: string | null
-          agreed_amount?: number
-          status?: string
-          progress?: number
-          progress_note?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          trade_company_id?: string
-          subcontractor_id?: string
-          job_id?: string
-          assignee_profile_id?: string | null
-          title?: string
-          scope?: string
-          due_date?: string | null
-          agreed_amount?: number
-          status?: string
-          progress?: number
-          progress_note?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      subcontract_payment_records: {
-        Row: {
-          id: string
-          work_order_id: string
-          amount: number
-          paid_on: string
-          reference: string
-          recorded_by: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          work_order_id?: string
-          amount?: number
-          paid_on?: string
-          reference?: string
-          recorded_by?: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          work_order_id?: string
-          amount?: number
-          paid_on?: string
-          reference?: string
-          recorded_by?: string
-          created_at?: string
-        }
-        Relationships: []
-      }
       jobs: {
         Row: {
-          project_category: string
-          funding_stage: string
-          planning_stage: string
-          planning_reference: string | null
-          council_name: string | null
-          required_credentials: string | null
-          scope_notes: string | null
-          site_visit_required: boolean
-
           address_line1: string
           budget_max: number | null
           budget_min: number | null
           city: string
+          council_name: string | null
           created_at: string
           customer_profile_id: string
           description: string | null
           exact_address_released: boolean
+          funding_stage: string
           id: string
           job_kind: string
+          planning_reference: string | null
+          planning_stage: string
           postcode: string
           postcode_sector: string | null
+          project_category: string
           property_reference: string | null
           repair_priority: string | null
           requested_trade: Database["public"]["Enums"]["trade_type"]
+          required_credentials: string | null
+          scope_notes: string | null
+          site_visit_required: boolean
           source_product: string
           source_reference: string | null
           status: Database["public"]["Enums"]["job_status"]
@@ -1507,30 +1338,29 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          project_category?: string
-          funding_stage?: string
-          planning_stage?: string
-          planning_reference?: string | null
-          council_name?: string | null
-          required_credentials?: string | null
-          scope_notes?: string | null
-          site_visit_required?: boolean
-
           address_line1: string
           budget_max?: number | null
           budget_min?: number | null
           city: string
+          council_name?: string | null
           created_at?: string
           customer_profile_id: string
           description?: string | null
           exact_address_released?: boolean
+          funding_stage?: string
           id?: string
           job_kind?: string
+          planning_reference?: string | null
+          planning_stage?: string
           postcode: string
           postcode_sector?: string | null
+          project_category?: string
           property_reference?: string | null
           repair_priority?: string | null
           requested_trade: Database["public"]["Enums"]["trade_type"]
+          required_credentials?: string | null
+          scope_notes?: string | null
+          site_visit_required?: boolean
           source_product?: string
           source_reference?: string | null
           status?: Database["public"]["Enums"]["job_status"]
@@ -1541,30 +1371,29 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          project_category?: string
-          funding_stage?: string
-          planning_stage?: string
-          planning_reference?: string | null
-          council_name?: string | null
-          required_credentials?: string | null
-          scope_notes?: string | null
-          site_visit_required?: boolean
-
           address_line1?: string
           budget_max?: number | null
           budget_min?: number | null
           city?: string
+          council_name?: string | null
           created_at?: string
           customer_profile_id?: string
           description?: string | null
           exact_address_released?: boolean
+          funding_stage?: string
           id?: string
           job_kind?: string
+          planning_reference?: string | null
+          planning_stage?: string
           postcode?: string
           postcode_sector?: string | null
+          project_category?: string
           property_reference?: string | null
           repair_priority?: string | null
           requested_trade?: Database["public"]["Enums"]["trade_type"]
+          required_credentials?: string | null
+          scope_notes?: string | null
+          site_visit_required?: boolean
           source_product?: string
           source_reference?: string | null
           status?: Database["public"]["Enums"]["job_status"]
@@ -1647,6 +1476,7 @@ export type Database = {
           order_status: Database["public"]["Enums"]["order_status"]
           pickup_address: string | null
           platform_delivery_fee: number
+          request_key: string | null
           required_vehicle: Database["public"]["Enums"]["vehicle_type"] | null
           trade_account_id: string | null
           trade_company_id: string
@@ -1670,6 +1500,7 @@ export type Database = {
           order_status?: Database["public"]["Enums"]["order_status"]
           pickup_address?: string | null
           platform_delivery_fee?: number
+          request_key?: string | null
           required_vehicle?: Database["public"]["Enums"]["vehicle_type"] | null
           trade_account_id?: string | null
           trade_company_id: string
@@ -1693,6 +1524,7 @@ export type Database = {
           order_status?: Database["public"]["Enums"]["order_status"]
           pickup_address?: string | null
           platform_delivery_fee?: number
+          request_key?: string | null
           required_vehicle?: Database["public"]["Enums"]["vehicle_type"] | null
           trade_account_id?: string | null
           trade_company_id?: string
@@ -2190,6 +2022,7 @@ export type Database = {
       price_quotes: {
         Row: {
           comparison_data: Json
+          converted_order_ids: string[] | null
           created_at: string
           delivery_address: string
           delivery_postcode: string
@@ -2204,6 +2037,7 @@ export type Database = {
         }
         Insert: {
           comparison_data?: Json
+          converted_order_ids?: string[] | null
           created_at?: string
           delivery_address?: string
           delivery_postcode: string
@@ -2218,6 +2052,7 @@ export type Database = {
         }
         Update: {
           comparison_data?: Json
+          converted_order_ids?: string[] | null
           created_at?: string
           delivery_address?: string
           delivery_postcode?: string
@@ -2324,6 +2159,108 @@ export type Database = {
           years_experience?: number | null
         }
         Relationships: []
+      }
+      project_opportunities: {
+        Row: {
+          council_name: string
+          created_at: string
+          deadline: string | null
+          decision_date: string | null
+          decision_status: string
+          eligibility: string
+          id: string
+          nation: string
+          opportunity_kind: string
+          postcode_area: string
+          project_category: string
+          published: boolean
+          required_credentials: string
+          reuse_basis: string
+          source_name: string
+          source_reference: string
+          source_url: string
+          summary: string
+          title: string
+          verified_at: string
+        }
+        Insert: {
+          council_name?: string
+          created_at?: string
+          deadline?: string | null
+          decision_date?: string | null
+          decision_status?: string
+          eligibility?: string
+          id?: string
+          nation: string
+          opportunity_kind: string
+          postcode_area?: string
+          project_category: string
+          published?: boolean
+          required_credentials?: string
+          reuse_basis: string
+          source_name: string
+          source_reference: string
+          source_url: string
+          summary?: string
+          title: string
+          verified_at?: string
+        }
+        Update: {
+          council_name?: string
+          created_at?: string
+          deadline?: string | null
+          decision_date?: string | null
+          decision_status?: string
+          eligibility?: string
+          id?: string
+          nation?: string
+          opportunity_kind?: string
+          postcode_area?: string
+          project_category?: string
+          published?: boolean
+          required_credentials?: string
+          reuse_basis?: string
+          source_name?: string
+          source_reference?: string
+          source_url?: string
+          summary?: string
+          title?: string
+          verified_at?: string
+        }
+        Relationships: []
+      }
+      project_opportunity_saves: {
+        Row: {
+          created_at: string
+          opportunity_id: string
+          profile_id: string
+        }
+        Insert: {
+          created_at?: string
+          opportunity_id: string
+          profile_id: string
+        }
+        Update: {
+          created_at?: string
+          opportunity_id?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_opportunity_saves_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "project_opportunities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_opportunity_saves_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       push_subscriptions: {
         Row: {
@@ -2914,6 +2851,131 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "staff_assignments_trade_company_id_fkey"
+            columns: ["trade_company_id"]
+            isOneToOne: false
+            referencedRelation: "trade_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subcontract_payment_records: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          paid_on: string
+          recorded_by: string
+          reference: string
+          work_order_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          paid_on: string
+          recorded_by: string
+          reference: string
+          work_order_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          paid_on?: string
+          recorded_by?: string
+          reference?: string
+          work_order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subcontract_payment_records_recorded_by_fkey"
+            columns: ["recorded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subcontract_payment_records_work_order_id_fkey"
+            columns: ["work_order_id"]
+            isOneToOne: false
+            referencedRelation: "subcontract_work_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subcontract_work_orders: {
+        Row: {
+          agreed_amount: number
+          assignee_profile_id: string | null
+          created_at: string
+          due_date: string | null
+          id: string
+          job_id: string
+          progress: number
+          progress_note: string
+          scope: string
+          status: string
+          subcontractor_id: string
+          title: string
+          trade_company_id: string
+          updated_at: string
+        }
+        Insert: {
+          agreed_amount: number
+          assignee_profile_id?: string | null
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          job_id: string
+          progress?: number
+          progress_note?: string
+          scope: string
+          status?: string
+          subcontractor_id: string
+          title: string
+          trade_company_id: string
+          updated_at?: string
+        }
+        Update: {
+          agreed_amount?: number
+          assignee_profile_id?: string | null
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          job_id?: string
+          progress?: number
+          progress_note?: string
+          scope?: string
+          status?: string
+          subcontractor_id?: string
+          title?: string
+          trade_company_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subcontract_work_orders_assignee_profile_id_fkey"
+            columns: ["assignee_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subcontract_work_orders_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subcontract_work_orders_subcontractor_id_fkey"
+            columns: ["subcontractor_id"]
+            isOneToOne: false
+            referencedRelation: "subcontractors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subcontract_work_orders_trade_company_id_fkey"
             columns: ["trade_company_id"]
             isOneToOne: false
             referencedRelation: "trade_companies"
@@ -3824,20 +3886,15 @@ export type Database = {
       }
     }
     Functions: {
-      driver_delivery_board: { Args: Record<PropertyKey, never>; Returns: Json }
-      driver_delivery_action: { Args: { p_delivery: string; p_status: Database["public"]["Enums"]["delivery_status"] }; Returns: string }
-      save_material_comparison: { Args: { p_quote: string; p_job: string }; Returns: string[] }
       accept_project_quote: { Args: { p_quote: string }; Returns: string }
-      create_material_request: { Args: { p_request_key: string; p_order: Json; p_items: Json }; Returns: string }
-      create_subcontract_work_order: { Args: { p_company: string; p_subcontractor: string; p_job: string; p_title: string; p_scope: string; p_due: string | null; p_amount: number; p_assignee_email?: string | null }; Returns: string }
-      update_subcontract_progress: { Args: { p_id: string; p_status: string; p_progress: number; p_note: string }; Returns: undefined }
-      record_subcontract_payment: { Args: { p_id: string; p_amount: number; p_paid_on: string; p_reference: string }; Returns: string }
-      trader_business_metrics: { Args: { p_company: string }; Returns: Json }
-
       accept_repair_offer: { Args: { p_quote_id: string }; Returns: string }
       approve_trader_profile_claim: {
         Args: { p_claim_id: string }
         Returns: string
+      }
+      can_access_project_evidence: {
+        Args: { p_path: string }
+        Returns: boolean
       }
       consume_ai_agent_quota: {
         Args: { p_agent?: string; p_user_id: string }
@@ -3848,12 +3905,29 @@ export type Database = {
           used: number
         }[]
       }
+      create_material_request: {
+        Args: { p_items: Json; p_order: Json; p_request_key: string }
+        Returns: string
+      }
       create_repair_job: {
         Args: {
           p_address_line1: string
           p_city: string
           p_description: string
           p_postcode: string
+          p_title: string
+        }
+        Returns: string
+      }
+      create_subcontract_work_order: {
+        Args: {
+          p_amount: number
+          p_assignee_email?: string
+          p_company: string
+          p_due: string
+          p_job: string
+          p_scope: string
+          p_subcontractor: string
           p_title: string
         }
         Returns: string
@@ -3880,6 +3954,15 @@ export type Database = {
           trade_company_id: string
         }[]
       }
+      record_subcontract_payment: {
+        Args: {
+          p_amount: number
+          p_id: string
+          p_paid_on: string
+          p_reference: string
+        }
+        Returns: string
+      }
       refresh_trader_public_profile: {
         Args: { p_id: string }
         Returns: undefined
@@ -3887,6 +3970,10 @@ export type Database = {
       reject_trader_profile_claim: {
         Args: { p_claim_id: string; p_reason?: string }
         Returns: undefined
+      }
+      save_material_comparison: {
+        Args: { p_job: string; p_quote: string }
+        Returns: string[]
       }
       submit_repair_offer: {
         Args: {
@@ -3902,6 +3989,16 @@ export type Database = {
           p_warranty_days: number
         }
         Returns: string
+      }
+      trader_business_metrics: { Args: { p_company: string }; Returns: Json }
+      update_subcontract_progress: {
+        Args: {
+          p_id: string
+          p_note: string
+          p_progress: number
+          p_status: string
+        }
+        Returns: undefined
       }
       verify_order_status: { Args: { order_id: string }; Returns: Json }
     }
