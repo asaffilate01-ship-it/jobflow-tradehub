@@ -19,7 +19,10 @@ beforeAll(async()=>{
  await db.exec(read('20260402123017_27f69905-6558-43de-b750-a2ce547aeb0e.sql'));
  await db.exec(read('20261023073508_craftvaro_transactional_workflows.sql'));
  await db.exec(read('20261023074153_craftvaro_driver_offer_discovery.sql'));
- await db.exec(`INSERT INTO auth.users(id) VALUES ('${id(1)}'),('${id(2)}'),('${id(3)}');
+ await db.exec('GRANT INSERT,UPDATE,DELETE ON material_orders,order_items,deliveries,delivery_events TO authenticated');
+ await db.exec(read('20261023155012_material_fulfilment_controls.sql'));
+ await db.exec(`INSERT INTO auth.users(id) VALUES ('${id(1)}'),('${id(2)}'),('${id(3)}'),('${id(6)}');
+ INSERT INTO user_roles(user_id,role) VALUES ('${id(6)}','admin');
  INSERT INTO trade_companies(id,owner_profile_id,legal_name) VALUES ('${id(11)}','${id(1)}','First'),('${id(12)}','${id(2)}','Second');
  INSERT INTO subscribers VALUES ('${id(1)}',true,'premium',null),('${id(2)}',true,'premium',null);
  INSERT INTO jobs(id,customer_profile_id,requested_trade,title,address_line1,city,postcode) VALUES ('${id(21)}','${id(3)}','builder','Project','Street','Luton','LU1');
@@ -40,11 +43,42 @@ describe.sequential('Atomic workflows',()=>{
  it('rolls back multi-merchant conversion if any item is invalid',async()=>{await db.exec(`RESET ROLE; INSERT INTO price_quotes(id,trade_company_id,requested_by,delivery_postcode,delivery_address) VALUES ('${id(71)}','${id(11)}','${id(1)}','LU1','Site'); INSERT INTO price_quote_items(price_quote_id,item_name,best_merchant_id,best_price,quantity) VALUES ('${id(71)}','Cement','${id(41)}',10,-1);`);await expect(as(1,'select save_material_comparison($1,$2)',[id(71),id(21)])).rejects.toThrow('Invalid item');await db.exec('RESET ROLE');expect((await db.query('select id from material_orders')).rows).toHaveLength(1);});
  it('saves comparison requests once and denies another user',async()=>{await db.exec(`RESET ROLE; UPDATE price_quote_items SET quantity=2 WHERE price_quote_id='${id(71)}';`);await expect(as(2,'select save_material_comparison($1,$2)',[id(71),id(21)])).rejects.toThrow('owner');const a=await as(1,'select save_material_comparison($1,$2) as ids',[id(71),id(21)]);const b=await as(1,'select save_material_comparison($1,$2) as ids',[id(71),id(21)]);expect(a.rows).toEqual(b.rows);});
  it('rejects expired subscriptions',async()=>{await db.exec(`RESET ROLE; UPDATE subscribers SET subscription_end='2000-01-01' WHERE user_id='${id(1)}';`);await expect(as(1,'select create_material_request($1,$2,$3)',[id(64),order(),items])).rejects.toThrow('Premium');});
+ it('denies legacy direct writes and non-admin fulfilment',async()=>{
+  for(const table of ['material_orders','order_items','deliveries','delivery_events']) for(const action of ['update','delete']) {
+   const sql=action==='update'?`update ${table} set id=id`:`delete from ${table}`;
+   await expect(as(1,sql)).rejects.toThrow('permission denied');
+  }
+  await expect(as(1,"insert into material_orders default values")).rejects.toThrow('permission denied');
+  await expect(as(1,'select material_fulfilment_board()')).rejects.toThrow('Admin required');
+  await expect(as(1,"select material_fulfilment_action($1,$2,'confirm','Merchant confirmed','REF','Pickup',20)",[id(62),id(80)])).rejects.toThrow('Admin required');
+ });
+ it('requires exact merchant total, evidence and valid sequencing',async()=>{
+  await db.exec('RESET ROLE');const r=await db.query<{id:string}>("select id from material_orders where delivery_mode='platform_driver'");const oid=r.rows[0].id;
+  await expect(as(6,"select material_fulfilment_action($1,$2,'ready','Stock checked')",[oid,id(80)])).rejects.toThrow('Confirm merchant');
+  await expect(as(6,"select material_fulfilment_action($1,$2,'confirm','Stock checked','REF','Pickup Street',99)",[oid,id(80)])).rejects.toThrow('matching goods');
+  await expect(as(6,"select material_fulfilment_action($1,$2,'confirm','', 'REF','Pickup Street',20)",[oid,id(80)])).rejects.toThrow('evidence');
+  const board=await as(6,'select material_fulfilment_board() as board');expect((board.rows[0].board as any[]).find(o=>o.id===oid).status).toBe('submitted');
+ });
+ it('cancels collection requests once and rejects reused keys',async()=>{
+  await db.exec('RESET ROLE');const r=await db.query<{id:string}>("select id from material_orders where delivery_mode='trade_collect'");const oid=r.rows[0].id;
+  await as(6,"select material_fulfilment_action($1,$2,'cancel','Merchant out of stock')",[oid,id(85)]);
+  await as(6,"select material_fulfilment_action($1,$2,'cancel','Merchant out of stock')",[oid,id(85)]);
+  await expect(as(6,"select material_fulfilment_action($1,$2,'ready','Stock checked')",[oid,id(85)])).rejects.toThrow('already used');
+  const history=await as(6,'select material_fulfilment_board() as board');expect((history.rows[0].board as any[]).find(o=>o.id===oid).events).toHaveLength(1);
+ });
  it('driver offers hide addresses until acceptance and reject skipped transitions',async()=>{
   await db.exec(`RESET ROLE; INSERT INTO auth.users(id) VALUES ('${id(4)}'),('${id(5)}');
    INSERT INTO user_roles(user_id,role) VALUES ('${id(4)}','driver'),('${id(5)}','driver');
    INSERT INTO driver_profiles(profile_id,vehicle_type,verified) VALUES ('${id(4)}','small_van',true),('${id(5)}','small_van',true);
-   UPDATE material_orders SET order_status='confirmed'; UPDATE deliveries SET status='broadcast';`);
+   `);
+  const saved=await db.query<{id:string}>('select id from material_orders where delivery_mode=\'platform_driver\'');
+  const oid=saved.rows[0].id;
+  await as(6,"select material_fulfilment_action($1,$2,'confirm','Merchant confirmed stock and original quote','REF-1','Merchant Street',20)",[oid,id(81)]);
+  await as(6,"select material_fulfilment_action($1,$2,'ready','Merchant confirmed ready for pickup')",[oid,id(82)]);
+  await expect(as(6,"select material_fulfilment_action($1,$2,'dispatch','Route checked',null,null,null,9)",[oid,id(83)])).rejects.toThrow('distance');
+  await as(6,"select material_fulfilment_action($1,$2,'dispatch','Route checked',null,null,null,5)",[oid,id(83)]);
+  await as(6,"select material_fulfilment_action($1,$2,'dispatch','Route checked',null,null,null,5)",[oid,id(83)]);
+
   await expect(as(2,'select driver_delivery_board()')).rejects.toThrow('Verified driver');
   const result=await as(4,'select driver_delivery_board() as board');
   const board=result.rows[0].board as any[];
@@ -55,6 +89,10 @@ describe.sequential('Atomic workflows',()=>{
   await expect(as(4,'select driver_delivery_action($1,$2)',[delivery,'delivered'])).rejects.toThrow('Invalid delivery transition');
   const own=await as(4,'select driver_delivery_board() as board');expect((own.rows[0].board as any[])[0].material_order.delivery_address).toBe('Site');
   for(const status of ['arrived_at_pickup','collected','en_route','delivered']) await as(4,'select driver_delivery_action($1,$2)',[delivery,status]);
+  await db.exec('RESET ROLE');
+  expect((await db.query('select order_status from material_orders where id=$1',[oid])).rows).toEqual([{order_status:'delivered'}]);
+  expect((await db.query('select event_type from delivery_events where delivery_id=$1',[delivery])).rows.map((r:any)=>r.event_type)).toEqual(['broadcast','assigned','arrived_at_pickup','collected','en_route','delivered']);
+  await expect(as(6,"select material_fulfilment_action($1,$2,'cancel','Cancellation requested')",[oid,id(84)])).rejects.toThrow('Cannot cancel');
   await expect(as(4,"update deliveries set driver_payout=999")).rejects.toThrow('permission denied');
  });
 
