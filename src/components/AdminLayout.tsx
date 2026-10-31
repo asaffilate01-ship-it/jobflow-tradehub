@@ -20,6 +20,7 @@ const navGroups = [
     label: "Platform",
     items: [
       { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
+      { to: "/admin/material-fulfilment", label: "Material fulfilment", icon: Store },
       { to: "/admin/project-opportunities", label: "Project sources", icon: Store },
       { to: "/admin/users", label: "Users", icon: Users },
       { to: "/admin/kyc-review", label: "KYC Review", icon: Shield },

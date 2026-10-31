@@ -29,3 +29,18 @@ The separate Omniqora migration 20261023073521 registers Craftvaro and its exter
 ## Limits
 
 Material requests retain manually entered/catalogue estimate prices. Suppliers must confirm price, stock and fulfilment. New platform deliveries remain unassigned until a confirmed merchant workflow dispatches them. Existing legacy direct order-write policies and verification history still require a broader access review. Factory GB/DE templates do not provision actual tenants or introduce German prices. Existing basic/premium billing stays local.
+
+
+## Material fulfilment implementation prepared — 31 October 2026
+
+The feature branch adds an administrator-only material-fulfilment board, manual merchant acceptance evidence, matched goods totals, pickup readiness, confirmed route-distance release, cancellation prior to driver assignment, and collection/delivery progression. Drivers' status changes produce server-side events and advance material order state transactionally. The new fulfilment evidence log uses payload-bound idempotency keys so a previously used request key cannot silently confirm changed facts.
+
+**Do not merge or publish as a normal frontend-only release.** The SQL migration `20261023155012_material_fulfilment_controls.sql` is not verified as deployed. It must be applied with the matching frontend and trigger. The existing driver discovery migration `20261023074153_craftvaro_driver_offer_discovery.sql` has conflicting historical deployment notes; inspect the actual Craftvaro migration ledger and function definitions first. The connected Supabase account available for this code review does not expose the Craftvaro project.
+
+Required staged release sequence:
+1. Verify the exact existing migration ledger, driver RPC signatures, grants and delivery status triggers on Craftvaro staging; take a backup and rehearse the fulfilment migration in a rolled-back transaction.
+2. Apply the approved SQL and record its exact version, including server-side delivery events, before publishing the frontend that removes legacy client event inserts.
+3. Test a subscribed trader, administrator, customer, authorised driver and unrelated user: merchant confirmation, altered totals, request-key payload mismatch, readiness, cancellation, dispatch, competing acceptance, collection, evidence privacy and delivery.
+4. Validate retry recovery, alerting and customer support before controlled production release. Do not claim an online supplier purchase, merchant stock reservation, payment collection, driver settlement or country-specific German processing; these are separate integrations.
+
+Current implementation operates on saved request totals and administrator-recorded offline supplier confirmations. No real merchant API, payment provider or route provider transaction is implied by a successful database action.

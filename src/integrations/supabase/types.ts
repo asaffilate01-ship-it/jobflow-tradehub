@@ -3886,6 +3886,11 @@ export type Database = {
       }
     }
     Functions: {
+      material_fulfilment_board: { Args: never; Returns: Json }
+      material_fulfilment_action: {
+        Args: { p_order: string; p_request_key: string; p_action: string; p_evidence: string; p_reference?: string; p_pickup?: string; p_goods_total?: number; p_distance?: number }
+        Returns: string
+      }
       accept_project_quote: { Args: { p_quote: string }; Returns: string }
       accept_repair_offer: { Args: { p_quote_id: string }; Returns: string }
       approve_trader_profile_claim: {

@@ -26,6 +26,7 @@ const ProjectOpportunitiesPage = lazyWithRetry(() => import("./pages/ProjectOppo
 const SubcontractorsPage = lazyWithRetry(() => import("./pages/SubcontractorsPage"));
 const BusinessPerformancePage = lazyWithRetry(() => import("./pages/BusinessPerformancePage"));
 const SmartOrderPage = lazyWithRetry(() => import("./pages/SmartOrderPage"));
+const AdminFulfilmentPage = lazyWithRetry(() => import("./pages/AdminFulfilmentPage"));
 const LandingPage = lazyWithRetry(() => import("./pages/LandingPage"));
 const JobsPage = lazyWithRetry(() => import("./pages/JobsPage"));
 const JobDetailPage = lazyWithRetry(() => import("./pages/JobDetailPage"));
@@ -200,6 +201,7 @@ const App = () => (
                 <AdminLayout />
               </ProtectedRoute>
             }>
+              <Route path="/admin/material-fulfilment" element={<AdminFulfilmentPage />} />
               <Route path="/admin/project-opportunities" element={<ProjectOpportunitiesPage />} />
               <Route path="/admin" element={<AdminDashboardPage />} />
               <Route path="/admin/users" element={<AdminUsersPage />} />

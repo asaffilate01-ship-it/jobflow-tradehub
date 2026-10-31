@@ -68,9 +68,6 @@ const DriverDashboard = () => {
     const { error } = await callDriverRpc("driver_delivery_action", { p_delivery: deliveryId, p_status: "assigned" });
     if (error) { toast.error(error.message); }
     else {
-      await supabase.from("delivery_events").insert({
-        delivery_id: deliveryId, event_type: "accepted", created_by: user.id, notes: "Driver accepted delivery",
-      });
       toast.success("Delivery accepted!");
       fetchData();
     }
@@ -83,9 +80,6 @@ const DriverDashboard = () => {
     const { error } = await callDriverRpc("driver_delivery_action", { p_delivery: deliveryId, p_status: nextStatus });
     if (error) { toast.error(error.message); }
     else {
-      await supabase.from("delivery_events").insert({
-        delivery_id: deliveryId, event_type: nextStatus, created_by: user.id,
-      });
       toast.success(`Status updated to ${nextStatus.replace(/_/g, " ")}`);
       fetchData();
     }
