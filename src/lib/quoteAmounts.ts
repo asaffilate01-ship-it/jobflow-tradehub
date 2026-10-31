@@ -15,6 +15,12 @@ export function validateQuoteBreakdown(
   summary: readonly string[],
   lines: readonly { description: string; quantity: number; unit_price: number }[],
 ): { valid: true; total: number; detailTotal: number } | { valid: false; reason: string } {
+  if (lines.length > 50) {
+    return { valid: false, reason: "A quote may contain no more than 50 itemised lines." };
+  }
+  if (lines.some((line) => line.description.trim().length > 500)) {
+    return { valid: false, reason: "Each line description must contain no more than 500 characters." };
+  }
   const amounts = summary.map(parseQuoteMoney);
   if (amounts.some((amount) => amount === null)) {
     return { valid: false, reason: "Enter non-negative amounts with no more than two decimal places." };
@@ -22,7 +28,7 @@ export function validateQuoteBreakdown(
   const summaryTotal = amounts.reduce<number>((total, amount) => total + (amount ?? 0), 0);
   if (
     lines.some((line) =>
-      !Number.isSafeInteger(line.quantity) || line.quantity < 1 ||
+      !Number.isSafeInteger(line.quantity) || line.quantity < 1 || line.quantity > 100_000 ||
       !Number.isFinite(line.unit_price) || line.unit_price < 0 ||
       Math.abs(Math.round(line.unit_price * 100) - line.unit_price * 100) > 0.000001
     )
@@ -37,6 +43,9 @@ export function validateQuoteBreakdown(
     .reduce((total, line) => total + line.quantity * line.unit_price, 0);
   if (detailTotal > 100_000_000) {
     return { valid: false, reason: "The itemised total is too large. Please review the quantities and prices." };
+  }
+  if (summaryTotal <= 0 && detailTotal <= 0) {
+    return { valid: false, reason: "Enter a positive quote total before submitting." };
   }
   if (summaryTotal > 0 && detailTotal > 0 && Math.abs(summaryTotal - detailTotal) > 0.009) {
     return { valid: false, reason: "The summary and itemised breakdown totals must match before submitting." };

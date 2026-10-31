@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { logAudit } from "@/lib/audit";
-import { notify, getJobCustomer } from "@/lib/notify";
+import { logAuditChecked } from "@/lib/audit";
+import { requestNotificationChecked, getJobCustomer } from "@/lib/notify";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,88 +57,109 @@ const SubmitQuotePage = () => {
     e.preventDefault();
     if (submitting) return;
     if (!jobId || !companyId || !user) {
-      toast.error("Missing information");
+      toast.error("Missing job or trade company information");
       return;
     }
     if ("reason" in quoteBreakdown) {
       toast.error(quoteBreakdown.reason);
       return;
     }
-    setSubmitting(true);
-
-    const { data: quote, error: quoteErr } = await supabase.from("quotes").insert({
-      job_id: jobId,
-      trade_company_id: companyId,
-      labour_amount: parseQuoteMoney(labourAmount) ?? 0,
-      materials_estimate: parseQuoteMoney(materialsEstimate) ?? 0,
-      delivery_estimate: parseQuoteMoney(deliveryEstimate) ?? 0,
-      total_amount: totalAmount,
-      notes,
-    }).select("id").single();
-
-    if (quoteErr) {
-      toast.error(quoteErr.message);
-      setSubmitting(false);
+    if (notes.length > 3000) {
+      toast.error("Additional notes cannot exceed 3,000 characters.");
       return;
     }
 
-    // Insert quote lines
-    const validLines = lines.filter(l => l.description.trim());
-    if (validLines.length > 0 && quote) {
-      const { error: linesErr } = await supabase.from("quote_lines").insert(
-        validLines.map(l => ({
-          quote_id: quote.id,
-          description: l.description,
-          line_type: l.line_type,
-          quantity: l.quantity,
-          unit_price: l.unit_price,
-          total: l.quantity * l.unit_price,
-        }))
+    const validLines = lines.filter(line => line.description.trim());
+    setSubmitting(true);
+    try {
+      // Only this authenticated RPC may commit a project quote. The migration
+      // must be deployed before the frontend; no generated columns are written.
+      const { data: quoteId, error } = await supabase.rpc(
+        "submit_project_quote_atomic",
+        {
+          p_job_id: jobId,
+          p_trade_company_id: companyId,
+          p_summary: {
+            labour_amount: parseQuoteMoney(labourAmount) ?? 0,
+            materials_estimate: parseQuoteMoney(materialsEstimate) ?? 0,
+            delivery_estimate: parseQuoteMoney(deliveryEstimate) ?? 0,
+            notes: notes.trim(),
+          },
+          p_lines: validLines.map(line => ({
+            description: line.description.trim(),
+            line_type: line.line_type,
+            quantity: line.quantity,
+            unit_price: line.unit_price,
+          })),
+        },
       );
-      if (linesErr) {
-        toast.error("The quote was saved, but its itemised breakdown failed. Please review the job and contact support before submitting another quote.");
-        setSubmitting(false);
-        navigate("/jobs/" + jobId);
+
+      if (error) {
+        if (error.code === "PGRST202" || /schema cache|could not find the function/i.test(error.message)) {
+          toast.error("Quote submission needs a database update. Nothing has been confirmed. Contact support.");
+        } else if (/already been submitted/i.test(error.message)) {
+          toast.warning("Your company already has a quote for this job. Review the job before submitting again.");
+          navigate(`/jobs/${jobId}`);
+        } else {
+          // Network failures can occur after a server commit: do not claim
+          // nothing was saved, and do not invite an unsafe immediate retry.
+          toast.error("Quote submission was not confirmed. Review the job before trying again.");
+        }
         return;
       }
-    }
+      if (!quoteId || typeof quoteId !== "string") {
+        toast.warning("The server did not confirm the quote ID. Review the job before trying again.");
+        return;
+      }
 
-    // Update job status
-    const { error: statusErr } = await supabase.from("jobs").update({ status: "quoted" }).eq("id", jobId).eq("status", "posted");
-    if (statusErr) {
-      toast.error("The quote was saved, but its job status could not be updated. Contact support before submitting again.");
-      setSubmitting(false);
-      navigate("/jobs/" + jobId);
-      return;
-    }
-
-    // The quote already exists. Delivery failures must not be represented as a failed submission.
-    try {
-      const { customerId, title: jobTitle } = await getJobCustomer(jobId);
-      if (customerId) {
-        await notify({
+      // The transaction has committed. Notifications are not the source of
+      // truth: a dispatch request can be accepted without actual delivery.
+      let followUpNeeded = false;
+      try {
+        const { customerId, title: jobTitle } = await getJobCustomer(jobId);
+        if (!customerId) throw new Error("Customer could not be resolved");
+        await requestNotificationChecked({
           recipientId: customerId,
           title: "New quote received",
-          body: "You have a new quote" + (jobTitle ? ' on "' + jobTitle + '"' : "") + ".",
-          link: "/jobs/" + jobId,
+          body: `You have a new quote${jobTitle ? ` on "${jobTitle}"` : ""}.`,
+          link: `/jobs/${jobId}`,
           type: "quote",
           channels: ["in_app", "email"],
         });
+      } catch (notificationError) {
+        followUpNeeded = true;
+        console.warn("Quote saved; notification request needs follow-up", notificationError);
       }
-      await logAudit({ action: "quote.submit", entityType: "quote", entityId: quote?.id, metadata: { job_id: jobId, total: totalAmount } });
-    } catch {
-      toast.error("Quote saved, but customer notification or audit follow-up needs attention. Do not submit again.");
-      setSubmitting(false);
-      navigate("/jobs/" + jobId);
-      return;
-    }
+      try {
+        await logAuditChecked({
+          action: "quote.submit",
+          entityType: "quote",
+          entityId: quoteId,
+          metadata: { job_id: jobId, total: quoteBreakdown.total },
+        });
+      } catch (auditError) {
+        followUpNeeded = true;
+        console.warn("Quote saved; supplementary audit logging needs follow-up", auditError);
+      }
 
-    toast.success("Quote submitted!");
-    setSubmitting(false);
-    navigate(`/jobs/${jobId}`);
+      if (followUpNeeded) {
+        toast.warning("Quote saved. Customer notification or audit follow-up may still be required. Do not resubmit.");
+      } else {
+        toast.success("Quote submitted!");
+      }
+      navigate(`/jobs/${jobId}`);
+    } catch (unexpectedError) {
+      console.warn("Quote submission result is uncertain", unexpectedError);
+      toast.error("Could not confirm whether the quote was saved. Check the job before trying again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const addLine = () => setLines([...lines, { description: "", line_type: "labour", quantity: 1, unit_price: 0 }]);
+  const addLine = () => {
+    if (lines.length >= 50) { toast.error("A quote may contain up to 50 lines."); return; }
+    setLines([...lines, { description: "", line_type: "labour", quantity: 1, unit_price: 0 }]);
+  };
   const removeLine = (i: number) => setLines(lines.filter((_, idx) => idx !== i));
   const updateLine = (i: number, field: keyof QuoteLine, value: any) => {
     const updated = [...lines];
@@ -251,6 +272,7 @@ const SubmitQuotePage = () => {
           <textarea
             id="quote-notes"
             rows={3}
+            maxLength={3000}
             value={notes}
             onChange={e => setNotes(e.target.value)}
             placeholder="Estimated timeline, special requirements, etc."

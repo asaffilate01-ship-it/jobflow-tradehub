@@ -461,7 +461,12 @@ const JobDetailPage = () => {
                         window.location.reload();
                         return;
                       }
-                      await supabase.from("quotes").update({ status: "rejected" }).eq("id", q.id);
+                      const { error: rejectError } = await supabase.rpc("reject_project_quote", { p_quote: q.id });
+                      if (rejectError) {
+                        toast.error("Quote rejection could not be confirmed. Please review and retry.");
+                        return;
+                      }
+                      toast.success("Quote rejected");
                       const rejOwner = await getCompanyOwner(q.trade_company_id);
                       if (rejOwner) {
                         await notify({

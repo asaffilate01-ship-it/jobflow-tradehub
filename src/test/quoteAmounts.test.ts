@@ -27,6 +27,19 @@ describe("quote amount integrity", () => {
       .toEqual({ valid: true, total: 36, detailTotal: 36 });
   });
 
+  it("refuses an empty or zero-valued quote", () => {
+    expect(validateQuoteBreakdown(["", "", ""], [{ description: "", quantity: 1, unit_price: 0 }]))
+      .toMatchObject({ valid: false, reason: "Enter a positive quote total before submitting." });
+  });
+
+  it("limits quote line count and description length", () => {
+    const line = { description: "Work", quantity: 1, unit_price: 1 };
+    expect(validateQuoteBreakdown(["51", "", ""], Array.from({ length: 51 }, () => line)))
+      .toMatchObject({ valid: false });
+    expect(validateQuoteBreakdown(["1", "", ""], [{ ...line, description: "A".repeat(501) }]))
+      .toMatchObject({ valid: false });
+  });
+
   it("rejects mismatched breakdowns and invalid line pricing", () => {
     const line = [{ description: "Work", quantity: 1, unit_price: 19.99 }];
     expect(validateQuoteBreakdown(["20", "", ""], line)).toMatchObject({ valid: false });
