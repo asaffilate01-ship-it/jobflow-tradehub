@@ -47,69 +47,103 @@ const SubmitQuotePage = () => {
     init();
   }, [jobId, user]);
 
-  const totalLines = lines.reduce((s, l) => s + l.quantity * l.unit_price, 0);
+  const validLines = lines.filter(l => l.description.trim());
+  const totalLines = validLines.reduce((sum, line) => sum + line.quantity * line.unit_price, 0);
   const totalAmount = (Number(labourAmount) || 0) + (Number(materialsEstimate) || 0) + (Number(deliveryEstimate) || 0);
+  const hasInvalidAmounts = [labourAmount, materialsEstimate, deliveryEstimate]
+    .some(value => value !== "" && (!Number.isFinite(Number(value)) || Number(value) < 0));
+  const hasInvalidLines = validLines.some(line =>
+    !Number.isFinite(line.quantity) || line.quantity <= 0 ||
+    !Number.isFinite(line.unit_price) || line.unit_price < 0
+  );
+  const totalsMismatch = totalAmount > 0 && validLines.length > 0 && Math.abs(totalAmount - totalLines) > 0.01;
+  const canSubmit = !hasInvalidAmounts && !hasInvalidLines && !totalsMismatch && (totalAmount > 0 || totalLines > 0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting) return;
     if (!jobId || !companyId || !user) {
-      toast.error("Missing information");
+      toast.error("Missing job or trade company information");
       return;
     }
+    if (!canSubmit) {
+      toast.error(totalsMismatch
+        ? "The itemised breakdown must match the quote summary total."
+        : "Enter a valid positive quote amount and itemised quantities.");
+      return;
+    }
+
     setSubmitting(true);
-
-    const { data: quote, error: quoteErr } = await supabase.from("quotes").insert({
-      job_id: jobId,
-      trade_company_id: companyId,
-      labour_amount: Number(labourAmount) || 0,
-      materials_estimate: Number(materialsEstimate) || 0,
-      delivery_estimate: Number(deliveryEstimate) || 0,
-      total_amount: totalAmount > 0 ? totalAmount : totalLines,
-      notes,
-    }).select("id").single();
-
-    if (quoteErr) {
-      toast.error(quoteErr.message);
-      setSubmitting(false);
-      return;
-    }
-
-    // Insert quote lines
-    const validLines = lines.filter(l => l.description.trim());
-    if (validLines.length > 0 && quote) {
-      const { error: linesErr } = await supabase.from("quote_lines").insert(
-        validLines.map(l => ({
-          quote_id: quote.id,
-          description: l.description,
-          line_type: l.line_type,
-          quantity: l.quantity,
-          unit_price: l.unit_price,
-          total: l.quantity * l.unit_price,
-        }))
+    try {
+      // One authenticated server transaction inserts the parent and itemised
+      // lines, derives the generated total and changes job status together.
+      // Never insert the generated total_amount or quote_lines.total fields.
+      const { data: quoteId, error: quoteError } = await (supabase.rpc as any)(
+        "submit_project_quote_atomic",
+        {
+          p_job_id: jobId,
+          p_trade_company_id: companyId,
+          p_summary: {
+            labour_amount: Number(labourAmount) || 0,
+            materials_estimate: Number(materialsEstimate) || 0,
+            delivery_estimate: Number(deliveryEstimate) || 0,
+            notes: notes.trim(),
+          },
+          p_lines: validLines.map(line => ({
+            description: line.description.trim(),
+            line_type: line.line_type,
+            quantity: line.quantity,
+            unit_price: line.unit_price,
+          })),
+        }
       );
-      if (linesErr) toast.error(linesErr.message);
+      if (quoteError) throw new Error(quoteError.message);
+      if (!quoteId || typeof quoteId !== "string") {
+        throw new Error("The server did not confirm the saved quote.");
+      }
+
+      // Auxiliary notifications cannot turn a committed quote into a false
+      // failure, but must not be silently represented as successfully sent.
+      let followUpNeeded = false;
+      try {
+        const { customerId, title: jobTitle } = await getJobCustomer(jobId);
+        if (customerId) {
+          await notify({
+            recipientId: customerId,
+            title: "New quote received",
+            body: `You have a new quote${jobTitle ? ` on "${jobTitle}"` : ""}.`,
+            link: `/jobs/${jobId}`,
+            type: "quote",
+            channels: ["in_app", "email"],
+          });
+        }
+      } catch (notificationError) {
+        followUpNeeded = true;
+        console.error("Quote saved; customer notification needs follow-up", notificationError);
+      }
+      try {
+        await logAudit({
+          action: "quote.submit",
+          entityType: "quote",
+          entityId: quoteId,
+          metadata: { job_id: jobId, total: totalAmount || totalLines },
+        });
+      } catch (auditError) {
+        followUpNeeded = true;
+        console.error("Quote saved; supplementary audit logging needs follow-up", auditError);
+      }
+
+      if (followUpNeeded) {
+        toast.warning("Quote saved, but a notification or audit update may need follow-up.");
+      } else {
+        toast.success("Quote submitted!");
+      }
+      navigate(`/jobs/${jobId}`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not submit your quote. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
-
-    // Update job status
-    await supabase.from("jobs").update({ status: "quoted" }).eq("id", jobId).eq("status", "posted");
-
-    // Notify the customer + audit trail
-    const { customerId, title: jobTitle } = await getJobCustomer(jobId);
-    if (customerId) {
-      await notify({
-        recipientId: customerId,
-        title: "New quote received",
-        body: `You have a new quote${jobTitle ? ` on "${jobTitle}"` : ""}.`,
-        link: `/jobs/${jobId}`,
-        type: "quote",
-        channels: ["in_app", "email"],
-      });
-    }
-    await logAudit({ action: "quote.submit", entityType: "quote", entityId: quote?.id, metadata: { job_id: jobId, total: totalAmount || totalLines } });
-
-    toast.success("Quote submitted!");
-    setSubmitting(false);
-    navigate(`/jobs/${jobId}`);
   };
 
   const addLine = () => setLines([...lines, { description: "", line_type: "labour", quantity: 1, unit_price: 0 }]);
@@ -152,15 +186,15 @@ const SubmitQuotePage = () => {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="space-y-2">
               <label className="text-sm font-medium text-muted-foreground">Labour (£)</label>
-              <Input type="number" placeholder="0" value={labourAmount} onChange={e => setLabourAmount(e.target.value)} />
+              <Input type="number" min={0} step="0.01" aria-label="Labour amount in pounds" placeholder="0" value={labourAmount} onChange={e => setLabourAmount(e.target.value)} />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium text-muted-foreground">Materials est. (£)</label>
-              <Input type="number" placeholder="0" value={materialsEstimate} onChange={e => setMaterialsEstimate(e.target.value)} />
+              <Input type="number" min={0} step="0.01" aria-label="Materials estimate in pounds" placeholder="0" value={materialsEstimate} onChange={e => setMaterialsEstimate(e.target.value)} />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium text-muted-foreground">Delivery est. (£)</label>
-              <Input type="number" placeholder="0" value={deliveryEstimate} onChange={e => setDeliveryEstimate(e.target.value)} />
+              <Input type="number" min={0} step="0.01" aria-label="Delivery estimate in pounds" placeholder="0" value={deliveryEstimate} onChange={e => setDeliveryEstimate(e.target.value)} />
             </div>
           </div>
           <div className="text-right text-lg font-bold text-primary">
@@ -222,6 +256,8 @@ const SubmitQuotePage = () => {
           <label className="text-sm font-medium text-muted-foreground">Additional notes</label>
           <textarea
             rows={3}
+            maxLength={3000}
+            aria-label="Additional notes for customer quote"
             value={notes}
             onChange={e => setNotes(e.target.value)}
             placeholder="Estimated timeline, special requirements, etc."
@@ -229,7 +265,12 @@ const SubmitQuotePage = () => {
           />
         </div>
 
-        <Button type="submit" className="w-full font-semibold text-base h-12" disabled={submitting}>
+        {totalsMismatch && (
+          <p role="alert" className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+            Your itemised lines total £{totalLines.toFixed(2)}, but the quote summary is £{totalAmount.toFixed(2)}. Update either total before submitting.
+          </p>
+        )}
+        <Button type="submit" className="w-full font-semibold text-base h-12" disabled={submitting || !canSubmit}>
           {submitting ? "Submitting…" : "Submit quote"}
         </Button>
       </form>
