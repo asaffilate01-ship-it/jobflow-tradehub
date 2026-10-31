@@ -21,20 +21,29 @@ interface AuditLogEntry {
   metadata?: Record<string, any>;
 }
 
-export const logAudit = async ({ action, entityType, entityId, metadata = {} }: AuditLogEntry) => {
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+/**
+ * Explicit audit receipt for high-impact actions. Does not replace a
+ * server-side, transactionally recorded audit event.
+ */
+export const logAuditChecked = async ({ action, entityType, entityId, metadata = {} }: AuditLogEntry): Promise<void> => {
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error("Sign in required to record the audit");
+  const { error } = await supabase.from("audit_logs").insert({
+    user_id: user.id,
+    action,
+    entity_type: entityType,
+    entity_id: entityId ?? null,
+    metadata,
+  } as any);
+  if (error) throw error;
+};
 
-    await supabase.from("audit_logs").insert({
-      user_id: user.id,
-      action,
-      entity_type: entityType,
-      entity_id: entityId ?? null,
-      metadata,
-    } as any);
+export const logAudit = async (entry: AuditLogEntry): Promise<void> => {
+  try {
+    await logAuditChecked(entry);
   } catch (e) {
-    // Silently fail — audit logging should never break the app
+    // Existing best-effort behaviour; use logAuditChecked when failure matters.
     console.warn("Audit log failed:", e);
   }
 };
