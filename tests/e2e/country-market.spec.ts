@@ -22,12 +22,14 @@ test("German market displays correct operator and blocks UK-only registration", 
 });
 
 test("market choice survives reload and does not change interface language", async ({ page }) => {
-  await page.addInitScript(() => {
+  // Seed once. addInitScript re-runs on every page reload, which would
+  // incorrectly overwrite the country preference we are testing.
+  await page.goto("/marketplace");
+  await page.evaluate(() => {
     localStorage.setItem("craftvaro-country", "GB");
     localStorage.setItem("craftvaro-lang", "de");
   });
-
-  await page.goto("/marketplace");
+  await page.reload();
   await expect(page.locator("html")).toHaveAttribute("lang", "de");
   await page.getByRole("button", { name: "Open menu" }).click();
   const market = page.locator("nav").getByRole("combobox", { name: "Land des Marktplatzes" });
