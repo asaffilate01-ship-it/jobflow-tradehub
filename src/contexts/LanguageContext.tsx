@@ -34,10 +34,4 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
 
 export const useLanguage = () => useContext(LanguageContext);
 
-/** Legal entity + contact details differ per language, domain is shared. */
-export const legalByLang: Record<Lang, { entity: string; email: string }> = {
-  en: { entity: "Craftvaro is a trading name of iTechLounge Ltd", email: "hello@craftvaro.com" },
-  de: { entity: "Craftvaro ist ein Handelsname der iTechLounge GmbH", email: "hallo@craftvaro.com" },
-};
-
 export const SITE_DOMAIN = "https://craftvaro.com";
