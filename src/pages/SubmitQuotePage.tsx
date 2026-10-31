@@ -60,7 +60,7 @@ const SubmitQuotePage = () => {
       toast.error("Missing information");
       return;
     }
-    if (!quoteBreakdown.valid) {
+    if ("reason" in quoteBreakdown) {
       toast.error(quoteBreakdown.reason);
       return;
     }
@@ -190,7 +190,7 @@ const SubmitQuotePage = () => {
             </div>
           </div>
           <p className="text-xs text-muted-foreground">If you enter both summary amounts and itemised line prices, their totals must match.</p>
-          {!quoteBreakdown.valid && <p role="alert" className="text-sm text-destructive">{quoteBreakdown.reason}</p>}
+          {"reason" in quoteBreakdown && <p role="alert" className="text-sm text-destructive">{quoteBreakdown.reason}</p>}
           <div aria-live="polite" className="text-right text-lg font-bold text-primary">
             Total: {quoteBreakdown.valid ? "£" + totalAmount.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "Review amounts"}
           </div>
