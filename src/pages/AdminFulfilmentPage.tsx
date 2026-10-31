@@ -7,6 +7,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
+/** Keep operator-entered totals/distance aligned with numeric(12,2) storage. */
+const parseNonNegativeDecimal = (value: string, maximum: number): number | null => {
+  const trimmed = value.trim();
+  if (!/^(?:0|[1-9]\\d*)(?:\\.\\d{1,2})?$/.test(trimmed)) return null;
+  const result = Number(trimmed);
+  return Number.isFinite(result) && result >= 0 && result <= maximum ? result : null;
+};
+
 type Order = {
   id: string; status: string; mode: string; goods_total: number; delivery_fee: number;
   reference: string | null; pickup_address: string | null; delivery_address: string;
@@ -22,18 +30,26 @@ function FulfilmentCard({ order, refresh }: { order: Order; refresh: () => Promi
   const [distance, setDistance] = useState("");
   const [evidence, setEvidence] = useState("");
   const [busy, setBusy] = useState(false);
+  const inFlight = useRef(false);
   const retry = useRef<{ fingerprint: string; key: string }>();
   const run = async (action: string) => {
-    if (busy) return;
+    if (inFlight.current || busy) return;
     if (evidence.trim().length < 5) { toast.error("Record the source and details of the confirmation first."); return; }
-    if (action === "confirm" && (!total.trim() || !Number.isFinite(Number(total)))) { toast.error("Enter the merchant-confirmed goods total."); return; }
-    if (action === "dispatch" && (!distance.trim() || !Number.isFinite(Number(distance)))) { toast.error("Enter the verified route distance."); return; }
+    const confirmedTotal = parseNonNegativeDecimal(total, 100_000_000);
+    const confirmedDistance = parseNonNegativeDecimal(distance, 1000);
+    if (action === "confirm" && confirmedTotal === null) { toast.error("Enter a valid goods total to two decimal places."); return; }
+    if (action === "dispatch" && confirmedDistance === null) { toast.error("Enter a verified route distance to two decimal places."); return; }
+    if (action === "confirm" && (!reference.trim() || (order.mode === "platform_driver" && pickup.trim().length < 5))) {
+      toast.error("Record the merchant reference and any required pickup address.");
+      return;
+    }
     const input = { p_order: order.id, p_action: action, p_evidence: evidence.trim(),
-      ...(action === "confirm" ? { p_reference: reference.trim(), p_pickup: pickup.trim(), p_goods_total: Number(total) } : {}),
-      ...(action === "dispatch" ? { p_distance: Number(distance) } : {}),
+      ...(action === "confirm" ? { p_reference: reference.trim(), p_pickup: pickup.trim(), p_goods_total: confirmedTotal! } : {}),
+      ...(action === "dispatch" ? { p_distance: confirmedDistance! } : {}),
     };
     const fingerprint = JSON.stringify(input);
     if (retry.current?.fingerprint !== fingerprint) retry.current = { fingerprint, key: crypto.randomUUID() };
+    inFlight.current = true;
     setBusy(true);
     try {
       const { error } = await supabase.rpc("material_fulfilment_action", { ...input, p_request_key: retry.current.key });
@@ -42,7 +58,7 @@ function FulfilmentCard({ order, refresh }: { order: Order; refresh: () => Promi
       setEvidence(""); retry.current = undefined;
       await refresh();
     } catch (error) { toast.error(error instanceof Error ? error.message : (error as { message?: string }).message ?? "Update failed. Retry with the same details."); }
-    finally { setBusy(false); }
+    finally { inFlight.current = false; setBusy(false); }
   };
   const unassigned = !order.delivery_status || ["unassigned", "broadcast"].includes(order.delivery_status);
   return <article className="rounded-xl border bg-card p-5 space-y-4">
