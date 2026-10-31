@@ -180,4 +180,73 @@ REVOKE ALL ON FUNCTION public.submit_project_quote_atomic(uuid, uuid, jsonb, jso
 GRANT EXECUTE ON FUNCTION public.submit_project_quote_atomic(uuid, uuid, jsonb, jsonb)
   TO authenticated;
 
+
+-- Retire the legacy directly writable quotes API: it permitted an eligible
+-- trader to insert an unvalidated quote or change a submitted price/status.
+-- Repair offers and project quote/acceptance remain available through their
+-- independently authorised SECURITY DEFINER transactions.
+DROP POLICY IF EXISTS "trades manage own quotes" ON public.quotes;
+CREATE POLICY "trades read own quotes" ON public.quotes
+  FOR SELECT TO authenticated
+  USING (EXISTS (
+    SELECT 1 FROM public.trade_companies tc
+    WHERE tc.id = quotes.trade_company_id
+      AND tc.owner_profile_id = (SELECT auth.uid())
+  ));
+
+ALTER TABLE public.quote_lines ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "quote participants read lines" ON public.quote_lines
+  FOR SELECT TO authenticated
+  USING (EXISTS (
+    SELECT 1 FROM public.quotes q WHERE q.id = quote_lines.quote_id
+  ));
+
+REVOKE INSERT, UPDATE, DELETE ON public.quotes, public.quote_lines
+  FROM PUBLIC, anon, authenticated;
+GRANT SELECT ON public.quotes, public.quote_lines TO authenticated;
+
+-- The customer rejection button must not attempt an unauthorised direct
+-- UPDATE (the old UI ignored that error and could notify a false rejection).
+-- Lock job before quote, consistent with accept_project_quote.
+CREATE OR REPLACE FUNCTION public.reject_project_quote(p_quote uuid)
+RETURNS uuid
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $reject$
+DECLARE
+  v_job_id uuid;
+  v_job public.jobs%ROWTYPE;
+  v_quote public.quotes%ROWTYPE;
+BEGIN
+  IF auth.uid() IS NULL OR p_quote IS NULL THEN
+    RAISE EXCEPTION 'Sign in and select a quote';
+  END IF;
+  SELECT q.job_id INTO v_job_id FROM public.quotes q WHERE q.id = p_quote;
+  IF NOT FOUND THEN RAISE EXCEPTION 'Quote unavailable'; END IF;
+  SELECT * INTO v_job FROM public.jobs WHERE id = v_job_id FOR UPDATE;
+  IF NOT FOUND OR v_job.customer_profile_id IS DISTINCT FROM auth.uid() THEN
+    RAISE EXCEPTION 'Job owner required';
+  END IF;
+  IF v_job.job_kind = 'repair' THEN
+    RAISE EXCEPTION 'Use the repair offer decline workflow';
+  END IF;
+  SELECT * INTO v_quote FROM public.quotes WHERE id = p_quote FOR UPDATE;
+  IF NOT FOUND OR v_quote.job_id IS DISTINCT FROM v_job.id THEN
+    RAISE EXCEPTION 'Quote unavailable';
+  END IF;
+  IF v_quote.status = 'rejected' THEN RETURN v_quote.id; END IF;
+  IF v_job.status NOT IN ('posted','quoted') OR v_quote.status <> 'submitted' THEN
+    RAISE EXCEPTION 'Job or quote is no longer available';
+  END IF;
+  UPDATE public.quotes SET status = 'rejected' WHERE id = p_quote;
+  RETURN p_quote;
+END;
+$reject$;
+
+REVOKE ALL ON FUNCTION public.reject_project_quote(uuid)
+  FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.reject_project_quote(uuid)
+  TO authenticated;
+
 COMMIT;
