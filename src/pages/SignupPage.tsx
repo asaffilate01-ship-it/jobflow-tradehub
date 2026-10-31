@@ -7,6 +7,7 @@ import { User, Wrench, TruckIcon, Phone, ArrowRight, Eye, EyeOff, Info, Home } f
 import Logo from "@/components/Logo";
 import { toast } from "sonner";
 import { usePageMeta } from "@/hooks/use-page-meta";
+import { useCountry } from "@/contexts/CountryContext";
 
 type RoleOption = "customer" | "trade" | "driver";
 
@@ -21,6 +22,7 @@ type Step = "details" | "verify-email" | "verify-phone";
 const SignupPage = () => {
   usePageMeta("Create your free account", "Join Craftvaro free to post jobs, win work and manage deliveries. Find. Hire. Done.");
   const navigate = useNavigate();
+  const { country } = useCountry();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -34,6 +36,7 @@ const SignupPage = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (country === "DE") { toast.error("German registration is not yet available"); return; }
     setLoading(true);
 
     const { data, error } = await supabase.auth.signUp({
@@ -71,6 +74,7 @@ const SignupPage = () => {
   };
 
   const handleSendPhoneOtp = async () => {
+    if (country === "DE") { toast.error("German phone verification is not yet available"); return; }
     if (!phone.trim()) {
       toast.error("Please enter your phone number");
       return;
@@ -227,6 +231,16 @@ const SignupPage = () => {
           </div>
         </div>
 
+        {country === "DE" && (
+          <section role="status" className="rounded-xl border border-warning/40 bg-warning/10 p-4 text-sm">
+            <h2 className="font-semibold">German registration is not yet open</h2>
+            <p className="mt-2 text-muted-foreground">
+              UK account and phone verification cannot register a German-market account.
+              You may browse German listings now; onboarding needs local verification and payment setup.
+            </p>
+            <Link to="/marketplace" className="mt-3 inline-block font-semibold text-primary underline underline-offset-4">Browse German listings</Link>
+          </section>
+        )}
         <form onSubmit={handleSignup} className="space-y-4">
           {/* Role selection */}
           <div className="space-y-2">
@@ -312,8 +326,8 @@ const SignupPage = () => {
             </div>
             <p className="text-xs text-muted-foreground">Use at least 8 characters.</p>
           </div>
-          <Button type="submit" className="w-full font-semibold" disabled={loading}>
-            {loading ? "Creating account…" : "Create account"}
+          <Button type="submit" className="w-full font-semibold" disabled={loading || country === "DE"}>
+            {country === "DE" ? "German registration not available" : loading ? "Creating account…" : "Create account"}
           </Button>
         </form>
 
