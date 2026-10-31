@@ -56,6 +56,8 @@ beforeAll(async () => {
     $$;
     GRANT USAGE ON SCHEMA public, auth TO authenticated;
     GRANT SELECT ON ALL TABLES IN SCHEMA public TO authenticated;
+    -- Model the legacy Data API grants that made quote DML callable.
+    GRANT INSERT, UPDATE, DELETE ON public.quotes, public.quote_lines TO authenticated;
   `);
   await db.exec(read("20260402123017_27f69905-6558-43de-b750-a2ce547aeb0e.sql"));
   await db.exec(read("20261023073508_craftvaro_transactional_workflows.sql"));
@@ -164,6 +166,36 @@ describe.sequential("Atomic project quote submission", () => {
       .rejects.toThrow("Invalid quote summary");
     await db.exec("RESET ROLE");
     expect((await db.query("SELECT id FROM public.quotes WHERE job_id=$1", [id(29)])).rows).toHaveLength(0);
+  });
+
+  it("prevents direct quote/line edits and only reveals line items to quote participants", async () => {
+    await db.exec("RESET ROLE");
+    const existing = await db.query<{ id: string }>("SELECT id FROM public.quotes WHERE job_id=$1", [id(22)]);
+    expect(existing.rows).toHaveLength(1);
+    const quote = existing.rows[0].id;
+    await expect(asUser(1, "UPDATE public.quotes SET labour_amount=1 WHERE id=$1", [quote]))
+      .rejects.toThrow("permission denied");
+    await expect(asUser(1, "UPDATE public.quotes SET status='accepted' WHERE id=$1", [quote]))
+      .rejects.toThrow("permission denied");
+    await expect(asUser(1, "INSERT INTO public.quote_lines(quote_id,description,line_type,quantity,unit_price) VALUES($1,'Unauthorised','labour',1,1)", [quote]))
+      .rejects.toThrow("permission denied");
+    await db.exec("RESET ROLE");
+    expect((await asUser(2, "SELECT id FROM public.quote_lines")).rows).toHaveLength(0);
+    expect((await asUser(3, "SELECT id FROM public.quote_lines")).rows).toHaveLength(2);
+  });
+
+  it("only lets the project customer reject a submitted quote, and safely retries", async () => {
+    await db.exec("RESET ROLE");
+    const existing = await db.query<{ id: string }>("SELECT id FROM public.quotes WHERE job_id=$1", [id(21)]);
+    const quoteId = existing.rows[0].id;
+    await expect(asUser(1, "SELECT public.reject_project_quote($1)", [quoteId]))
+      .rejects.toThrow("Job owner required");
+    const confirmed = await asUser(3, "SELECT public.reject_project_quote($1) as rejected", [quoteId]);
+    expect(confirmed.rows[0].rejected).toBe(quoteId);
+    expect((await asUser(3, "SELECT public.reject_project_quote($1) as rejected", [quoteId])).rows[0].rejected).toBe(quoteId);
+    await db.exec("RESET ROLE");
+    expect((await db.query<{ status: string }>("SELECT status FROM public.quotes WHERE id=$1", [quoteId])).rows[0].status).toBe("rejected");
+    expect((await db.query<{ status: string }>("SELECT status FROM public.jobs WHERE id=$1", [id(21)])).rows[0].status).toBe("quoted");
   });
 
   it("rejects cancelled projects before inserting anything", async () => {
