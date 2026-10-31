@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCountry } from "@/contexts/CountryContext";
 import { usePageMeta } from "@/hooks/use-page-meta";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -73,6 +74,7 @@ const emptyStats: MarketplaceStats = {
 export default function MarketplacePage() {
   usePageMeta("Find verified tradespeople", "AI-powered search for verified, subscribing Craftvaro tradespeople, plus claimable factual directory profiles.");
   const { user } = useAuth();
+  const { country, setCountry } = useCountry();
   const [params] = useSearchParams();
   const db = supabase as any;
   const [listings, setListings] = useState<Listing[]>([]);
@@ -86,7 +88,6 @@ export default function MarketplacePage() {
     query: params.get("q") || "",
     location: params.get("location") || "",
     category: params.get("category") || "all",
-    country: "GB",
     scope: "all",
     minimumRating: "0",
     language: "",
@@ -97,11 +98,12 @@ export default function MarketplacePage() {
   });
 
   useEffect(() => {
+    let cancelled = false;
     const timer = window.setTimeout(async () => {
       setLoading(true);
       setLoadError("");
       let request = db.from("marketplace_listings_public").select("*", { count: "exact" });
-      if (filters.country) request = request.eq("country_code", filters.country);
+      request = request.eq("country_code", country);
       if (filters.category !== "all") request = request.eq("trade_specialism", filters.category);
       if (filters.scope !== "all") request = request.eq("listing_kind", filters.scope);
       if (Number(filters.minimumRating) > 0) request = request.gte("rating", Number(filters.minimumRating));
@@ -124,6 +126,7 @@ export default function MarketplacePage() {
         request.range(start, start + pageSize - 1),
         db.from("marketplace_stats_public").select("*").maybeSingle(),
       ]);
+      if (cancelled) return;
       if (error) {
         setLoadError(error.message);
         setListings([]);
@@ -135,10 +138,10 @@ export default function MarketplacePage() {
       if (statsResult.data) setStats(statsResult.data as MarketplaceStats);
       setLoading(false);
     }, 250);
-    return () => window.clearTimeout(timer);
-  }, [db, filters, page]);
+    return () => { cancelled = true; window.clearTimeout(timer); };
+  }, [db, filters, page, country]);
 
-  useEffect(() => { setPage(1); }, [filters]);
+  useEffect(() => { setPage(1); }, [filters, country]);
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const activeFilters = useMemo(() => [
@@ -166,7 +169,8 @@ export default function MarketplacePage() {
             <Button asChild><Link to="/repair-assist"><Sparkles className="mr-2 h-4 w-4" />AI repair help</Link></Button>
           </div>
         </div>
-        <div className="mt-6 grid grid-cols-2 gap-3 border-t pt-6 sm:grid-cols-4">
+        <p className="mt-5 text-xs text-muted-foreground">Platform-wide activity across both markets; not country-specific totals.</p>
+        <div className="mt-3 grid grid-cols-2 gap-3 border-t pt-6 sm:grid-cols-4">
           <Metric icon={ShieldCheck} value={stats.verified_members} label="Subscribed members" />
           <Metric icon={Store} value={stats.directory_profiles} label="Claimable profiles" />
           <Metric icon={BriefcaseBusiness} value={stats.completed_jobs} label="Completed jobs" />
@@ -178,7 +182,15 @@ export default function MarketplacePage() {
         </p>
       </section>
 
-      <AITradeSearch />
+      {country === "GB" ? <AITradeSearch /> : (
+        <section className="glass-card border-info/30 p-5" role="status">
+          <h2 className="text-base font-semibold">German marketplace search</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Filter the German directory below. AI Trade Finder currently validates UK postcodes and UK-specific credentials,
+            so it is unavailable for Germany until local trade and licensing checks are implemented.
+          </p>
+        </section>
+      )}
 
       <section className="glass-card space-y-4 p-4 sm:p-5">
         <div className="grid gap-3 md:grid-cols-[1fr_0.7fr_auto]">
@@ -196,7 +208,7 @@ export default function MarketplacePage() {
         </div>
 
         <div className={`${showFilters ? "grid" : "hidden"} gap-4 border-t pt-4 sm:grid-cols-2 lg:grid lg:grid-cols-4`}>
-          <FilterSelect label="Country" value={filters.country} onChange={(country) => setFilters({ ...filters, country })} options={[["GB", "United Kingdom"], ["DE", "Germany"]]} />
+          <FilterSelect label="Country" value={country} onChange={(next) => { if (next === "GB" || next === "DE") setCountry(next); }} options={[["GB", "United Kingdom"], ["DE", "Germany"]]} />
           <FilterSelect label="Listing type" value={filters.scope} onChange={(scope) => setFilters({ ...filters, scope })} options={[["all", "Members + directory"], ["member", "Subscribed members only"], ["directory", "Claimable profiles only"]]} />
           <FilterSelect label="Minimum verified rating" value={filters.minimumRating} onChange={(minimumRating) => setFilters({ ...filters, minimumRating })} options={[["0", "Any rating"], ["4", "4.0+"], ["4.5", "4.5+"], ["5", "5.0"]]} />
           <FilterSelect label="Sort" value={filters.sort} onChange={(sort) => setFilters({ ...filters, sort })} options={[["recommended", "Recommended"], ["rating", "Highest verified rating"], ["experience", "Most experienced"], ["name", "Name A–Z"]]} />
