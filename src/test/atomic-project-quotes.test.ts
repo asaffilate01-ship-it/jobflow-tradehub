@@ -97,7 +97,7 @@ describe.sequential("Atomic project quote submission", () => {
       materials_estimate: "20.00",
       total_amount: "120.00",
     }]);
-    expect((await db.query("SELECT status FROM public.jobs WHERE id=$1", [id(21)])).rows[0].status).toBe("quoted");
+    expect((await db.query<{ status: string }>("SELECT status FROM public.jobs WHERE id=$1", [id(21)])).rows[0].status).toBe("quoted");
     await expect(submit(1, 21, 11, summary(), [])).rejects.toThrow("already been submitted");
   });
 
@@ -110,7 +110,7 @@ describe.sequential("Atomic project quote submission", () => {
     await db.exec("RESET ROLE");
     const quote = (await db.query("SELECT labour_amount, materials_estimate, total_amount FROM public.quotes WHERE id=$1", [quoteId])).rows[0];
     expect(quote).toMatchObject({ labour_amount: "120.00", materials_estimate: "80.00", total_amount: "200.00" });
-    const lines = await db.query("SELECT line_type, total FROM public.quote_lines WHERE quote_id=$1 ORDER BY description", [quoteId]);
+    const lines = await db.query<{ line_type: string; total: string }>("SELECT line_type, total FROM public.quote_lines WHERE quote_id=$1 ORDER BY description", [quoteId]);
     expect(lines.rows).toHaveLength(2);
     expect(lines.rows.find((r) => r.line_type === "plant")?.total).toBe("80.00");
   });
@@ -121,7 +121,7 @@ describe.sequential("Atomic project quote submission", () => {
     ])).rejects.toThrow("Every quote line");
     await db.exec("RESET ROLE");
     expect((await db.query("SELECT id FROM public.quotes WHERE job_id=$1", [id(23)])).rows).toHaveLength(0);
-    expect((await db.query("SELECT status FROM public.jobs WHERE id=$1", [id(23)])).rows[0].status).toBe("posted");
+    expect((await db.query<{ status: string }>("SELECT status FROM public.jobs WHERE id=$1", [id(23)])).rows[0].status).toBe("posted");
   });
 
   it("rejects contradictory summary and lines without a partial quote", async () => {
