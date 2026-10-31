@@ -82,3 +82,21 @@ export const getJobCustomer = async (
     .maybeSingle();
   return { customerId: data?.customer_profile_id ?? null, title: data?.title ?? null };
 };
+
+/**
+ * For committed financial/workflow actions only: unlike notify(), surface a
+ * failed dispatch request so the UI does not falsely report notification success.
+ * A successful response confirms acceptance of the request, not actual delivery.
+ */
+export const requestNotificationChecked = async ({
+  recipientId, title, body, link, type = "general", channels = ["in_app"],
+}: NotifyArgs): Promise<void> => {
+  if (!recipientId) throw new Error("Missing notification recipient");
+  const { data, error } = await supabase.functions.invoke("dispatch-notification", {
+    body: { recipient_id: recipientId, title, body, link, type, channels },
+  });
+  if (error) throw error;
+  if (data && typeof data === "object" && "error" in data && data.error) {
+    throw new Error(String(data.error));
+  }
+};
