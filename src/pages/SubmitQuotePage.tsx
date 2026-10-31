@@ -120,7 +120,7 @@ const SubmitQuotePage = () => {
     setLines(updated);
   };
 
-  if (loading) return <div className="glass-card h-64 animate-pulse" />;
+  if (loading) return <div role="status" aria-live="polite" className="glass-card flex h-64 items-center justify-center p-6 text-sm text-muted-foreground">Loading quote details…</div>;
 
   if (!companyId) {
     return (
@@ -149,7 +149,7 @@ const SubmitQuotePage = () => {
         {/* Summary amounts */}
         <div className="glass-card p-6 space-y-4">
           <h2 className="text-lg font-semibold flex items-center gap-2"><DollarSign className="h-5 w-5 text-primary" />Summary</h2>
-          <div className="grid sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="space-y-2">
               <label className="text-sm font-medium text-muted-foreground">Labour (£)</label>
               <Input type="number" placeholder="0" value={labourAmount} onChange={e => setLabourAmount(e.target.value)} />
@@ -175,15 +175,15 @@ const SubmitQuotePage = () => {
             <Button type="button" variant="outline" size="sm" onClick={addLine} className="gap-1"><Plus className="h-3.5 w-3.5" />Add line</Button>
           </div>
           {lines.map((line, i) => (
-            <div key={i} className="grid grid-cols-12 gap-2 items-end">
-              <div className="col-span-5 space-y-1">
+            <div key={i} className="grid grid-cols-1 gap-3 rounded-xl border border-border/60 p-3 sm:grid-cols-12 sm:items-end sm:border-0 sm:p-0">
+              <div className="space-y-1 sm:col-span-5">
                 <label className="text-xs text-muted-foreground">Description</label>
-                <Input placeholder="e.g. Strip existing tiles" value={line.description} onChange={e => updateLine(i, "description", e.target.value)} />
+                <Input aria-label={`Description for line ${i + 1}`} placeholder="e.g. Strip existing tiles" value={line.description} onChange={e => updateLine(i, "description", e.target.value)} />
               </div>
-              <div className="col-span-2 space-y-1">
+              <div className="space-y-1 sm:col-span-2">
                 <label className="text-xs text-muted-foreground">Type</label>
                 <select
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-2 py-2 text-sm text-foreground"
+                  aria-label={`Cost type for line ${i + 1}`} className="flex h-10 w-full rounded-md border border-input bg-background px-2 py-2 text-sm text-foreground"
                   value={line.line_type}
                   onChange={e => updateLine(i, "line_type", e.target.value)}
                 >
@@ -193,21 +193,21 @@ const SubmitQuotePage = () => {
                   <option value="other">Other</option>
                 </select>
               </div>
-              <div className="col-span-1 space-y-1">
+              <div className="space-y-1 sm:col-span-1">
                 <label className="text-xs text-muted-foreground">Qty</label>
-                <Input type="number" value={line.quantity} onChange={e => updateLine(i, "quantity", Number(e.target.value))} min={1} />
+                <Input type="number" aria-label={`Quantity for line ${i + 1}`} value={line.quantity} onChange={e => updateLine(i, "quantity", Number(e.target.value))} min={1} step={1} />
               </div>
-              <div className="col-span-2 space-y-1">
+              <div className="space-y-1 sm:col-span-2">
                 <label className="text-xs text-muted-foreground">Unit £</label>
-                <Input type="number" value={line.unit_price} onChange={e => updateLine(i, "unit_price", Number(e.target.value))} />
+                <Input type="number" aria-label={`Unit price for line ${i + 1}`} value={line.unit_price} onChange={e => updateLine(i, "unit_price", Number(e.target.value))} min={0} step="0.01" />
               </div>
-              <div className="col-span-1 space-y-1">
+              <div className="space-y-1 sm:col-span-1">
                 <label className="text-xs text-muted-foreground">Total</label>
                 <div className="h-10 flex items-center text-sm font-medium text-foreground">£{(line.quantity * line.unit_price).toLocaleString()}</div>
               </div>
-              <div className="col-span-1">
+              <div className="sm:col-span-1">
                 {lines.length > 1 && (
-                  <Button type="button" variant="ghost" size="icon" onClick={() => removeLine(i)} className="text-destructive"><Trash2 className="h-4 w-4" /></Button>
+                  <Button type="button" variant="ghost" size="icon" aria-label={`Remove quote line ${i + 1}`} onClick={() => removeLine(i)} className="min-h-11 min-w-11 text-destructive"><Trash2 className="h-4 w-4" /></Button>
                 )}
               </div>
             </div>
