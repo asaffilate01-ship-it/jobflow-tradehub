@@ -87,11 +87,17 @@ BEGIN
   v_delivery := COALESCE((p_summary ->> 'delivery_estimate')::numeric, 0);
   v_note := NULLIF(pg_catalog.btrim(COALESCE(p_summary ->> 'notes', '')), '');
 
+  -- Numeric(12,2) storage rounds on INSERT. Reject sub-penny values
+  -- rather than accepting a payload whose recorded total then differs.
   IF v_labour < 0 OR v_labour > 9999999999
     OR v_materials < 0 OR v_materials > 9999999999
     OR v_delivery < 0 OR v_delivery > 9999999999
     OR v_labour::text = 'NaN' OR v_materials::text = 'NaN'
-    OR v_delivery::text = 'NaN' OR pg_catalog.length(COALESCE(v_note, '')) > 3000 THEN
+    OR v_delivery::text = 'NaN'
+    OR v_labour IS DISTINCT FROM pg_catalog.round(v_labour, 2)
+    OR v_materials IS DISTINCT FROM pg_catalog.round(v_materials, 2)
+    OR v_delivery IS DISTINCT FROM pg_catalog.round(v_delivery, 2)
+    OR pg_catalog.length(COALESCE(v_note, '')) > 3000 THEN
     RAISE EXCEPTION 'Quote amounts and notes must be valid and non-negative';
   END IF;
 
@@ -110,7 +116,9 @@ BEGIN
       OR v_kind IS NULL
       OR v_qty IS NULL OR v_qty <= 0 OR v_qty > 100000
       OR v_price IS NULL OR v_price < 0 OR v_price > 999999999
-      OR v_qty::text = 'NaN' OR v_price::text = 'NaN' THEN
+      OR v_qty::text = 'NaN' OR v_price::text = 'NaN'
+      OR v_qty IS DISTINCT FROM pg_catalog.round(v_qty, 2)
+      OR v_price IS DISTINCT FROM pg_catalog.round(v_price, 2) THEN
       RAISE EXCEPTION 'Every quote line needs a description, valid type, quantity and price';
     END IF;
 
@@ -168,7 +176,7 @@ END;
 $function$;
 
 REVOKE ALL ON FUNCTION public.submit_project_quote_atomic(uuid, uuid, jsonb, jsonb)
-  FROM PUBLIC, anon;
+  FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.submit_project_quote_atomic(uuid, uuid, jsonb, jsonb)
   TO authenticated;
 
