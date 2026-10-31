@@ -11,7 +11,7 @@ Pending/blocked: PR #14 atomic quote RPC requires a matching staged migration; d
 ## Design research and adoption decision
 | Source | Fit | Decision |
 |---|---|---|
-| https://github.com/Leonxlnx/taste-skill | Existing React site redesign, hierarchy, spacing, premium trade-specific visual language | Follow `redesign-existing-projects` audit-first and default `design-taste-frontend`; keep Craftvaro assets; do not replace navigation or form contracts blindly |
+| https://github.com/Leonxlnx/taste-skill | Existing React site redesign, hierarchy, spacing, premium trade-specific visual language | Use the current `design-taste-frontend` existing-project browser-audit workflow first; keep Craftvaro assets; do not replace navigation or form contracts blindly |
 | https://github.com/pbakaus/impeccable | Deterministic source detectors plus critique/polish/UX refinement | Existing advisory GitHub Action retained. Upgrade detector only after pin review and baseline; source scan is not browser QA |
 | https://github.com/VoltAgent/awesome-design-md | DESIGN.md reference structures and token patterns | Structure/inspiration only; use project-owned DESIGN.md and original brand identity |
 | https://github.com/nextlevelbuilder/ui-ux-pro-max-skill | Pattern and component comparison | Use for exceptional workflows, avoid duplicated instruction packs and generic dashboard generation |
@@ -55,13 +55,13 @@ Agents are features with **read, propose, verify, approve, execute, reconcile** 
 
 ### MCP connector shortlist
 - **Model Context Protocol standards/reference:** https://github.com/modelcontextprotocol/servers — reference servers are educational, not production-ready.
-- **Playwright MCP:** https://github.com/microsoft/playwright — browser QA of real hosted builds; no privileged production session in public AI chat.
+- **Playwright MCP:** https://github.com/microsoft/playwright-mcp — browser QA of real hosted builds; no privileged production session in public AI chat.
 - **Sentry MCP:** https://github.com/getsentry/toolkit — limited-read error triage; redact account, customer address, tokens and attachment payloads.
 - **GitHub tools:** for PR review, CI status, checks and release evidence; avoid unreviewed direct-to-main agents.
 - **Approved supplier, routing and payment tools:** implement in Omniqora via typed, tenant-scoped connectors with explicit action ACL, country scopes, versioned schemas and audited approvals; public unauthenticated MCP endpoints are prohibited.
 
 ## Release gates and separation
-**P0 — current safe changes:** Country selection/display decoupling, DE UK-only AI disclaimer, UI reliability; no database migration. Validate CI/build and manual browser before merge.
+**P0 — current safe changes:** Country selection/display decoupling, DE UK-only AI disclaimer, explicit DE gates for UK-only signup/job posting, UI reliability; no database migration. Validate CI/build and manual browser before merge.
 
 **P1 — transactional correctness:** Stage and verify atomic quote submission PR #14 with signed-in tests; do not merge/publish frontend before migration. Rehearse draft PR #11 separately with strict sequencing, event logging and driver permissions.
 
