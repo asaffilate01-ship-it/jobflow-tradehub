@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import Logo from "@/components/Logo";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { useLanguage, legalByLang } from "@/contexts/LanguageContext";
+import CountrySwitcher from "@/components/CountrySwitcher";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useCountry, legalByCountry } from "@/contexts/CountryContext";
 
 const footerLinks = {
   Platform: [
@@ -93,7 +95,8 @@ const deLabels: Record<string, string> = {
 
 const Footer = () => {
   const { lang } = useLanguage();
-  const legal = legalByLang[lang];
+  const { country } = useCountry();
+  const legal = legalByCountry[country][lang];
   const tr = (s: string) => (lang === "de" ? deLabels[s] ?? s : s);
 
   return (
@@ -111,7 +114,10 @@ const Footer = () => {
               : "The complete platform for finding trusted tradespeople and managing construction projects."}
           </p>
 
-          <LanguageSwitcher className="w-fit" />
+          <div className="flex flex-wrap items-center gap-2">
+            <CountrySwitcher className="w-fit" />
+            <LanguageSwitcher className="w-fit" />
+          </div>
 
           {/* Social icons */}
           <div className="flex items-center gap-2 pt-1">
@@ -152,7 +158,7 @@ const Footer = () => {
           {lang === "de" ? "Alle Rechte vorbehalten." : "All rights reserved."} · {legal.email}
         </p>
         <p className="text-xs text-muted-foreground">
-          {lang === "de" ? "Made in Europe 🇪🇺" : "Built in the UK 🇬🇧"}
+          {country === "DE" ? "Germany 🇩🇪" : "United Kingdom 🇬🇧"}
         </p>
       </div>
 
