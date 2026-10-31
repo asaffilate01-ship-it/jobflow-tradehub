@@ -1,4 +1,4 @@
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useCountry } from "@/contexts/CountryContext";
 import logoEn from "@/assets/craftvaro-logo-trim.png";
 import logoDe from "@/assets/craftvaro-logo-de-trim.png";
 import logoEnLight from "@/assets/craftvaro-logo-light.png";
@@ -48,8 +48,8 @@ export const Logo = ({
   className = "",
   priority = false,
 }: LogoProps) => {
-  const { lang } = useLanguage();
-  const asset = ASSETS[lang === "de" ? "de" : "en"][variant];
+  const { country } = useCountry();
+  const asset = ASSETS[country === "DE" ? "de" : "en"][variant];
   const width = Math.round(height * asset.ratio);
   const loading = priority ? "eager" : "lazy";
 
