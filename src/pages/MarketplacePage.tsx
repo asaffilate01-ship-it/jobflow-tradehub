@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCountry } from "@/contexts/CountryContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { usePageMeta } from "@/hooks/use-page-meta";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -75,6 +76,7 @@ export default function MarketplacePage() {
   usePageMeta("Find verified tradespeople", "AI-powered search for verified, subscribing Craftvaro tradespeople, plus claimable factual directory profiles.");
   const { user } = useAuth();
   const { country, setCountry } = useCountry();
+  const { lang } = useLanguage();
   const [params] = useSearchParams();
   const db = supabase as any;
   const [listings, setListings] = useState<Listing[]>([]);
@@ -169,7 +171,7 @@ export default function MarketplacePage() {
             <Button asChild><Link to="/repair-assist"><Sparkles className="mr-2 h-4 w-4" />AI repair help</Link></Button>
           </div>
         </div>
-        <p className="mt-5 text-xs text-muted-foreground">Platform-wide activity across both markets; not country-specific totals.</p>
+        <p className="mt-5 text-xs text-muted-foreground">{lang === "de" ? "Plattformweite Kennzahlen für beide Märkte, keine Ländersummen." : "Platform-wide activity across both markets; not country-specific totals."}</p>
         <div className="mt-3 grid grid-cols-2 gap-3 border-t pt-6 sm:grid-cols-4">
           <Metric icon={ShieldCheck} value={stats.verified_members} label="Subscribed members" />
           <Metric icon={Store} value={stats.directory_profiles} label="Claimable profiles" />
@@ -184,10 +186,11 @@ export default function MarketplacePage() {
 
       {country === "GB" ? <AITradeSearch /> : (
         <section className="glass-card border-info/30 p-5" role="status">
-          <h2 className="text-base font-semibold">German marketplace search</h2>
+          <h2 className="text-base font-semibold">{lang === "de" ? "Handwerkersuche in Deutschland" : "German marketplace search"}</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Filter the German directory below. AI Trade Finder currently validates UK postcodes and UK-specific credentials,
-            so it is unavailable for Germany until local trade and licensing checks are implemented.
+            {lang === "de"
+              ? "Durchsuchen Sie unten das deutsche Verzeichnis. Der KI-Handwerkersucher prüft derzeit britische Postleitzahlen und Nachweise. Er wird für Deutschland erst nach lokaler Qualifikationsprüfung freigeschaltet."
+              : "Filter the German directory below. AI Trade Finder currently validates UK postcodes and UK-specific credentials, so it is unavailable for Germany until local trade and licensing checks are implemented."}
           </p>
         </section>
       )}
