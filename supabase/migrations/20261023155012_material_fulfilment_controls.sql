@@ -4,6 +4,7 @@ CREATE TABLE public.material_fulfilment_events (
  material_order_id uuid NOT NULL REFERENCES public.material_orders(id),
  actor_id uuid NOT NULL REFERENCES public.profiles(id),
  request_key uuid NOT NULL,
+ request_fingerprint text NOT NULL,
  action text NOT NULL,
  evidence text NOT NULL CHECK(length(evidence) BETWEEN 5 AND 2000),
  created_at timestamptz NOT NULL DEFAULT now(),
@@ -12,10 +13,10 @@ CREATE TABLE public.material_fulfilment_events (
 ALTER TABLE public.material_fulfilment_events ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "admins read fulfilment evidence" ON public.material_fulfilment_events FOR SELECT TO authenticated USING(public.has_role(auth.uid(),'admin'));
 GRANT SELECT ON public.material_fulfilment_events TO authenticated;
-REVOKE INSERT,UPDATE,DELETE ON public.material_fulfilment_events FROM anon,authenticated;
+REVOKE INSERT,UPDATE,DELETE ON public.material_fulfilment_events FROM PUBLIC,anon,authenticated;
 
 CREATE FUNCTION public.material_fulfilment_board() RETURNS jsonb
-LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $$
+LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
 DECLARE result jsonb;
 BEGIN
  IF auth.uid() IS NULL OR NOT public.has_role(auth.uid(),'admin') THEN RAISE EXCEPTION 'Admin required'; END IF;
@@ -33,18 +34,25 @@ BEGIN
 END $$;
 
 CREATE FUNCTION public.material_fulfilment_action(p_order uuid,p_request_key uuid,p_action text,p_evidence text,p_reference text DEFAULT NULL,p_pickup text DEFAULT NULL,p_goods_total numeric DEFAULT NULL,p_distance numeric DEFAULT NULL) RETURNS uuid
-LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $$
-DECLARE m public.material_orders; d public.deliveries; previous public.material_fulfilment_events;
+LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
+DECLARE m public.material_orders; d public.deliveries; previous public.material_fulfilment_events; v_fingerprint text;
 BEGIN
  IF auth.uid() IS NULL OR NOT public.has_role(auth.uid(),'admin') THEN RAISE EXCEPTION 'Admin required'; END IF;
  IF p_request_key IS NULL OR coalesce(length(trim(p_evidence)),0) NOT BETWEEN 5 AND 2000 THEN RAISE EXCEPTION 'Request key and confirmation evidence required'; END IF;
+ -- Idempotency must bind every material argument, not just actor and action.
+ -- Replaying a key with changed totals/evidence must be an error, not "success".
+ v_fingerprint := pg_catalog.md5(pg_catalog.jsonb_build_object(
+  'order',p_order,'action',p_action,'evidence',pg_catalog.btrim(p_evidence),
+  'reference',pg_catalog.btrim(p_reference),'pickup',pg_catalog.btrim(p_pickup),
+  'goods_total',p_goods_total,'distance',p_distance
+ )::text);
  -- Match the driver's delivery-before-order lock order to avoid a dispatch/accept deadlock.
  SELECT * INTO d FROM public.deliveries WHERE material_order_id=p_order FOR UPDATE;
  SELECT * INTO m FROM public.material_orders WHERE id=p_order FOR UPDATE;
  IF NOT FOUND THEN RAISE EXCEPTION 'Order unavailable'; END IF;
  SELECT * INTO previous FROM public.material_fulfilment_events WHERE material_order_id=p_order AND request_key=p_request_key;
  IF FOUND THEN
-  IF previous.actor_id<>auth.uid() OR previous.action<>p_action THEN RAISE EXCEPTION 'Request key already used'; END IF;
+  IF previous.actor_id<>auth.uid() OR previous.action<>p_action OR previous.request_fingerprint IS DISTINCT FROM v_fingerprint THEN RAISE EXCEPTION 'Request key already used with different details'; END IF;
   RETURN m.id;
  END IF;
  IF p_action='confirm' THEN
@@ -72,14 +80,14 @@ BEGIN
   UPDATE public.material_orders SET order_status='delivered' WHERE id=m.id;
  ELSE RAISE EXCEPTION 'Unsupported fulfilment action';
  END IF;
- INSERT INTO public.material_fulfilment_events(material_order_id,actor_id,request_key,action,evidence) VALUES(m.id,auth.uid(),p_request_key,p_action,trim(p_evidence));
+ INSERT INTO public.material_fulfilment_events(material_order_id,actor_id,request_key,request_fingerprint,action,evidence) VALUES(m.id,auth.uid(),p_request_key,v_fingerprint,p_action,trim(p_evidence));
  RETURN m.id;
 END $$;
 REVOKE ALL ON FUNCTION public.material_fulfilment_board(),public.material_fulfilment_action(uuid,uuid,text,text,text,text,numeric,numeric) FROM PUBLIC,anon;
 GRANT EXECUTE ON FUNCTION public.material_fulfilment_board(),public.material_fulfilment_action(uuid,uuid,text,text,text,text,numeric,numeric) TO authenticated;
 
 -- Audit and order progression commit in the same transaction as driver state.
-CREATE FUNCTION public.record_delivery_transition() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $$
+CREATE FUNCTION public.record_delivery_transition() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
 BEGIN
  IF NEW.status IS DISTINCT FROM OLD.status THEN
   INSERT INTO public.delivery_events(delivery_id,event_type,created_by,notes) VALUES(NEW.id,NEW.status::text,auth.uid(),'Server-recorded delivery transition');
