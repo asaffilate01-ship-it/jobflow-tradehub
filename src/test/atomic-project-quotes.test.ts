@@ -79,7 +79,11 @@ beforeAll(async () => {
       ('${id(22)}', '${id(3)}', 'builder', 'Second', 'Road', 'Luton', 'LU1'),
       ('${id(23)}', '${id(3)}', 'builder', 'Third', 'Road', 'Luton', 'LU1'),
       ('${id(24)}', '${id(3)}', 'builder', 'Fourth', 'Road', 'Luton', 'LU1'),
-      ('${id(25)}', '${id(3)}', 'builder', 'Fifth', 'Road', 'Luton', 'LU1');
+      ('${id(25)}', '${id(3)}', 'builder', 'Fifth', 'Road', 'Luton', 'LU1'),
+      ('${id(26)}', '${id(3)}', 'builder', 'Sixth', 'Road', 'Luton', 'LU1'),
+      ('${id(27)}', '${id(3)}', 'builder', 'Seventh', 'Road', 'Luton', 'LU1'),
+      ('${id(28)}', '${id(3)}', 'builder', 'Eighth', 'Road', 'Luton', 'LU1'),
+      ('${id(29)}', '${id(3)}', 'builder', 'Ninth', 'Road', 'Luton', 'LU1');
   `);
 }, 25000);
 
@@ -135,6 +139,31 @@ describe.sequential("Atomic project quote submission", () => {
     await expect(submit(3, 25, 11, summary(), [])).rejects.toThrow("verified trader");
     await db.exec("RESET ROLE");
     expect((await db.query("SELECT id FROM public.quotes WHERE job_id=$1", [id(25)])).rows).toHaveLength(0);
+  });
+
+  it("rejects sub-penny summary amounts before database storage can silently round", async () => {
+    await expect(submit(1, 26, 11, summary(1.005, 0), []))
+      .rejects.toThrow("valid and non-negative");
+    await db.exec("RESET ROLE");
+    expect((await db.query("SELECT id FROM public.quotes WHERE job_id=$1", [id(26)])).rows).toHaveLength(0);
+  });
+
+  it("rejects sub-penny line prices and quantities before storing generated totals", async () => {
+    await expect(submit(1, 27, 11, summary(0, 0), [line("Small cost", 1, 0.005)]))
+      .rejects.toThrow("Every quote line");
+    await expect(submit(1, 28, 11, summary(0, 0), [line("Fractional units", 0.001, 20)]))
+      .rejects.toThrow("Every quote line");
+    await db.exec("RESET ROLE");
+    for (const job of [27, 28]) {
+      expect((await db.query("SELECT id FROM public.quotes WHERE job_id=$1", [id(job)])).rows).toHaveLength(0);
+    }
+  });
+
+  it("enforces the 50 line upper bound inside the RPC", async () => {
+    await expect(submit(1, 29, 11, summary(0, 0), Array.from({ length: 51 }, () => line("Work", 1, 1))))
+      .rejects.toThrow("Invalid quote summary");
+    await db.exec("RESET ROLE");
+    expect((await db.query("SELECT id FROM public.quotes WHERE job_id=$1", [id(29)])).rows).toHaveLength(0);
   });
 
   it("rejects cancelled projects before inserting anything", async () => {
