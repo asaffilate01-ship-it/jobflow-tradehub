@@ -14,6 +14,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import NotificationBell from "@/components/NotificationBell";
 import Logo from "@/components/Logo";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import CountrySwitcher from "@/components/CountrySwitcher";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const AppNav = () => {
@@ -106,6 +107,7 @@ const AppNav = () => {
         </div>
 
         <div className="ml-auto hidden xl:flex items-center gap-2">
+          <CountrySwitcher />
           <LanguageSwitcher />
           <Button
             variant="ghost"
@@ -231,6 +233,11 @@ const AppNav = () => {
                   </div>
                 </div>
               )}
+
+              <div className="mb-5 flex flex-wrap items-center gap-2 border-b border-border pb-4">
+                <CountrySwitcher />
+                <LanguageSwitcher />
+              </div>
 
               <p className="px-1 pb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Browse</p>
               <div className="space-y-1">
