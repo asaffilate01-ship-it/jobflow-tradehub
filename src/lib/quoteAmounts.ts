@@ -24,7 +24,7 @@ export function validateQuoteBreakdown(
     lines.some((line) =>
       !Number.isSafeInteger(line.quantity) || line.quantity < 1 ||
       !Number.isFinite(line.unit_price) || line.unit_price < 0 ||
-      Math.round(line.unit_price * 100) !== line.unit_price * 100
+      Math.abs(Math.round(line.unit_price * 100) - line.unit_price * 100) > 0.000001
     )
   ) {
     return { valid: false, reason: "Each quote line needs a positive whole quantity and a valid non-negative unit price." };
@@ -32,6 +32,9 @@ export function validateQuoteBreakdown(
   const detailTotal = lines
     .filter((line) => line.description.trim())
     .reduce((total, line) => total + line.quantity * line.unit_price, 0);
+  if (detailTotal > 100_000_000) {
+    return { valid: false, reason: "The itemised total is too large. Please review the quantities and prices." };
+  }
   if (summaryTotal > 0 && detailTotal > 0 && Math.abs(summaryTotal - detailTotal) > 0.009) {
     return { valid: false, reason: "The summary and itemised breakdown totals must match before submitting." };
   }
