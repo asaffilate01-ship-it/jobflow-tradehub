@@ -3886,6 +3886,7 @@ export type Database = {
       }
     }
     Functions: {
+      reject_project_quote: { Args: { p_quote: string }; Returns: string }
       submit_project_quote_atomic: {
         Args: { p_job_id: string; p_trade_company_id: string; p_summary: Json; p_lines: Json }
         Returns: string
