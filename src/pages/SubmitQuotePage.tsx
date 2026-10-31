@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { ArrowLeft, Plus, Trash2, FileText, DollarSign } from "lucide-react";
+import { parseQuoteMoney, validateQuoteBreakdown } from "@/lib/quoteAmounts";
 
 type QuoteLine = {
   description: string;
@@ -35,7 +36,7 @@ const SubmitQuotePage = () => {
 
   useEffect(() => {
     const init = async () => {
-      if (!jobId || !user) return;
+      if (!jobId || !user) { setLoading(false); return; }
       const [jobRes, compRes] = await Promise.all([
         supabase.from("jobs").select("*").eq("id", jobId).single(),
         supabase.from("trade_companies").select("id").eq("owner_profile_id", user.id),
@@ -47,13 +48,20 @@ const SubmitQuotePage = () => {
     init();
   }, [jobId, user]);
 
-  const totalLines = lines.reduce((s, l) => s + l.quantity * l.unit_price, 0);
-  const totalAmount = (Number(labourAmount) || 0) + (Number(materialsEstimate) || 0) + (Number(deliveryEstimate) || 0);
+  const totalLines = lines.filter((line) => line.description.trim())
+    .reduce((total, line) => total + line.quantity * line.unit_price, 0);
+  const quoteBreakdown = validateQuoteBreakdown([labourAmount, materialsEstimate, deliveryEstimate], lines);
+  const totalAmount = quoteBreakdown.valid ? quoteBreakdown.total : 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting) return;
     if (!jobId || !companyId || !user) {
       toast.error("Missing information");
+      return;
+    }
+    if ("reason" in quoteBreakdown) {
+      toast.error(quoteBreakdown.reason);
       return;
     }
     setSubmitting(true);
@@ -61,10 +69,10 @@ const SubmitQuotePage = () => {
     const { data: quote, error: quoteErr } = await supabase.from("quotes").insert({
       job_id: jobId,
       trade_company_id: companyId,
-      labour_amount: Number(labourAmount) || 0,
-      materials_estimate: Number(materialsEstimate) || 0,
-      delivery_estimate: Number(deliveryEstimate) || 0,
-      total_amount: totalAmount > 0 ? totalAmount : totalLines,
+      labour_amount: parseQuoteMoney(labourAmount) ?? 0,
+      materials_estimate: parseQuoteMoney(materialsEstimate) ?? 0,
+      delivery_estimate: parseQuoteMoney(deliveryEstimate) ?? 0,
+      total_amount: totalAmount,
       notes,
     }).select("id").single();
 
@@ -87,25 +95,43 @@ const SubmitQuotePage = () => {
           total: l.quantity * l.unit_price,
         }))
       );
-      if (linesErr) toast.error(linesErr.message);
+      if (linesErr) {
+        toast.error("The quote was saved, but its itemised breakdown failed. Please review the job and contact support before submitting another quote.");
+        setSubmitting(false);
+        navigate("/jobs/" + jobId);
+        return;
+      }
     }
 
     // Update job status
-    await supabase.from("jobs").update({ status: "quoted" }).eq("id", jobId).eq("status", "posted");
-
-    // Notify the customer + audit trail
-    const { customerId, title: jobTitle } = await getJobCustomer(jobId);
-    if (customerId) {
-      await notify({
-        recipientId: customerId,
-        title: "New quote received",
-        body: `You have a new quote${jobTitle ? ` on "${jobTitle}"` : ""}.`,
-        link: `/jobs/${jobId}`,
-        type: "quote",
-        channels: ["in_app", "email"],
-      });
+    const { error: statusErr } = await supabase.from("jobs").update({ status: "quoted" }).eq("id", jobId).eq("status", "posted");
+    if (statusErr) {
+      toast.error("The quote was saved, but its job status could not be updated. Contact support before submitting again.");
+      setSubmitting(false);
+      navigate("/jobs/" + jobId);
+      return;
     }
-    await logAudit({ action: "quote.submit", entityType: "quote", entityId: quote?.id, metadata: { job_id: jobId, total: totalAmount || totalLines } });
+
+    // The quote already exists. Delivery failures must not be represented as a failed submission.
+    try {
+      const { customerId, title: jobTitle } = await getJobCustomer(jobId);
+      if (customerId) {
+        await notify({
+          recipientId: customerId,
+          title: "New quote received",
+          body: "You have a new quote" + (jobTitle ? ' on "' + jobTitle + '"' : "") + ".",
+          link: "/jobs/" + jobId,
+          type: "quote",
+          channels: ["in_app", "email"],
+        });
+      }
+      await logAudit({ action: "quote.submit", entityType: "quote", entityId: quote?.id, metadata: { job_id: jobId, total: totalAmount } });
+    } catch {
+      toast.error("Quote saved, but customer notification or audit follow-up needs attention. Do not submit again.");
+      setSubmitting(false);
+      navigate("/jobs/" + jobId);
+      return;
+    }
 
     toast.success("Quote submitted!");
     setSubmitting(false);
@@ -151,20 +177,22 @@ const SubmitQuotePage = () => {
           <h2 className="text-lg font-semibold flex items-center gap-2"><DollarSign className="h-5 w-5 text-primary" />Summary</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">Labour (£)</label>
-              <Input type="number" placeholder="0" value={labourAmount} onChange={e => setLabourAmount(e.target.value)} />
+              <label htmlFor="quote-labour" className="text-sm font-medium text-muted-foreground">Labour (£)</label>
+              <Input id="quote-labour" type="number" inputMode="decimal" min="0" step="0.01" placeholder="0" value={labourAmount} onChange={e => setLabourAmount(e.target.value)} />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">Materials est. (£)</label>
-              <Input type="number" placeholder="0" value={materialsEstimate} onChange={e => setMaterialsEstimate(e.target.value)} />
+              <label htmlFor="quote-materials" className="text-sm font-medium text-muted-foreground">Materials est. (£)</label>
+              <Input id="quote-materials" type="number" inputMode="decimal" min="0" step="0.01" placeholder="0" value={materialsEstimate} onChange={e => setMaterialsEstimate(e.target.value)} />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">Delivery est. (£)</label>
-              <Input type="number" placeholder="0" value={deliveryEstimate} onChange={e => setDeliveryEstimate(e.target.value)} />
+              <label htmlFor="quote-delivery" className="text-sm font-medium text-muted-foreground">Delivery est. (£)</label>
+              <Input id="quote-delivery" type="number" inputMode="decimal" min="0" step="0.01" placeholder="0" value={deliveryEstimate} onChange={e => setDeliveryEstimate(e.target.value)} />
             </div>
           </div>
-          <div className="text-right text-lg font-bold text-primary">
-            Total: £{(totalAmount > 0 ? totalAmount : totalLines).toLocaleString()}
+          <p className="text-xs text-muted-foreground">If you enter both summary amounts and itemised line prices, their totals must match.</p>
+          {"reason" in quoteBreakdown && <p role="alert" className="text-sm text-destructive">{quoteBreakdown.reason}</p>}
+          <div aria-live="polite" className="text-right text-lg font-bold text-primary">
+            Total: {quoteBreakdown.valid ? "£" + totalAmount.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "Review amounts"}
           </div>
         </div>
 
@@ -219,8 +247,9 @@ const SubmitQuotePage = () => {
 
         {/* Notes */}
         <div className="glass-card p-6 space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">Additional notes</label>
+          <label htmlFor="quote-notes" className="text-sm font-medium text-muted-foreground">Additional notes</label>
           <textarea
+            id="quote-notes"
             rows={3}
             value={notes}
             onChange={e => setNotes(e.target.value)}
@@ -229,7 +258,7 @@ const SubmitQuotePage = () => {
           />
         </div>
 
-        <Button type="submit" className="w-full font-semibold text-base h-12" disabled={submitting}>
+        <Button type="submit" className="w-full font-semibold text-base h-12" disabled={submitting || !quoteBreakdown.valid}>
           {submitting ? "Submitting…" : "Submit quote"}
         </Button>
       </form>
