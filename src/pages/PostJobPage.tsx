@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { projectCategories, fundingStages, planningStages, humanise, validBudget } from "@/features/projects/catalog";
 import { useSearchParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCountry } from "@/contexts/CountryContext";
 import { supabase } from "@/integrations/supabase/client";
 import { logAudit } from "@/lib/audit";
 import { notify, notifyRole } from "@/lib/notify";
@@ -48,6 +49,7 @@ const stepVariants = {
 const PostJobPage = () => {
   usePageMeta("Post a job for free", "Describe your project and get quotes from vetted local tradespeople on Craftvaro.");
   const { user } = useAuth();
+  const { country } = useCountry();
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const [step, setStep] = useState(0);
@@ -77,6 +79,7 @@ const PostJobPage = () => {
   };
 
   const handleSubmit = async () => {
+    if (country === "DE") { toast.error("German job posting is not yet available"); return; }
     if (!user || submitting) return;
     if (!form.trade || !form.title.trim() || !form.address_line1.trim() || !form.city.trim() || !form.postcode.trim() || !validBudget(form.budget_min, form.budget_max)) return toast.error("Check the required details and budget range.");
     setSubmitting(true);
@@ -232,6 +235,23 @@ const PostJobPage = () => {
   ];
 
   const totalSteps = steps.length;
+
+  // Existing job fields, matching and pricing are UK-specific. Country is only
+  // the visitor's display choice: never turn that into a false German order.
+  if (country === "DE") {
+    return (
+      <main className="container max-w-2xl py-12">
+        <section role="status" className="glass-card-elevated p-6 sm:p-8">
+          <h1 className="text-2xl font-bold tracking-tight">German job posting is not yet open</h1>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            The current posting, quote budgets, trade credentials and notification routes are built for the UK.
+            German jobs will be enabled only after local onboarding, currency, compliance and dispatch checks are in place.
+          </p>
+          <Button asChild className="mt-6"><Link to="/marketplace">Explore German trades</Link></Button>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <div className="min-h-[70vh] flex flex-col">
