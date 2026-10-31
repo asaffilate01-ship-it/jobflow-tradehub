@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "./contexts/AuthContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { CountryProvider } from "./contexts/CountryContext";
 import AppLayout from "./components/AppLayout";
 import RoleAwareJobsLayout from "./components/RoleAwareJobsLayout";
 import ScrollToTop from "./components/ScrollToTop";
@@ -85,6 +86,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
+    <CountryProvider>
     <TooltipProvider>
       <Toaster />
       <Sonner />
@@ -252,6 +254,7 @@ const App = () => (
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
+    </CountryProvider>
     </LanguageProvider>
   </QueryClientProvider>
 );
