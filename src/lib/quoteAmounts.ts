@@ -29,6 +29,9 @@ export function validateQuoteBreakdown(
   ) {
     return { valid: false, reason: "Each quote line needs a positive whole quantity and a valid non-negative unit price." };
   }
+  if (lines.some((line) => !line.description.trim() && line.unit_price > 0)) {
+    return { valid: false, reason: "Add a description to each priced quote line." };
+  }
   const detailTotal = lines
     .filter((line) => line.description.trim())
     .reduce((total, line) => total + line.quantity * line.unit_price, 0);
