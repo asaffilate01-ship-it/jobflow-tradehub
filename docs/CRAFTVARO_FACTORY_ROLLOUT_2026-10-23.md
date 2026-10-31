@@ -8,38 +8,39 @@ The five 20260912 migrations and 20261023073508 transactional-workflow migration
 
 The separate Omniqora migration 20261023073521 registers Craftvaro and its external core service, with draft GB/DE country blueprints. Its deployment and disabled automatic provisioning were independently verified. This is Factory registration, not a tenant or shared-service cutover.
 
-## Released core changes
+## Source changes awaiting release
 
 - KYC uploads remain authenticated but do not require prior KYC approval. Missing or failed lookups no longer approve access.
 - Ordinary project awards execute atomically with ownership, availability, verification and paid-subscription checks; repair awards keep their existing RPC.
 - Material requests save header/items/delivery atomically, validate company/job/merchant/account, calculate delivery rates on the server and deduplicate retries.
 - Smart comparison saves collection requests atomically. It does not claim merchant acceptance or payment. Delivery booking from comparison remains gated pending route/rate confirmation.
-- compare-prices forwards the user session and checks company, Premium subscription, job ownership and item bounds. The Edge Function was deployed separately and rejects missing/invalid sessions.
-- Driver board uses a narrow RPC and withholds exact addresses before acceptance. Server transitions reject unavailable offers, competing acceptance and skipped steps. Migration 20261023074153 is applied and both updated driver screens are released.
+- compare-prices forwards the user session and checks company, Premium subscription, job ownership and item bounds. Deploy this Edge Function with the source release; it has not yet been deployed by the SQL changes.
+- Driver board uses a narrow RPC and withholds exact addresses before acceptance. Server transitions reject unavailable offers, competing acceptance and skipped steps. Its migration 20261023074153 is NOT yet applied: it revokes direct delivery UPDATE, so apply only with both updated driver screens, after preview validation.
 
-## Fulfilment controls prepared, pending coordinated deployment
+## Release sequence
 
-The material fulfilment implementation adds an admin-only board, offline merchant confirmation evidence, pickup readiness, verified quote-distance dispatch, cancellation before assignment, collection and merchant delivery completion. Every action uses a retry key and an append-only audit record. Driver transitions now atomically record delivery events and advance the parent material order. Direct client writes to material orders, items, deliveries and delivery events are revoked; the transactional RPCs remain the write boundary.
-
-Migration `20261023155012_material_fulfilment_controls.sql` and its frontend must release together. The Lovable SQL connector returned `Database is possibly not accessible at the moment` during this phase, including a minimal health query. The new migration has therefore NOT been applied or recorded in the live migration ledger. Keep this change on its feature branch until backend access is restored; removing the driver's old event inserts before the trigger is installed would lose event logging.
-
-Deployment sequence:
-
-1. Rehearse the new migration in a rolled-back transaction against the matching backend, then apply it and record the exact SQL/version in the migration ledger in one transaction. Reload the API schema cache.
-2. Release the matching frontend and verify admin/non-admin access and one confirmed request through dispatch and delivery using approved test accounts.
-3. Confirm duplicate retries do not create extra audit events; failed actions must leave order and delivery unchanged.
-
-Local database tests cover role denial, blocked direct writes, required evidence, price/distance mismatch, sequencing, retry deduplication, cancellation and the complete competing-driver acceptance/collection/delivery journey. Local tests are not production-account acceptance evidence.
-
-## Next phases
-
-- Reconcile PR #7 subcontract activity/notifications; email recovery and notification delivery reliability remain separate work.
-- Establish verified tenant mappings, signed adapter credentials, replay/idempotency tests and event minimisation before Factory shadow mode. Keep local authority until parity and approved cutover.
-- Integrate actual merchant ordering and route-distance providers. Manual confirmations do not contact suppliers or reserve stock.
-- Implement marketplace payment collection, refunds and driver settlement; current actions move no money.
-- Finish German workflows/prices and signed-in acceptance across customer, pending trader, approved Premium trader and verified driver roles, plus physical mobile devices.
-- PR #6 Veyumo remains optional and gated.
+1. Review/merge source PR; preserve Lovable .env, previewAuthStorage.ts, claimable directory and current lockfiles.
+2. Deploy compare-prices. Run both driver screens against a matching preview/staging backend; apply the driver migration during the coordinated release, not ahead of the old frontend.
+3. Smoke-test customer, pending trader, approved Premium trader and verified driver flows. Database tests are disposable fixtures, not production-account acceptance evidence.
+4. Reconcile PR #7 subcontract activity/notifications separately; PR #6 Veyumo remains optional and gated.
+5. Establish verified tenant mappings, signed adapter credentials, replay/idempotency tests and event minimisation before Factory shadow mode. Keep local authority until parity and cutover approval.
+6. Complete merchant confirmation/dispatch integration, payment settlement, notification recovery, German workflows and device acceptance. No merchant purchase, payout, public publication or customer-data migration was performed here.
 
 ## Limits
 
-Material requests retain manually entered/catalogue estimate prices. An admin must obtain supplier confirmation and match the saved total; changed prices or route distances require a new agreed request. New platform deliveries stay unassigned until that workflow releases them. Broader legacy permissions and verification history still require review. Factory GB/DE templates do not provision actual tenants or introduce German prices. Existing basic/premium billing stays local. The public homepage and core release were previously published; this fulfilment phase is not live yet.
+Material requests retain manually entered/catalogue estimate prices. Suppliers must confirm price, stock and fulfilment. New platform deliveries remain unassigned until a confirmed merchant workflow dispatches them. Existing legacy direct order-write policies and verification history still require a broader access review. Factory GB/DE templates do not provision actual tenants or introduce German prices. Existing basic/premium billing stays local.
+
+
+## Material fulfilment implementation prepared — 31 October 2026
+
+The feature branch adds an administrator-only material-fulfilment board, manual merchant acceptance evidence, matched goods totals, pickup readiness, confirmed route-distance release, cancellation prior to driver assignment, and collection/delivery progression. Drivers' status changes produce server-side events and advance material order state transactionally. The new fulfilment evidence log uses payload-bound idempotency keys so a previously used request key cannot silently confirm changed facts.
+
+**Do not merge or publish as a normal frontend-only release.** The SQL migration `20261023155012_material_fulfilment_controls.sql` is not verified as deployed. It must be applied with the matching frontend and trigger. The existing driver discovery migration `20261023074153_craftvaro_driver_offer_discovery.sql` has conflicting historical deployment notes; inspect the actual Craftvaro migration ledger and function definitions first. The connected Supabase account available for this code review does not expose the Craftvaro project.
+
+Required staged release sequence:
+1. Verify the exact existing migration ledger, driver RPC signatures, grants and delivery status triggers on Craftvaro staging; take a backup and rehearse the fulfilment migration in a rolled-back transaction.
+2. Apply the approved SQL and record its exact version, including server-side delivery events, before publishing the frontend that removes legacy client event inserts.
+3. Test a subscribed trader, administrator, customer, authorised driver and unrelated user: merchant confirmation, altered totals, request-key payload mismatch, readiness, cancellation, dispatch, competing acceptance, collection, evidence privacy and delivery.
+4. Validate retry recovery, alerting and customer support before controlled production release. Do not claim an online supplier purchase, merchant stock reservation, payment collection, driver settlement or country-specific German processing; these are separate integrations.
+
+Current implementation operates on saved request totals and administrator-recorded offline supplier confirmations. No real merchant API, payment provider or route provider transaction is implied by a successful database action.
