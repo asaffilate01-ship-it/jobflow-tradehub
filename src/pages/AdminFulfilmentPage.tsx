@@ -10,7 +10,7 @@ import { toast } from "sonner";
 /** Keep operator-entered totals/distance aligned with numeric(12,2) storage. */
 const parseNonNegativeDecimal = (value: string, maximum: number): number | null => {
   const trimmed = value.trim();
-  if (!/^(?:0|[1-9]\\d*)(?:\\.\\d{1,2})?$/.test(trimmed)) return null;
+  if (!/^(?:0|[1-9]\d*)(?:\.\d{1,2})?$/.test(trimmed)) return null;
   const result = Number(trimmed);
   return Number.isFinite(result) && result >= 0 && result <= maximum ? result : null;
 };
