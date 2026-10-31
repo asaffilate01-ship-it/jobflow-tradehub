@@ -63,6 +63,7 @@ describe.sequential('Atomic workflows',()=>{
   await db.exec('RESET ROLE');const r=await db.query<{id:string}>("select id from material_orders where delivery_mode='trade_collect'");const oid=r.rows[0].id;
   await as(6,"select material_fulfilment_action($1,$2,'cancel','Merchant out of stock')",[oid,id(85)]);
   await as(6,"select material_fulfilment_action($1,$2,'cancel','Merchant out of stock')",[oid,id(85)]);
+  await expect(as(6,"select material_fulfilment_action($1,$2,'cancel','Different merchant explanation')",[oid,id(85)])).rejects.toThrow('already used');
   await expect(as(6,"select material_fulfilment_action($1,$2,'ready','Stock checked')",[oid,id(85)])).rejects.toThrow('already used');
   const history=await as(6,'select material_fulfilment_board() as board');expect((history.rows[0].board as any[]).find(o=>o.id===oid).events).toHaveLength(1);
  });
