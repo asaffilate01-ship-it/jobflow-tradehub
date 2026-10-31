@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useCountry, legalByCountry } from "@/contexts/CountryContext";
 import { usePageMeta } from "@/hooks/use-page-meta";
 
 type LegalKind = "privacy" | "terms" | "cookies";
@@ -10,13 +11,13 @@ const copy = {
       title: "Privacy policy",
       intro: "How Craftvaro uses and protects personal information.",
       sections: [
-        ["Who controls your data", "Craftvaro is a trading name of iTechLounge Ltd. Contact privacy@craftvaro.com about privacy or data rights."],
+        ["Who controls your data", "The marketplace operator for the selected territory is identified above. Contact privacy@craftvaro.com about privacy or data rights."],
         ["What we collect", "We process account and profile information, subscription status, job and quotation records, messages, approximate and accepted-job locations, repair media, safety assessments, evidence records, device and security logs, and support communications."],
         ["Why we use it", "We use information to provide the marketplace, verify paid traders and credentials, match jobs, prevent fraud, operate Repair Assist, maintain evidence and audit trails, support users, and meet legal obligations. Where consent is needed, you may withdraw it."],
         ["Repair photos and video", "Original repair media is private. Providers and Dokuvera receive media only after an approved redaction process marks a separate copy as safe. Automated assessments are indicative and do not replace a qualified professional."],
         ["Sharing", "Information is shared only with selected or invited marketplace participants as needed, and with contracted infrastructure, payment, notification, AI-processing and evidence providers. Full job addresses are released only after an offer is accepted, except where law or safety requires otherwise."],
         ["Retention and security", "We keep records only as long as necessary for service, safety, tax, warranty, dispute and legal needs. Access is restricted, logged where appropriate, and protected with encryption and row-level permissions."],
-        ["Your rights", "Depending on your location, you may request access, correction, deletion, restriction, portability or objection. Use Account deletion when signed in, or email privacy@craftvaro.com. You may also complain to the UK Information Commissioner’s Office."],
+        ["Your rights", "Depending on your location, you may request access, correction, deletion, restriction, portability or objection. Use Account deletion when signed in, or email privacy@craftvaro.com. You may also complain to the relevant data-protection supervisory authority."],
       ],
     },
     terms: {
@@ -36,7 +37,7 @@ const copy = {
       title: "Cookie policy",
       intro: "How browser storage is used on Craftvaro.",
       sections: [
-        ["Essential storage", "Craftvaro uses essential cookies or local storage for authentication, security, language, accessibility and saved consent choices. These are necessary to provide the service."],
+        ["Essential storage", "Craftvaro uses essential cookies or local storage for authentication, security, marketplace country, language, accessibility and saved consent choices. These are necessary to provide the service."],
         ["Analytics and marketing", "Non-essential analytics or marketing technologies must remain disabled until you make a choice through a consent control. The production team must record and maintain the exact vendor list here before enabling them."],
         ["Your choices", "You can clear browser storage or block cookies in your browser. Blocking essential storage may prevent sign-in and other core features from working."],
       ],
@@ -47,7 +48,7 @@ const copy = {
       title: "Datenschutzerklärung",
       intro: "Wie Craftvaro personenbezogene Daten verwendet und schützt.",
       sections: [
-        ["Verantwortlicher", "Craftvaro ist ein Handelsname der iTechLounge GmbH. Datenschutzanfragen können an privacy@craftvaro.com gerichtet werden."],
+        ["Verantwortlicher", "Der Anbieter für das ausgewählte Marktgebiet ist oben angegeben. Datenschutzanfragen können an privacy@craftvaro.com gerichtet werden."],
         ["Verarbeitete Daten", "Wir verarbeiten Konto- und Profildaten, Abonnementstatus, Aufträge, Angebote, Nachrichten, ungefähre und nach Auftragsannahme vollständige Standorte, Reparaturmedien, Sicherheitsbewertungen, Nachweise, Geräte- und Sicherheitsprotokolle sowie Supportanfragen."],
         ["Zwecke", "Wir verwenden Daten, um den Marktplatz bereitzustellen, zahlende Betriebe und Nachweise zu prüfen, Aufträge zu vermitteln, Betrug zu verhindern, Repair Assist zu betreiben, Nachweise zu führen, Support zu leisten und rechtliche Pflichten zu erfüllen."],
         ["Reparaturfotos und -videos", "Originalmedien bleiben privat. Betriebe und Dokuvera erhalten Medien nur, wenn eine getrennte Kopie durch den Freigabeprozess als sicher markiert wurde. Automatische Bewertungen ersetzen keine Fachkraft."],
@@ -73,7 +74,7 @@ const copy = {
       title: "Cookie-Richtlinie",
       intro: "Wie Craftvaro Browser-Speicher verwendet.",
       sections: [
-        ["Notwendige Speicherung", "Craftvaro verwendet notwendige Cookies oder lokalen Speicher für Anmeldung, Sicherheit, Sprache, Barrierefreiheit und gespeicherte Einwilligungen."],
+        ["Notwendige Speicherung", "Craftvaro verwendet notwendige Cookies oder lokalen Speicher für Anmeldung, Sicherheit, Marktauswahl, Sprache, Barrierefreiheit und gespeicherte Einwilligungen."],
         ["Analyse und Marketing", "Nicht notwendige Analyse- oder Marketingdienste müssen deaktiviert bleiben, bis eine Einwilligung erteilt wurde. Vor Aktivierung muss die Produktionsverantwortung hier alle Anbieter dokumentieren."],
         ["Ihre Auswahl", "Sie können Browser-Speicher löschen oder Cookies blockieren. Das Blockieren notwendiger Speicherung kann Anmeldung und Kernfunktionen verhindern."],
       ],
@@ -84,6 +85,8 @@ const copy = {
 export default function LegalPage() {
   const { pathname } = useLocation();
   const { lang } = useLanguage();
+  const { country } = useCountry();
+  const legal = legalByCountry[country][lang];
   const candidate = pathname.slice(1);
   const legalKind: LegalKind = candidate === "terms" || candidate === "cookies" ? candidate : "privacy";
   const page = copy[lang][legalKind];
@@ -93,6 +96,15 @@ export default function LegalPage() {
       <p className="text-sm text-muted-foreground">Last updated: 30 August 2026</p>
       <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">{page.title}</h1>
       <p className="mt-3 text-lg text-muted-foreground">{page.intro}</p>
+      <section className="mt-6 rounded-xl border border-border bg-secondary/30 p-4" aria-label={lang === "de" ? "Marktgebiet" : "Marketplace territory"}>
+        <h2 className="text-sm font-semibold">{lang === "de" ? "Gewählter Markt" : "Selected market"}: {country === "DE" ? (lang === "de" ? "Deutschland" : "Germany") : (lang === "de" ? "Vereinigtes Königreich" : "United Kingdom")}</h2>
+        <p className="mt-2 text-sm text-foreground">{legal.entity}. · {legal.email}</p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          {lang === "de"
+            ? "Die Anzeige des Marktgebiets oder der Sprache ändert nicht die Vertragspartei eines bereits bestehenden Auftrags oder einer Zahlung."
+            : "Changing the displayed country or language does not change the contracting party on an existing job, order or payment."}
+        </p>
+      </section>
       <div className="mt-10 space-y-8">
         {page.sections.map(([heading, body]) => <section key={heading}><h2 className="text-xl font-semibold">{heading}</h2><p className="mt-2 leading-7 text-muted-foreground">{body}</p></section>)}
       </div>

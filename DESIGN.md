@@ -23,3 +23,10 @@ Real job/quote price, scope and exclusions, dates and contractor identities must
 
 ## Ship gate
 Existing tests, lint and build, role-and-transaction acceptance, rendered breakpoints and keyboard UX. Do not force push or use Lovable credits.
+
+## UK and German markets (31 October 2026)
+- Keep **market/country** (GB or DE) independent of **interface language** (en or de). A German-speaking UK visitor must see the UK regional mark/operator, and an English-speaking German-market visitor the DE variant.
+- Country preference is a display/search preference only. Server-owned merchant country, registered contracting entity, VAT, prices, permissions, job jurisdiction and payment mandate must never be inferred from a browser selector.
+- The visible country selector must be keyboard accessible, available in mobile navigation, and persist across public pages. Deep links may express the initial display preference with ?country=DE; official country domains take priority.
+- Never present UK-only Gas Safe search, UK SMS verification, Stripe subscriptions or fulfilment as complete German operations. German workflows require separate acceptance and legal approval.
+- Regional-brand assets are owned by Craftvaro; use Awesome DESIGN.md as structural reference, not as a licence to copy another company's identity.

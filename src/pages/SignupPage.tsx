@@ -7,6 +7,8 @@ import { User, Wrench, TruckIcon, Phone, ArrowRight, Eye, EyeOff, Info, Home } f
 import Logo from "@/components/Logo";
 import { toast } from "sonner";
 import { usePageMeta } from "@/hooks/use-page-meta";
+import { useCountry } from "@/contexts/CountryContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type RoleOption = "customer" | "trade" | "driver";
 
@@ -21,6 +23,8 @@ type Step = "details" | "verify-email" | "verify-phone";
 const SignupPage = () => {
   usePageMeta("Create your free account", "Join Craftvaro free to post jobs, win work and manage deliveries. Find. Hire. Done.");
   const navigate = useNavigate();
+  const { country } = useCountry();
+  const { lang } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -34,6 +38,7 @@ const SignupPage = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (country === "DE") { toast.error(lang === "de" ? "Registrierung in Deutschland ist noch nicht verfügbar" : "German registration is not yet available"); return; }
     setLoading(true);
 
     const { data, error } = await supabase.auth.signUp({
@@ -71,6 +76,7 @@ const SignupPage = () => {
   };
 
   const handleSendPhoneOtp = async () => {
+    if (country === "DE") { toast.error(lang === "de" ? "Deutsche Telefonverifizierung ist noch nicht verfügbar" : "German phone verification is not yet available"); return; }
     if (!phone.trim()) {
       toast.error("Please enter your phone number");
       return;
@@ -227,6 +233,17 @@ const SignupPage = () => {
           </div>
         </div>
 
+        {country === "DE" && (
+          <section role="status" className="rounded-xl border border-warning/40 bg-warning/10 p-4 text-sm">
+            <h2 className="font-semibold">{lang === "de" ? "Registrierung für Deutschland noch nicht verfügbar" : "German registration is not yet open"}</h2>
+            <p className="mt-2 text-muted-foreground">
+              {lang === "de"
+                ? "Die britische Konto- und Telefonprüfung ist nicht für deutsche Nutzerkonten geeignet. Deutsche Inserate können bereits durchsucht werden; Registrierung und Zahlungsabläufe müssen noch lokal geprüft werden."
+                : "UK account and phone verification cannot register a German-market account. You may browse German listings now; onboarding needs local verification and payment setup."}
+            </p>
+            <Link to="/marketplace" className="mt-3 inline-block font-semibold text-primary underline underline-offset-4">{lang === "de" ? "Handwerker in Deutschland ansehen" : "Browse German listings"}</Link>
+          </section>
+        )}
         <form onSubmit={handleSignup} className="space-y-4">
           {/* Role selection */}
           <div className="space-y-2">
@@ -312,8 +329,8 @@ const SignupPage = () => {
             </div>
             <p className="text-xs text-muted-foreground">Use at least 8 characters.</p>
           </div>
-          <Button type="submit" className="w-full font-semibold" disabled={loading}>
-            {loading ? "Creating account…" : "Create account"}
+          <Button type="submit" className="w-full font-semibold" disabled={loading || country === "DE"}>
+            {country === "DE" ? (lang === "de" ? "Registrierung noch nicht verfügbar" : "German registration not available") : loading ? "Creating account…" : "Create account"}
           </Button>
         </form>
 
