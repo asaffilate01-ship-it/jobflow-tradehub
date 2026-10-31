@@ -112,19 +112,26 @@ const SubmitQuotePage = () => {
       return;
     }
 
-    // Notify the customer + audit trail
-    const { customerId, title: jobTitle } = await getJobCustomer(jobId);
-    if (customerId) {
-      await notify({
-        recipientId: customerId,
-        title: "New quote received",
-        body: `You have a new quote${jobTitle ? ` on "${jobTitle}"` : ""}.`,
-        link: `/jobs/${jobId}`,
-        type: "quote",
-        channels: ["in_app", "email"],
-      });
+    // The quote already exists. Delivery failures must not be represented as a failed submission.
+    try {
+      const { customerId, title: jobTitle } = await getJobCustomer(jobId);
+      if (customerId) {
+        await notify({
+          recipientId: customerId,
+          title: "New quote received",
+          body: "You have a new quote" + (jobTitle ? ' on "' + jobTitle + '"' : "") + ".",
+          link: "/jobs/" + jobId,
+          type: "quote",
+          channels: ["in_app", "email"],
+        });
+      }
+      await logAudit({ action: "quote.submit", entityType: "quote", entityId: quote?.id, metadata: { job_id: jobId, total: totalAmount } });
+    } catch {
+      toast.error("Quote saved, but customer notification or audit follow-up needs attention. Do not submit again.");
+      setSubmitting(false);
+      navigate("/jobs/" + jobId);
+      return;
     }
-    await logAudit({ action: "quote.submit", entityType: "quote", entityId: quote?.id, metadata: { job_id: jobId, total: totalAmount || totalLines } });
 
     toast.success("Quote submitted!");
     setSubmitting(false);
