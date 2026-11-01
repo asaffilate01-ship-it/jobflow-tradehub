@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { summarizeDispatch } from "../_shared/notification-delivery.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -150,9 +151,22 @@ Deno.serve(async (req) => {
       }
     }
 
+    const outcome = summarizeDispatch(results);
+    // An HTTP 200 with failed channels used to mislead callers into marking
+    // notifications as successful. A 502 means at least one request was not
+    // accepted; it does NOT mean a saved job/quote transaction failed.
     return new Response(
-      JSON.stringify({ success: true, results }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      JSON.stringify({
+        success: outcome.success,
+        results,
+        failed_channels: outcome.failedChannels,
+        accepted_channels: outcome.acceptedChannels,
+        ...(outcome.success ? {} : { error: "One or more notification requests failed" }),
+      }),
+      {
+        status: outcome.success ? 200 : 502,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
     );
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unknown error";
