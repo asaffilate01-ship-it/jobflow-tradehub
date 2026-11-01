@@ -46,6 +46,13 @@ beforeAll(async () => {
       id uuid PRIMARY KEY,
       owner_profile_id uuid NOT NULL REFERENCES public.profiles(id)
     );
+    CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $f$
+      SELECT nullif(current_setting('request.jwt.claim.sub',true),'')::uuid
+    $f$;
+    CREATE FUNCTION public.has_role(p_user uuid, p_role public.app_role)
+    RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path='' AS $f$
+      SELECT EXISTS (SELECT 1 FROM public.user_roles r WHERE r.user_id=p_user AND r.role=p_role)
+    $f$;
     ALTER TABLE public.trade_companies ENABLE ROW LEVEL SECURITY;
     CREATE POLICY "owners view company" ON public.trade_companies
       FOR SELECT TO authenticated USING (owner_profile_id=auth.uid());
@@ -93,13 +100,6 @@ beforeAll(async () => {
           WHERE a.job_id=jobs.id AND tc.owner_profile_id=auth.uid()
         )
       );
-    CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $f$
-      SELECT nullif(current_setting('request.jwt.claim.sub',true),'')::uuid
-    $f$;
-    CREATE FUNCTION public.has_role(p_user uuid, p_role public.app_role)
-    RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path='' AS $f$
-      SELECT EXISTS (SELECT 1 FROM public.user_roles r WHERE r.user_id=p_user AND r.role=p_role)
-    $f$;
     GRANT USAGE ON SCHEMA public,auth TO anon,authenticated;
     GRANT SELECT ON public.jobs TO anon,authenticated;
     GRANT SELECT ON public.profiles,public.user_roles,public.subscribers,public.trade_companies TO authenticated;
