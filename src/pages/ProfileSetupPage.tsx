@@ -54,7 +54,11 @@ const ProfileSetupPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || loading) return;
+    if (isTrade && !companyName.trim()) {
+      toast.error("Enter a company name before continuing.");
+      return;
+    }
     setLoading(true);
 
     // Update profile
@@ -93,14 +97,22 @@ const ProfileSetupPage = () => {
           .from("trade_companies")
           .update({ legal_name: companyName || "My Company" })
           .eq("id", companyId);
-        if (companyUpdateError) toast.error(companyUpdateError.message);
+        if (companyUpdateError) {
+          toast.error("Profile saved, but company details could not be updated. Please retry.");
+          setLoading(false);
+          return;
+        }
       } else {
         const { data: newCompany, error: compErr } = await supabase.from("trade_companies").insert({
           legal_name: companyName || "My Company",
           owner_profile_id: user.id,
         }).select("id").single();
-        if (compErr) toast.error(compErr.message);
-        companyId = newCompany?.id;
+        if (compErr || !newCompany?.id) {
+          toast.error("Profile saved, but the trade company could not be created. Please retry.");
+          setLoading(false);
+          return;
+        }
+        companyId = newCompany.id;
       }
 
       if (companyId) {
@@ -118,19 +130,25 @@ const ProfileSetupPage = () => {
             available: acceptingWork,
             emergency_work: emergencyWork,
           }, { onConflict: "trade_company_id,trade" });
-        if (repairProfileError) toast.error(repairProfileError.message);
+        if (repairProfileError) {
+          toast.error("Company saved, but trade coverage could not be completed. Please retry.");
+          setLoading(false);
+          return;
+        }
       }
     }
 
     // Create driver profile
     if (isDriver) {
-      const { error: driverErr } = await supabase.from("driver_profiles").insert({
+      const { error: driverErr } = await supabase.from("driver_profiles").upsert({
         profile_id: user.id,
         vehicle_type: vehicleType,
         vehicle_reg: vehicleReg,
-      });
-      if (driverErr && !driverErr.message.includes("duplicate")) {
-        toast.error(driverErr.message);
+      }, { onConflict: "profile_id" });
+      if (driverErr) {
+        toast.error("Profile saved, but vehicle details could not be completed. Please retry.");
+        setLoading(false);
+        return;
       }
     }
 
