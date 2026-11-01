@@ -11,7 +11,11 @@ import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
 import { usePageMeta } from "@/hooks/use-page-meta";
 
-type Job = Database["public"]["Tables"]["jobs"]["Row"];
+type Job = Pick<Database["public"]["Tables"]["jobs"]["Row"],
+  "id" | "title" | "requested_trade" | "city" | "postcode" | "status" |
+  "created_at" | "project_category" | "budget_min" | "budget_max"
+> & { preview_only?: boolean };
+
 
 const statusColor: Record<string, string> = {
   posted: "bg-info/15 text-info border-info/20",
@@ -33,6 +37,7 @@ const JobsPage = () => {
   const [category, setCategory] = useState("");
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [showForm, setShowForm] = useState(false);
 
   // Form state
@@ -72,17 +77,51 @@ const JobsPage = () => {
 
   const fetchJobs = async () => {
     setLoading(true);
-    const { data } = await supabase
-      .from("jobs")
-      .select("*")
-      .order("created_at", { ascending: false });
-    setJobs(data ?? []);
-    setLoading(false);
+    setLoadError("");
+    try {
+      // Private rows are available only to the owner, awarded contractor and
+      // admin through RLS. Never run SELECT * over jobs for marketplace leads.
+      const privateRequest = supabase
+        .from("jobs")
+        .select("id,title,requested_trade,city,postcode,status,created_at,project_category,budget_min,budget_max")
+        .order("created_at", { ascending: false })
+        .limit(100);
+      const previewRequest = user && isTrade
+        ? supabase.rpc("list_project_job_previews", { p_job_id: null })
+        : Promise.resolve({ data: [], error: null });
+      const [privateResult, previewResult] = await Promise.all([privateRequest, previewRequest]);
+      if (privateResult.error) throw privateResult.error;
+      if (previewResult.error) throw previewResult.error;
+      const combined = new Map<string, Job>();
+      for (const lead of previewResult.data ?? []) {
+        combined.set(lead.id, {
+          id: lead.id,
+          title: lead.title,
+          requested_trade: lead.requested_trade,
+          city: lead.city,
+          postcode: lead.postcode_district ?? "",
+          status: lead.status,
+          created_at: lead.created_at,
+          project_category: lead.project_category,
+          budget_min: lead.budget_min,
+          budget_max: lead.budget_max,
+          preview_only: true,
+        });
+      }
+      // RLS-authorised full jobs replace the generic lead preview.
+      for (const job of privateResult.data ?? []) combined.set(job.id, job);
+      setJobs([...combined.values()].sort((a,b) => b.created_at.localeCompare(a.created_at)));
+    } catch (error) {
+      setJobs([]);
+      setLoadError(error instanceof Error ? error.message : "Could not load jobs. Please retry.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchJobs();
-  }, []);
+    void fetchJobs();
+  }, [user?.id, isTrade]);
 
   const handlePostJob = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -196,14 +235,21 @@ const JobsPage = () => {
         <div className="glass-card p-4 flex items-center gap-3 border-primary/30">
           <Lock className="h-5 w-5 text-primary shrink-0" />
           <div className="flex-1">
-            <p className="text-sm font-medium text-foreground">Upgrade to see full job details</p>
-            <p className="text-xs text-muted-foreground">Subscribe to view budgets, addresses, and contact customers directly.</p>
+            <p className="text-sm font-medium text-foreground">Upgrade to view eligible project leads</p>
+            <p className="text-xs text-muted-foreground">Verified subscribing traders can browse limited project leads and submit quotes. The exact site address stays private until your quote is accepted.</p>
           </div>
           <Button asChild size="sm" className="shrink-0"><Link to="/subscription">Subscribe</Link></Button>
         </div>
       )}
 
-      {/* Jobs grid */}
+      {/* Jobs grid. Never fall back to unrestricted jobs if the preview RPC is absent. */}
+      {loadError && !loading && (
+        <div className="glass-card space-y-3 border-destructive/30 p-5" role="alert">
+          <p className="font-semibold">Could not load the jobs board</p>
+          <p className="break-words text-sm text-muted-foreground">{loadError}</p>
+          <Button variant="outline" onClick={() => void fetchJobs()}>Retry</Button>
+        </div>
+      )}
       {loading ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -214,11 +260,13 @@ const JobsPage = () => {
             </div>
           ))}
         </div>
-      ) : jobs.filter(j=>!category||j.project_category===category).length === 0 ? (
+      ) : loadError ? null : jobs.filter(j=>!category||j.project_category===category).length === 0 ? (
         <div className="empty-state glass-card">
           <Briefcase className="empty-state-icon" />
-          <p className="empty-state-title">No jobs posted yet</p>
-          <p className="empty-state-desc">Be the first to post a job and get quotes from verified tradespeople.</p>
+          <p className="empty-state-title">No accessible jobs yet</p>
+          <p className="empty-state-desc">
+            {isTrade ? "Only eligible, verified members can see current project leads. Your own awarded jobs remain available." : "Post a job to receive quotes from verified tradespeople."}
+          </p>
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -237,7 +285,7 @@ const JobsPage = () => {
                 <span className="capitalize">{job.requested_trade.replace("_", " ")}</span>
                 <span className="flex items-center gap-1">
                   <MapPin className="h-3.5 w-3.5" />
-                  {job.postcode.split(" ")[0]}
+                  {job.postcode ? (job.preview_only ? job.postcode : job.postcode.split(" ")[0]) : "Area undisclosed"}
                 </span>
                 {(isCustomer || isSubscribed) && (
                   <span className="text-muted-foreground/70">{job.city}</span>
@@ -257,9 +305,10 @@ const JobsPage = () => {
                   Budget hidden
                 </div>
               )}
+              {job.preview_only && <span className="text-xs text-muted-foreground">Limited lead preview · site address withheld</span>}
               {isTrade && job.status === "posted" && (
                 <div className="pt-1">
-                  <span className="text-xs text-primary font-medium">Click to view & submit quote →</span>
+                  <span className="text-xs text-primary font-medium">Review lead and submit a quote</span>
                 </div>
               )}
             </Link>
