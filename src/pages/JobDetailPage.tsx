@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 
 type Tab = "overview" | "quotes" | "tasks" | "milestones" | "evidence" | "snags" | "compliance" | "changes";
+type LeadPreview = Database["public"]["Functions"]["list_project_job_previews"]["Returns"][number];
 
 const statusColor: Record<string, string> = {
   posted: "bg-info/15 text-info border-info/20",
@@ -48,6 +49,8 @@ const JobDetailPage = () => {
   const { user, roles } = useAuth();
   const [tab, setTab] = useState<Tab>("overview");
   const [job, setJob] = useState<any>(null);
+  const [leadPreview, setLeadPreview] = useState<LeadPreview | null>(null);
+  const [loadError, setLoadError] = useState("");
   const [loading, setLoading] = useState(true);
 
   // Sub-data
@@ -64,39 +67,65 @@ const JobDetailPage = () => {
   const isTrade = roles.includes("trade");
 
   useEffect(() => {
-    if (!id) return;
-    const fetchAll = async () => {
-      const [jobRes, quotesRes, tasksRes, milestonesRes, snagsRes, certsRes, changesRes, evidenceRes] = await Promise.all([
-        supabase.from("jobs").select("*").eq("id", id).single(),
-        supabase.from("quotes").select("*, quote_lines(*)").eq("job_id", id).order("created_at", { ascending: false }),
-        supabase.from("job_tasks").select("*").eq("job_id", id).order("sort_order"),
-        supabase.from("job_milestones").select("*").eq("job_id", id).order("sort_order"),
-        supabase.from("snag_items").select("*").eq("job_id", id).order("created_at", { ascending: false }),
-        supabase.from("compliance_certificates").select("*").eq("job_id", id).order("created_at", { ascending: false }),
-        supabase.from("change_orders").select("*").eq("job_id", id).order("created_at", { ascending: false }),
-        supabase.from("job_media").select("*").eq("job_id", id).order("created_at", { ascending: false }),
-      ]);
-      let visibleJob = jobRes.data;
-      if (visibleJob?.job_kind === "repair") {
-        const { data: privateLocation } = await supabase
-          .from("repair_private_locations")
-          .select("address_line1,city,postcode")
-          .eq("job_id", id)
-          .maybeSingle();
-        if (privateLocation) visibleJob = { ...visibleJob, ...privateLocation };
-      }
-      setJob(visibleJob);
-      setQuotes(quotesRes.data ?? []);
-      setTasks(tasksRes.data ?? []);
-      setMilestones(milestonesRes.data ?? []);
-      setSnags(snagsRes.data ?? []);
-      setCerts(certsRes.data ?? []);
-      setChanges(changesRes.data ?? []);
-      setEvidence(evidenceRes.data ?? []);
+    let cancelled = false;
+    if (!id) {
       setLoading(false);
+      return;
+    }
+    const fetchAll = async () => {
+      setLoading(true);
+      setLoadError("");
+      setJob(null);
+      setLeadPreview(null);
+      try {
+        // Full project/repair rows are strictly limited by database RLS to
+        // owners, accepted contractors and admins; no SELECT * lead fallback.
+        const jobRes = await supabase.from("jobs").select("*").eq("id", id).maybeSingle();
+        if (jobRes.error) throw jobRes.error;
+        if (!jobRes.data) {
+          const previewRes = await supabase.rpc("list_project_job_previews", { p_job_id: id });
+          if (previewRes.error) throw previewRes.error;
+          if (!cancelled) setLeadPreview(previewRes.data?.[0] ?? null);
+          return;
+        }
+        let visibleJob = jobRes.data;
+        // Repair details stay private under the existing repair location RLS.
+        if (visibleJob.job_kind === "repair") {
+          const { data: privateLocation, error: locationError } = await supabase
+            .from("repair_private_locations")
+            .select("address_line1,city,postcode")
+            .eq("job_id", id)
+            .maybeSingle();
+          if (locationError) throw locationError;
+          if (privateLocation) visibleJob = { ...visibleJob, ...privateLocation };
+        }
+        const [quotesRes, tasksRes, milestonesRes, snagsRes, certsRes, changesRes, evidenceRes] = await Promise.all([
+          supabase.from("quotes").select("*, quote_lines(*)").eq("job_id", id).order("created_at", { ascending: false }),
+          supabase.from("job_tasks").select("*").eq("job_id", id).order("sort_order"),
+          supabase.from("job_milestones").select("*").eq("job_id", id).order("sort_order"),
+          supabase.from("snag_items").select("*").eq("job_id", id).order("created_at", { ascending: false }),
+          supabase.from("compliance_certificates").select("*").eq("job_id", id).order("created_at", { ascending: false }),
+          supabase.from("change_orders").select("*").eq("job_id", id).order("created_at", { ascending: false }),
+          supabase.from("job_media").select("*").eq("job_id", id).order("created_at", { ascending: false }),
+        ]);
+        if (cancelled) return;
+        setJob(visibleJob);
+        setQuotes(quotesRes.data ?? []);
+        setTasks(tasksRes.data ?? []);
+        setMilestones(milestonesRes.data ?? []);
+        setSnags(snagsRes.data ?? []);
+        setCerts(certsRes.data ?? []);
+        setChanges(changesRes.data ?? []);
+        setEvidence(evidenceRes.data ?? []);
+      } catch (err) {
+        if (!cancelled) setLoadError(err instanceof Error ? err.message : "Could not load this job.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     };
-    fetchAll();
-  }, [id]);
+    void fetchAll();
+    return () => { cancelled = true; };
+  }, [id, user?.id]);
 
   // --- Quote acceptance ---
   const handleAcceptQuote = async (quoteId: string, tradeCompanyId: string) => {
@@ -254,8 +283,50 @@ const JobDetailPage = () => {
     return <div className="space-y-4">{[1, 2, 3].map(i => <div key={i} className="glass-card h-32 animate-pulse" />)}</div>;
   }
 
+  if (loadError) {
+    return <div className="glass-card p-8 space-y-3" role="alert">
+      <h1 className="font-semibold">Could not load this job</h1>
+      <p className="break-words text-sm text-muted-foreground">{loadError}</p>
+      <Button asChild variant="outline"><Link to="/jobs">Back to jobs</Link></Button>
+    </div>;
+  }
+
+  if (!job && leadPreview) {
+    return (
+      <main className="mx-auto max-w-3xl space-y-6">
+        <Link to="/jobs" className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+          <ArrowLeft className="h-4 w-4" /> Back to jobs
+        </Link>
+        <section className="glass-card space-y-4 p-6 sm:p-8">
+          <Badge variant="outline">Verified-member lead preview</Badge>
+          <h1 className="text-2xl font-bold">{leadPreview.title}</h1>
+          <p className="text-sm text-muted-foreground">
+            {leadPreview.city}{leadPreview.postcode_district ? ` · ${leadPreview.postcode_district} district` : " · specific location withheld"}
+            {" · "}{leadPreview.requested_trade.replace(/_/g, " ")}
+          </p>
+          <p className="text-sm">Project category: {categoryLabel(leadPreview.project_category)}</p>
+          {(leadPreview.budget_min !== null || leadPreview.budget_max !== null) && (
+            <p className="font-semibold">
+              Customer budget: £{leadPreview.budget_min?.toLocaleString() ?? "?"} – £{leadPreview.budget_max?.toLocaleString() ?? "?"}
+            </p>
+          )}
+          <p className="text-sm leading-6 text-muted-foreground">
+            Customer identity, street address, full postcode, attachments and private project information
+            remain restricted until the customer accepts your quotation. This lead summary
+            does not guarantee appointment availability or contract award.
+          </p>
+          {isTrade && (
+            <Button asChild><Link to={`/jobs/${leadPreview.id}/quote`}>Prepare a quotation</Link></Button>
+          )}
+        </section>
+      </main>
+    );
+  }
+
   if (!job) {
-    return <div className="glass-card p-12 text-center"><p className="text-muted-foreground">Job not found.</p></div>;
+    return <div className="glass-card p-12 text-center">
+      <p className="text-muted-foreground">Job not found or not available to your account.</p>
+    </div>;
   }
 
   const tabs: { key: Tab; label: string; icon: any; count?: number }[] = [

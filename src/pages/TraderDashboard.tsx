@@ -20,6 +20,7 @@ const TraderDashboard = () => {
   const { user } = useAuth();
   const [stats, setStats] = useState({ activeJobs: 0, pendingQuotes: 0, totalOrders: 0, revenue: 0, completedJobs: 0, evidenceCount: 0 });
   const [recentJobs, setRecentJobs] = useState<any[]>([]);
+  const [leadsError, setLeadsError] = useState("");
   const [recentLogs, setRecentLogs] = useState<any[]>([]);
   const [upcomingMilestones, setUpcomingMilestones] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,11 +37,30 @@ const TraderDashboard = () => {
       setProfile(prof);
       const companyIds = companies?.map((c) => c.id) ?? [];
 
-      const [{ data: quotes }, { data: jobs }, { data: awards }] = await Promise.all([
+      const [{ data: quotes }, { data: jobs }, { data: awards }, leadResult] = await Promise.all([
         supabase.from("quotes").select("id, status, total_amount").in("trade_company_id", companyIds),
+        // Private job rows now cover only this user’s accepted/awarded work.
         supabase.from("jobs").select("id, title, requested_trade, city, status, created_at, budget_min, budget_max").in("status", ["posted", "quoted", "awarded", "active"]).order("created_at", { ascending: false }).limit(6),
         supabase.from("job_awards").select("job_id").in("trade_company_id", companyIds),
+        // Prospective work comes only through the server-authorised safe RPC.
+        supabase.rpc("list_project_job_previews", { p_job_id: null }),
       ]);
+      setLeadsError(leadResult.error ? "Lead previews are temporarily unavailable. Your awarded jobs remain accessible." : "");
+      const leads = (leadResult.data ?? []).map(lead => ({
+        id: lead.id, title: lead.title, requested_trade: lead.requested_trade,
+        city: lead.city, status: lead.status, created_at: lead.created_at,
+        budget_min: lead.budget_min, budget_max: lead.budget_max, preview_only: true,
+      }));
+      const allRecent = new Map<string, {
+        id: string; title: string; requested_trade: string; city: string;
+        status: string; created_at: string; budget_min: number | null;
+        budget_max: number | null; preview_only?: boolean;
+      }>();
+      for (const lead of leads) allRecent.set(lead.id, lead);
+      for (const job of jobs ?? []) allRecent.set(job.id, job);
+      const recent = [...allRecent.values()]
+        .sort((a,b) => b.created_at.localeCompare(a.created_at))
+        .slice(0, 6);
 
       const pendingQuotes = quotes?.filter((q) => q.status === "submitted").length ?? 0;
       const acceptedQuotes = quotes?.filter((q) => q.status === "accepted") ?? [];
@@ -77,7 +97,7 @@ const TraderDashboard = () => {
         : { data: [], error: null };
       if (ownedError) console.error("Could not load awarded job counts", ownedError.message);
       setStats({ activeJobs: ownedJobs?.filter(j => ["awarded", "active"].includes(j.status)).length ?? 0, pendingQuotes, totalOrders: 0, revenue, completedJobs: ownedJobs?.filter(j => j.status === "completed").length ?? 0, evidenceCount: evidenceCount ?? 0 });
-      setRecentJobs(jobs ?? []);
+      setRecentJobs(recent);
       setLoading(false);
     };
     fetchDashboard();
@@ -256,6 +276,7 @@ const TraderDashboard = () => {
               </Button>
             </CardHeader>
             <CardContent>
+              {leadsError && <p role="alert" className="mb-3 text-xs text-destructive">{leadsError}</p>}
               {loading ? (
                 <div className="grid sm:grid-cols-2 gap-3">
                   {[1, 2, 3, 4].map((i) => <div key={i} className="skeleton-shimmer h-24" />)}
