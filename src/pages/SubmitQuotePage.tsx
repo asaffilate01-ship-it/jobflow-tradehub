@@ -21,7 +21,8 @@ const SubmitQuotePage = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [job, setJob] = useState<any>(null);
+  const [job, setJob] = useState<{ id: string; title: string } | null>(null);
+  const [jobError, setJobError] = useState("");
   const [companyId, setCompanyId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -35,17 +36,35 @@ const SubmitQuotePage = () => {
   ]);
 
   useEffect(() => {
+    let cancelled = false;
     const init = async () => {
       if (!jobId || !user) { setLoading(false); return; }
+      setJobError("");
       const [jobRes, compRes] = await Promise.all([
-        supabase.from("jobs").select("*").eq("id", jobId).single(),
+        // Only owner/accepted-contractor/admin may query a full project row.
+        supabase.from("jobs").select("id,title").eq("id", jobId).maybeSingle(),
         supabase.from("trade_companies").select("id").eq("owner_profile_id", user.id),
       ]);
-      setJob(jobRes.data);
+      if (cancelled) return;
+      if (compRes.error) {
+        setJobError(compRes.error.message);
+      } else if (jobRes.error) {
+        setJobError(jobRes.error.message);
+      } else if (jobRes.data) {
+        setJob(jobRes.data);
+      } else {
+        // Prospective verified traders see a generic lead title only; the RPC
+        // refuses unpaid or unverified access and never exposes the address.
+        const { data: previews, error } = await supabase.rpc("list_project_job_previews", { p_job_id: jobId });
+        if (cancelled) return;
+        if (error) setJobError(error.message);
+        else setJob(previews?.[0] ? { id: previews[0].id, title: previews[0].title } : null);
+      }
       setCompanyId(compRes.data?.[0]?.id ?? null);
       setLoading(false);
     };
-    init();
+    void init();
+    return () => { cancelled = true; };
   }, [jobId, user]);
 
   const totalLines = lines.filter((line) => line.description.trim())
@@ -148,6 +167,13 @@ const SubmitQuotePage = () => {
 
   if (loading) return <div role="status" aria-live="polite" className="glass-card flex h-64 items-center justify-center p-6 text-sm text-muted-foreground">Loading quote details…</div>;
 
+  if (jobError || !job) {
+    return <div className="glass-card p-8 text-center space-y-3" role="alert">
+      <p className="text-muted-foreground">{jobError || "This job is no longer open to your account."}</p>
+      <Button asChild variant="outline"><Link to="/jobs">Return to available jobs</Link></Button>
+    </div>;
+  }
+
   if (!companyId) {
     return (
       <div className="glass-card p-8 text-center space-y-3">
@@ -168,7 +194,8 @@ const SubmitQuotePage = () => {
           <FileText className="h-5 w-5 text-primary" />
           <h1 className="text-xl font-bold text-foreground">Submit Quote</h1>
         </div>
-        {job && <p className="text-sm text-muted-foreground">For: {job.title}</p>}
+        <p className="text-sm text-muted-foreground">For: {job.title}</p>
+        <p className="text-xs text-muted-foreground">The full address is shared only after acceptance. Confirm scope and access with the customer before committing to fixed-price work.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
