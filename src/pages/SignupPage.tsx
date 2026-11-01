@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { User, Wrench, TruckIcon, Phone, ArrowRight, Eye, EyeOff, Info, Home } from "lucide-react";
+import { User, Wrench, TruckIcon, Eye, EyeOff, Info, Home } from "lucide-react";
 import Logo from "@/components/Logo";
 import { toast } from "sonner";
 import { usePageMeta } from "@/hooks/use-page-meta";
@@ -16,8 +16,6 @@ const roleCards: { value: RoleOption; label: string; desc: string; icon: typeof 
   { value: "driver", label: "Driver", desc: "Deliver materials to sites", icon: TruckIcon },
 ];
 
-type Step = "details" | "verify-email" | "verify-phone";
-
 const SignupPage = () => {
   usePageMeta("Create your free account", "Join Craftvaro free to post jobs, win work and manage deliveries. Find. Hire. Done.");
   const navigate = useNavigate();
@@ -27,192 +25,40 @@ const SignupPage = () => {
   const [role, setRole] = useState<RoleOption>("customer");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [step, setStep] = useState<Step>("details");
-  const [phone, setPhone] = useState("");
-  const [otp, setOtp] = useState("");
-  const [userId, setUserId] = useState<string | null>(null);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
+    try {
+      // The auth.users trigger creates the initial *unverified* role in the
+      // same transaction. Never write user_roles from a browser: signUp may
+      // return no session until the person confirms their email.
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          data: { full_name: fullName.trim(), role },
+          emailRedirectTo: window.location.origin,
+        },
+      });
+      if (error) throw error;
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName, role },
-        emailRedirectTo: window.location.origin,
-      },
-    });
-
-    if (error) {
-      toast.error(error.message);
+      if (data.session) {
+        toast.success("Account created. Complete your profile and any required verification.");
+        navigate("/profile-setup", { replace: true });
+        return;
+      }
+      // Supabase can deliberately return an obfuscated user for an address
+      // that already exists. Do not disclose whether an account exists.
+      toast.success("If this is a new account, check your email to confirm it, then sign in.");
+      navigate("/login", { replace: true });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Account registration could not be completed.");
+    } finally {
       setLoading(false);
-      return;
-    }
-
-    // Assign role
-    if (data.user) {
-      setUserId(data.user.id);
-      await supabase.from("user_roles").insert({ user_id: data.user.id, role });
-    }
-
-    setLoading(false);
-
-    if (role === "customer") {
-      // Customers need email verification + phone 2FA
-      toast.success("Account created! Check your email to verify, then add your phone number.");
-      setStep("verify-phone");
-    } else {
-      // Traders/drivers verify email, then go to profile setup
-      toast.success("Check your email to confirm your account!");
-      navigate("/login");
     }
   };
-
-  const handleSendPhoneOtp = async () => {
-    if (!phone.trim()) {
-      toast.error("Please enter your phone number");
-      return;
-    }
-
-    // Format UK phone: ensure it starts with +44
-    let formattedPhone = phone.trim();
-    if (formattedPhone.startsWith("07")) {
-      formattedPhone = "+44" + formattedPhone.slice(1);
-    } else if (!formattedPhone.startsWith("+")) {
-      formattedPhone = "+44" + formattedPhone;
-    }
-
-    setLoading(true);
-
-    // Use Supabase phone OTP (signInWithOtp sends an SMS code)
-    const { error } = await supabase.auth.signInWithOtp({
-      phone: formattedPhone,
-    });
-
-    if (error) {
-      toast.error(error.message);
-      setLoading(false);
-      return;
-    }
-
-    toast.success("Verification code sent to your phone!");
-    setPhone(formattedPhone);
-    setStep("verify-phone");
-    setLoading(false);
-  };
-
-  const handleVerifyPhone = async () => {
-    if (!otp.trim() || otp.length < 6) {
-      toast.error("Please enter the 6-digit code");
-      return;
-    }
-
-    setLoading(true);
-
-    const { error } = await supabase.auth.verifyOtp({
-      phone,
-      token: otp,
-      type: "sms",
-    });
-
-    if (error) {
-      toast.error(error.message);
-      setLoading(false);
-      return;
-    }
-
-    // Mark phone as verified in profile
-    if (userId) {
-      await supabase.from("profiles").update({ phone_verified: true, phone }).eq("id", userId);
-    }
-
-    toast.success("Phone verified! You're all set.");
-    setLoading(false);
-    navigate("/login");
-  };
-
-  if (step === "verify-phone") {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <div className="glass-card p-8 w-full max-w-md space-y-6">
-          <div className="flex flex-col items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
-              <Phone className="h-6 w-6 text-primary-foreground" />
-            </div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              Verify your phone
-            </h1>
-            <p className="text-sm text-muted-foreground text-center">
-              We'll send a 6-digit code to verify your mobile number.<br />
-              This adds an extra layer of security to your account.
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            {!otp && (
-              <>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">
-                    UK mobile number
-                  </label>
-                  <Input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="07xxx xxxxxx"
-                    required
-                  />
-                </div>
-                <Button
-                  onClick={handleSendPhoneOtp}
-                  className="w-full font-semibold gap-2"
-                  disabled={loading}
-                >
-                  {loading ? "Sending…" : "Send verification code"}
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </>
-            )}
-
-            {phone.startsWith("+") && (
-              <>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Enter 6-digit code sent to {phone}
-                  </label>
-                  <Input
-                    type="text"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                    placeholder="000000"
-                    maxLength={6}
-                    className="text-center text-2xl tracking-[0.5em] font-mono"
-                  />
-                </div>
-                <Button
-                  onClick={handleVerifyPhone}
-                  className="w-full font-semibold gap-2"
-                  disabled={loading || otp.length < 6}
-                >
-                  {loading ? "Verifying…" : "Verify & continue"}
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </>
-            )}
-
-            <button
-              onClick={() => navigate("/login")}
-              className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Skip for now — verify later
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="auth-shell">
@@ -224,6 +70,7 @@ const SignupPage = () => {
           <div className="space-y-1">
             <h1 className="text-2xl font-bold tracking-tight text-foreground">Create your account</h1>
             <p className="text-sm text-muted-foreground">Free to join, no card required. Customers never pay — trade businesses subscribe to receive work.</p>
+            <p className="text-xs text-muted-foreground">Confirm your email before signing in. Driver and trade permissions remain restricted until identity checks are approved.</p>
           </div>
         </div>
 
