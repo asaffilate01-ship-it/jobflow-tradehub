@@ -3886,6 +3886,21 @@ export type Database = {
       }
     }
     Functions: {
+      list_project_job_previews: {
+        Args: { p_job_id?: string | null }
+        Returns: {
+          id: string
+          title: string
+          requested_trade: Database["public"]["Enums"]["trade_type"]
+          city: string
+          postcode_district: string | null
+          status: Database["public"]["Enums"]["job_status"]
+          created_at: string
+          project_category: string
+          budget_min: number | null
+          budget_max: number | null
+        }[]
+      }
       accept_project_quote: { Args: { p_quote: string }; Returns: string }
       accept_repair_offer: { Args: { p_quote_id: string }; Returns: string }
       approve_trader_profile_claim: {
