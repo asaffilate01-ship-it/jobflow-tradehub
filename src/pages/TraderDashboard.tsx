@@ -51,7 +51,11 @@ const TraderDashboard = () => {
         city: lead.city, status: lead.status, created_at: lead.created_at,
         budget_min: lead.budget_min, budget_max: lead.budget_max, preview_only: true,
       }));
-      const allRecent = new Map<string, (typeof leads)[number]>();
+      const allRecent = new Map<string, {
+        id: string; title: string; requested_trade: string; city: string;
+        status: string; created_at: string; budget_min: number | null;
+        budget_max: number | null; preview_only?: boolean;
+      }>();
       for (const lead of leads) allRecent.set(lead.id, lead);
       for (const job of jobs ?? []) allRecent.set(job.id, job);
       const recent = [...allRecent.values()]
